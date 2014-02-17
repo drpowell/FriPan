@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="lib/jquery-ui.js"></script>
+
+  <!-- D3 -->
+  <script type="text/javascript" src="lib/d3.v3.min.js"></script>
+
+  <script type="text/javascript" src="pan.js"></script>
+
+  <style>
+    .hdr { font-size: 32px; font-weight: bold; margin-left: 20px; }
+    .by { font-size: 20px; font-weight: bold; margin-left: 20px; }
+    .gravatar { position: absolute; top:0; right:0; display: none; }
+
+    svg {
+      font: 10px sans-serif;
+    }
+    
+    path {
+      fill: steelblue;
+    }
+    
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    
+    .brush .extent {
+      stroke: #fff;
+      fill-opacity: .125;
+      shape-rendering: crispEdges;
+    }
+
+    div.tooltip {   
+      position: absolute;           
+      text-align: center;           
+      width: 160px;                  
+      height: 45px;                 
+      padding: 2px;             
+      font: 12px sans-serif;        
+      background: lightsteelblue;   
+      border: 0px;      
+      border-radius: 8px;           
+      pointer-events: none;         
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <span class='hdr'>FriPan</span>
+    <span class='by'>David Powell - <a href='http://vicbioinformatics.com/'>Victorian Bioinformatics Consortium (VBC)</a></span>
+    <img class='gravatar' src='http://www.gravatar.com/avatar/45c20adc35d534056a20322e2c70173e.png'/>
+  </div>
+
+  <div id='chart'></div>
+ 
+  <div id="container">
+    Selected: <span id='info'>HERE</span>
+  </div>
+</body>
