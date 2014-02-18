@@ -1,6 +1,7 @@
 
 strains = []
 genes = []
+descs = []
 values = []
 
 bw = 1
@@ -28,9 +29,10 @@ detail = () ->
     [x,y] = d3.mouse(focus.node())
     strain = strains[Math.round(y/bh)]
     gene = genes[Math.round(x)]
+    desc = descs[Math.round(x)]
     p = values[Math.round(y/bh)][Math.round(x)]
     $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
-    tooltip.html("Strain:#{strain}<br/>Gene:#{gene}<br/>present:#{p}")
+    tooltip.html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
                  .style("opacity", .9)
                  .style("left", (d3.event.pageX) + "px")
                  .style("top", (d3.event.pageY) + "px");
@@ -121,7 +123,7 @@ init = () ->
             i += 1
             if i==1
                 genes = d3.keys(row)
-                desc = d3.values(row)
+                descs = d3.values(row)
                 continue
             val_row = []
             values.push(val_row)
