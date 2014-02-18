@@ -1,7 +1,22 @@
 
-.hdr { font-size: 32px; font-weight: bold; margin-left: 20px; }
-.by { font-size: 20px; font-weight: bold; margin-left: 20px; }
-.gravatar { position: absolute; top:0; right:0; display: none; }
+.hdr { 
+  font-size: 32px; 
+  font-weight: bold; 
+  margin-left: 20px; 
+}
+
+.by { 
+  font-size: 20px; 
+  font-weight: bold; 
+  margin-left: 20px; 
+}
+
+.gravatar { 
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  display: none; 
+}
 
 svg {
   font: 10px sans-serif;
@@ -40,3 +55,4 @@ path {
 #tooltip h4 {
   margin: 0;
 }
+

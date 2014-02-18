@@ -26,6 +26,7 @@ brushed = () ->
 set_scale = (pos,sc) ->
   svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0)scale(#{sc},1)")
 
+
 detail = () ->
     [x,y] = d3.mouse(focus.node())
     strain = strains[Math.round(y/bh)]
@@ -33,11 +34,12 @@ detail = () ->
     desc = descs[Math.round(x)]
     p = values[Math.round(y/bh)][Math.round(x)]
     $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
-    tooltip.style("display", "block") # un-hide it (was display: none)
+    tooltip.style("display", "block") # un-hide it (display: none <=> block)
            .style("left", (d3.event.pageX) + "px")
            .style("top", (d3.event.pageY) + "px")
            .select("#tooltip-text")
                .html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
+
 
 create_elems = () ->
     tot_width = 1200
@@ -145,8 +147,6 @@ init = () ->
 
         #xAxis2.tickFormat((d) -> genes[d])
         context.select(".x.axis").call(xAxis2)
-
-
 
         for i in [0 ... strains.length]
 	    # draw big rectangle first, then blank out missing genes
