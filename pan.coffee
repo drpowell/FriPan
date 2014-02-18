@@ -4,8 +4,9 @@ genes = []
 descs = []
 values = []
 
+# block width and height, one block per gene per species
 bw = 1
-bh = 5
+bh = 10
 
 
 margin = margin2 = width = height = height2 = x = x2 = y = y2 = null
@@ -40,9 +41,9 @@ detail = () ->
 
 create_elems = () ->
     tot_width = 1200
-    tot_height = 600
+    tot_height = 800
     margin = {top: 150, right: 10, bottom: 10, left: 40}
-    margin2 = {top: 10, right: 10, bottom: 500, left: 40}
+    margin2 = {top: 10, right: 10, bottom: 700, left: 40}
     width = tot_width - margin.left - margin.right
     height = tot_height - margin.top - margin.bottom
     height2 = tot_height - margin2.top - margin2.bottom
@@ -146,14 +147,16 @@ init = () ->
         context.select(".x.axis").call(xAxis2)
 
 
-        focus.append('rect')
-            .attr('width', bw*genes.length)
-            .attr('height',bh*strains.length)
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('fill', 'blue')
 
         for i in [0 ... strains.length]
+	    # draw big rectangle first, then blank out missing genes
+            focus.append('rect')
+                .attr('width', bw*genes.length)
+                .attr('height',bh-1)
+                .attr('x', 0)
+                .attr('y', i*bh)
+                .attr('fill', 'green')
+      
             last_j = null
             for j in [0 ... genes.length]
                 p = values[i][j]

@@ -8,7 +8,7 @@ svg {
 }
 
 path {
-  fill: steelblue;
+  fill: green;
 }
 
 .axis path, .axis line {
@@ -24,13 +24,14 @@ path {
 }
 
 #tooltip {   
+  display: none;
   position: absolute;           
   text-align: left;           
  // width: 160px;                  
  // height: 45px;                 
   padding: 1ex;             
   font: 12px sans-serif;        
-  background: lightsteelblue;   
+  background: lemonchiffon;   
   border: solid 1px black;
   border-radius: 8px;           
   pointer-events: none;         
