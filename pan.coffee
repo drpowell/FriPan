@@ -11,7 +11,7 @@ bcolouron = "green"
 bcolouroff = "lightgray"
 
 margin = margin2 = width = height = height2 = x = x2 = y = y2 = null
-svg = focus = context = xAxis = xAxis2 = yAxis = brush = tooltip = null
+svg = focus = context = labels = xAxis = xAxis2 = yAxis = brush = tooltip = null
 
 brushed = () ->
     #x.domain(if brush.empty() then x2.domain() else brush.extent())
@@ -50,8 +50,8 @@ detail = () ->
 create_elems = () ->
     tot_width = 1200
     tot_height = 800
-    margin = {top: 150, right: 10, bottom: 10, left: 40}
-    margin2 = {top: 10, right: 10, bottom: 700, left: 40}
+    margin = {top: 150, right: 10, bottom: 10, left: 140}
+    margin2 = {top: 10, right: margin.right, bottom: 700, left: margin.left}
     width = tot_width - margin.left - margin.right
     height = tot_height - margin.top - margin.bottom
     height2 = tot_height - margin2.top - margin2.bottom
@@ -96,7 +96,7 @@ create_elems = () ->
                  .attr("clip-path", "url(#circle1)")
                  .attr("transform", "translate(#{margin.left},#{margin.top})")
                .append("g")
-                 .attr("transform","translate(0,0)scale(0.3,1)")
+                 .attr("transform","translate(0,0)scale(0.3,1)")   # what is 0.3 here?
                  .attr("class", "scale")
                  .on("mousemove", () -> detail())
                  .on("mouseout", () -> tooltip.style("display", "none"))
@@ -117,6 +117,13 @@ create_elems = () ->
       .selectAll("rect")
         .attr("y", -6)
         .attr("height", height2 + 7)
+
+    # set up label area
+    
+    labels = svg.append("g")
+         .attr("transform", "translate(0,#{margin.top})")
+         .attr("width", margin.left)
+         .attr("height", height)
 
     # set tooltip global variable
     tooltip = d3.select("#tooltip")
@@ -174,12 +181,12 @@ init = () ->
                 .attr('fill', bcolouron)
 
             # draw strain labels
-            focus.append('text')
+            labels.append('text')
                 .text(strains[i])
-                .attr('x', '-10ex')
-                .attr('y', i*bh)
-                .attr('width', '10ex')
-                .attr('height', bh-1)              
+                .attr('x', 0)
+                .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
+            # TODO: set font size to be same as row height?
+            # TODO: right-align the text?
 
             # paint where the gene is ABSENT      
             last_j = null
