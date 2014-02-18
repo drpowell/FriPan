@@ -1,0 +1,37 @@
+
+.hdr { font-size: 32px; font-weight: bold; margin-left: 20px; }
+.by { font-size: 20px; font-weight: bold; margin-left: 20px; }
+.gravatar { position: absolute; top:0; right:0; display: none; }
+
+svg {
+  font: 10px sans-serif;
+}
+
+path {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+div.tooltip {   
+  position: absolute;           
+  text-align: center;           
+ // width: 160px;                  
+ // height: 45px;                 
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: lightsteelblue;   
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none;         
+}
