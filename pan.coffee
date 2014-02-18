@@ -7,7 +7,8 @@ values = []
 # block width and height, one block per gene per species
 bw = 1
 bh = 10
-
+bcolouron = "green"
+bcolouroff = "lightgray"
 
 margin = margin2 = width = height = height2 = x = x2 = y = y2 = null
 svg = focus = context = xAxis = xAxis2 = yAxis = brush = tooltip = null
@@ -18,13 +19,15 @@ brushed = () ->
     #focus.select(".x.axis").call(xAxis)
     ex = brush.extent()
     diff = ex[1] - ex[0]
-    sc = (width / diff)
-    console.log "brushed", brush.extent(), diff, sc
-    set_scale(ex[0], sc)
+    if diff > 1  # only sane scaling please
+        sc = (width / diff)
+        console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
+        set_scale(ex[0], sc)
 
 
+# should the x-translate NOT be scaled?
 set_scale = (pos,sc) ->
-  svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0)scale(#{sc},1)")
+  svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0) scale(#{sc},1)")
 
 
 detail = () ->
@@ -65,6 +68,7 @@ create_elems = () ->
         .x(x2)
         .on("brush", brushed);
 
+    # should tot_width here be width?
     svg = d3.select("#chart").append("svg")
         .attr("width", tot_width)
         .attr("height", tot_height)
@@ -72,7 +76,7 @@ create_elems = () ->
     # Add a clip rectangle to keep the area inside
     svg.append("svg:defs")
        .append("svg:clipPath")
-        .attr("id", "circle1")
+        .attr("id", "circle1")  # what is circle1?
        .append('rect')
         .attr('width', width)
         .attr('height',height)
@@ -84,6 +88,9 @@ create_elems = () ->
     #   .append("rect")
     #     .attr("width", width)
     #     .attr("height", height);
+
+
+    # what does the code below here do?
 
     focus = svg.append("g")
                  .attr("clip-path", "url(#circle1)")
@@ -110,6 +117,7 @@ create_elems = () ->
         .attr("y", -6)
         .attr("height", height2 + 7)
 
+    # set tooltip global variable
     tooltip = d3.select("#tooltip")
     window.tooltip = tooltip
 
@@ -161,7 +169,7 @@ init = () ->
                 .attr('height',bh-1)
                 .attr('x', 0)
                 .attr('y', i*bh)
-                .attr('fill', 'green')
+                .attr('fill', bcolouron)
       
             last_j = null
             for j in [0 ... genes.length]
@@ -171,10 +179,10 @@ init = () ->
                         tot+=1
                         focus.append('rect')
                            .attr('width',  (j-last_j)*bw)
-                           .attr('height', bh)
+                           .attr('height', bh-1)
                            .attr('x',last_j*bw)
                            .attr('y',i*bh)
-                           .attr('fill', 'white')
+                           .attr('fill', bcolouroff)
                            #.attr('opacity', 1-p)
                         last_j = null
                     continue
@@ -185,12 +193,15 @@ init = () ->
                 tot+=1
                 focus.append('rect')
                    .attr('width',  (j-last_j)*bw)
-                   .attr('height', bh)
+                   .attr('height', bh-1)
                    .attr('x',last_j*bw)
                    .attr('y',i*bh)
-                   .attr('fill', 'white')
+                   .attr('fill', bcolouroff)
                    #.attr('opacity', 1-p)
         console.log tot
+
+        # commence completely zoomed out
+        set_scale(0, width/(bw*genes.length))
     )
 
 
