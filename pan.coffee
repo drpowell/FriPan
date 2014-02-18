@@ -50,8 +50,8 @@ detail = () ->
                .html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
 
 
-create_elems = () ->
-    tot_width = 1200
+create_elems = (elem) ->
+    tot_width = $(elem).width()
     tot_height = 800
     margin = {top: 150, right: 10, bottom: 10, left: 140}
     margin2 = {top: 10, right: margin.right, bottom: 700, left: margin.left}
@@ -72,7 +72,7 @@ create_elems = () ->
         .on("brush", brushed);
 
     # should tot_width here be width?
-    svg = d3.select("#chart").append("svg")
+    svg = d3.select(elem).append("svg")
         .attr("width", tot_width)
         .attr("height", tot_height)
 
@@ -122,7 +122,7 @@ create_elems = () ->
         .attr("height", height2 + 7)
 
     # set up label area
-    
+
     labels = svg.append("g")
          .attr("transform", "translate(0,#{margin.top})")
          .attr("width", margin.left)
@@ -134,7 +134,7 @@ create_elems = () ->
 
 
 init = () ->
-    create_elems()
+    create_elems('#chart')
 
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
@@ -191,7 +191,7 @@ init = () ->
             # TODO: set font size to be same as row height?
             # TODO: right-align the text?
 
-            # paint where the gene is ABSENT      
+            # paint where the gene is ABSENT
             last_j = null
             for j in [0 ... genes.length]
                 p = values[i][j]
