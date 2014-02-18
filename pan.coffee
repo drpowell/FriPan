@@ -19,9 +19,12 @@ brushed = () ->
     #focus.select(".x.axis").call(xAxis)
     ex = brush.extent()
     diff = ex[1] - ex[0]
-    if diff > 1  # only sane scaling please
+    if diff==0
+        # Reset to full zoom
+        set_scale(0, width/(bw*genes.length))
+    else if diff > 1  # only sane scaling please
         sc = (width / diff)
-        console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
+        #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
         set_scale(ex[0], sc)
 
 
