@@ -56,3 +56,17 @@ path {
   margin: 0;
 }
 
+#topinfo {
+  display: block;
+  margin: 3ex;
+//  text-align: center;
+//  width: 100%;
+//  height: 3ex;
+//  background: pink;
+//  color: black;
+}
+
+#chart {
+//  background: lightgray;
+}
+

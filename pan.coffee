@@ -29,11 +29,14 @@ set_scale = (pos,sc) ->
 
 detail = () ->
     [x,y] = d3.mouse(focus.node())
-    strain = strains[Math.round(y/bh)]
-    gene = genes[Math.round(x)]
-    desc = descs[Math.round(x)]
-    p = values[Math.round(y/bh)][Math.round(x)]
-    $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
+    # convert from screen coordinates to matrix coordinates
+    row = Math.round(y/bh)
+    col = Math.round(x/bw)  # dave didn't have /bw here -- because it was set to 1 ?
+    strain = strains[row]
+    gene = genes[col]
+    desc = descs[col]
+    p = values[row][col]
+#    $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
     tooltip.style("display", "block") # un-hide it (display: none <=> block)
            .style("left", (d3.event.pageX) + "px")
            .style("top", (d3.event.pageY) + "px")
@@ -141,6 +144,9 @@ init = () ->
         tot=0
         console.log "Features : ",genes
         console.log "Strains : ",strains
+
+        d3.select("#topinfo")
+            .html("Loaded #{strains.length} strains and #{genes.length} ortholog clusters")
 
         x.domain([0, genes.length])
         x2.domain([0, genes.length])
