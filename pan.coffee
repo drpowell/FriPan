@@ -32,10 +32,11 @@ detail = () ->
     desc = descs[Math.round(x)]
     p = values[Math.round(y/bh)][Math.round(x)]
     $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
-    tooltip.html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
-                 .style("opacity", .9)
-                 .style("left", (d3.event.pageX) + "px")
-                 .style("top", (d3.event.pageY) + "px");
+    tooltip.style("display", "block") # un-hide it (was display: none)
+           .style("left", (d3.event.pageX) + "px")
+           .style("top", (d3.event.pageY) + "px")
+           .select("#tooltip-text")
+               .html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
 
 create_elems = () ->
     tot_width = 1200
@@ -85,7 +86,7 @@ create_elems = () ->
                  .attr("transform","translate(0,0)scale(0.3,1)")
                  .attr("class", "scale")
                  .on("mousemove", () -> detail())
-                 .on("mouseout", () -> tooltip.style("opacity", 0))
+                 .on("mouseout", () -> tooltip.style("display", "none"))
 
 
     context = svg.append("g")
@@ -103,9 +104,7 @@ create_elems = () ->
         .attr("y", -6)
         .attr("height", height2 + 7)
 
-    tooltip = d3.select("body").append("div")
-                .attr("class", "tooltip")
-                .style("opacity", 0);
+    tooltip = d3.select("#tooltip")
     window.tooltip = tooltip
 
 
