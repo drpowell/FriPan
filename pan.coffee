@@ -4,7 +4,7 @@ genes = []
 descs = []
 values = []
 
-# block width and height, one block per gene per species
+# block width and heightl, one block per gene per species
 bw = 1
 bh = 10
 bcolouron = "green"
@@ -90,24 +90,25 @@ create_elems = () ->
     #     .attr("height", height);
 
 
-    # what does the code below here do?
+    # set up SVG for gene content pane
 
     focus = svg.append("g")
                  .attr("clip-path", "url(#circle1)")
-                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                 .attr("transform", "translate(#{margin.left},#{margin.top})")
                .append("g")
                  .attr("transform","translate(0,0)scale(0.3,1)")
                  .attr("class", "scale")
                  .on("mousemove", () -> detail())
                  .on("mouseout", () -> tooltip.style("display", "none"))
 
+    # set up SVG for brush selection
 
     context = svg.append("g")
-        .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+        .attr( "transform", "translate(#{margin2.left},#{margin2.top})" );
 
     context.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height2 + ")")
+        .attr("transform", "translate(0,#{height2})")
         .call(xAxis2)
 
     context.append("g")
@@ -163,6 +164,7 @@ init = () ->
         context.select(".x.axis").call(xAxis2)
 
         for i in [0 ... strains.length]
+
 	    # draw big rectangle first, then blank out missing genes
             focus.append('rect')
                 .attr('width', bw*genes.length)
@@ -170,7 +172,16 @@ init = () ->
                 .attr('x', 0)
                 .attr('y', i*bh)
                 .attr('fill', bcolouron)
-      
+
+            # draw strain labels
+            focus.append('text')
+                .text(strains[i])
+                .attr('x', '-10ex')
+                .attr('y', i*bh)
+                .attr('width', '10ex')
+                .attr('height', bh-1)              
+
+            # paint where the gene is ABSENT      
             last_j = null
             for j in [0 ... genes.length]
                 p = values[i][j]
