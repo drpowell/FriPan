@@ -42,7 +42,6 @@ class Pan
                .select("#tooltip-text")
                    .html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
 
-
     create_elems: () ->
         tot_width = $(@elem).width()
         tot_height = 800
@@ -184,6 +183,14 @@ class Pan
         @create_elems()
         @draw_boxes()
 
+    # Resize.  Just redraw everything!
+    # TODO : Would be nice to maintain current brush on resize
+    resize: () ->
+        @svg.remove()
+        @create_elems()
+        @draw_boxes()
+
+
 
 init = () ->
 
@@ -220,7 +227,9 @@ init = () ->
             .html("Loaded #{strains.length} strains and #{genes.length} ortholog clusters")
 
 
-        new Pan('#chart', genes, strains, descs, values)
+        pan = new Pan('#chart', genes, strains, descs, values)
+
+        $( window ).resize(() -> pan.resize())
     )
 
 $(document).ready(() -> init() )
