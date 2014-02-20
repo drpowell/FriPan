@@ -53,10 +53,6 @@ path {
   pointer-events: none;         
 }
 
-#tooltip h4 {
-  margin: 0;
-}
-
 #topinfo {
   display: block;
   margin: 3ex;

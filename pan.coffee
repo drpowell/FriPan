@@ -39,7 +39,7 @@ class Pan
                .style("left", (d3.event.pageX) + "px")
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
-                   .html("Strain:#{strain}<br/>Gene:#{gene.name}</br>Product:#{gene.desc}<br/>present:#{p}")
+                   .html("<b>Strain:</b> #{strain}<br/><b>Gene:</b> #{gene.name}</br><b>Product:</b> #{gene.desc}<br/><b>Present:</b> #{p}")
 
     create_elems: () ->
         tot_width = $(@elem).width()
