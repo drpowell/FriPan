@@ -112,6 +112,15 @@ class Pan
 
 
     draw_boxes: (elem) ->
+        box = (x,y,w) ->
+                      elem.append('rect')
+                          .attr('width',  w*bw)
+      		              .attr('height', bh-1)
+      		              .attr('x',x*bw)
+      		              .attr('y',y*bh)
+      		              .attr('fill', bcolouroff)
+      		              #.attr('opacity', 1-p)
+
         for i in [0 ... @matrix.strains().length]
      	    # draw big rectangle first, then blank out missing genes
             elem.append('rect')
@@ -127,27 +136,14 @@ class Pan
                 p = @matrix.presence(i,j)
                 if p==1
                     if last_j
-                        elem.append('rect')
-                           .attr('width',  (j-last_j)*bw)
-                           .attr('height', bh-1)
-                           .attr('x',last_j*bw)
-                           .attr('y',i*bh)
-                           .attr('fill', bcolouroff)
-                           #.attr('opacity', 1-p)
+                        box(last_j, i, j-last_j)
                         last_j = null
                     continue
                 if !last_j
                     last_j=j
 
             if last_j
-                elem.append('rect')
-                   .attr('width',  (j-last_j)*bw)
-                   .attr('height', bh-1)
-                   .attr('x',last_j*bw)
-                   .attr('y',i*bh)
-                   .attr('fill', bcolouroff)
-                   #.attr('opacity', 1-p)
-
+                box(last_j, i, j-last_j)
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
