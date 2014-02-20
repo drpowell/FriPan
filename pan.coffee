@@ -50,10 +50,7 @@ class Pan
         @height = tot_height - margin.top - margin.bottom
         @height2 = tot_height - margin2.top - margin2.bottom
 
-        @x = d3.scale.linear().range([0, @width])
         @x2 = d3.scale.linear().range([0, @width])
-        @y = d3.scale.linear().range([@height, 0])
-        @y2 = d3.scale.linear().range([@height2, 0])
 
         #x2.domain([0,2846])
         @xAxis2 = d3.svg.axis().scale(@x2).orient("bottom")
@@ -77,27 +74,26 @@ class Pan
             .attr('x', 0)
             .attr('y', 0)
 
-        # svg.append("defs").append("clipPath")
-        #     .attr("id", "clip")
-        #   .append("rect")
-        #     .attr("width", width)
-        #     .attr("height", height);
-
-
         # set up SVG for gene content pane
 
         @focus = @svg.append("g")
                      .attr("clip-path", "url(#circle1)")
                      .attr("transform", "translate(#{margin.left},#{margin.top})")
                    .append("g")
-                     .attr("transform","translate(0,0)scale(0.3,1)")   # what is 0.3 here?
+                     .attr("transform","translate(0,0)scale(1,1)")
                      .attr("class", "scale")
                      .on("mousemove", () => @detail())
                      .on("mouseout", () => @tooltip.style("display", "none"))
 
+
         # set up SVG for brush selection
         @context = @svg.append("g")
             .attr( "transform", "translate(#{margin2.left},#{margin2.top})" );
+
+        # Create - @mini a <g> to hold the small plot
+        # FIXME.  Factor out this scaling.  width should be like "set scale full".  Heightt should depend on number of strains
+        @mini = @context.append("g")
+                        .attr("transform","translate(0,0)scale(#{@width/(bw*@matrix.genes().length)},0.15)")
 
         @context.append("g")
             .attr("class", "x axis")
@@ -117,27 +113,54 @@ class Pan
              .attr("width", margin.left)
              .attr("height", @height)
 
-        # set tooltip global variable
+        # set tooltip object
         @tooltip = d3.select("#tooltip")
 
 
-    draw_boxes: () ->
-        @x.domain([0, @matrix.genes().length])
-        @x2.domain([0, @matrix.genes().length])
+    draw_boxes: (elem) ->
+        box = (x,y,w) ->
+                      elem.append('rect')
+                          .attr('width',  w*bw)
+      		              .attr('height', bh-1)
+      		              .attr('x',x*bw)
+      		              .attr('y',y*bh)
+      		              .attr('fill', bcolouroff)
+      		              #.attr('opacity', 1-p)
 
-        #xAxis2.tickFormat((d) -> genes[d])
-        @context.select(".x.axis").call(@xAxis2)
-
-        tot=0
         for i in [0 ... @matrix.strains().length]
      	    # draw big rectangle first, then blank out missing genes
-            @focus.append('rect')
+            elem.append('rect')
                 .attr('width', bw*@matrix.genes().length)
                 .attr('height',bh-1)
                 .attr('x', 0)
                 .attr('y', i*bh)
                 .attr('fill', bcolouron)
 
+            # paint where the gene is ABSENT
+            last_j = null
+            for j in [0 ... @matrix.genes().length]
+                p = @matrix.presence(i,j)
+                if p==1
+                    if last_j
+                        box(last_j, i, j-last_j)
+                        last_j = null
+                    continue
+                if !last_j
+                    last_j=j
+
+            if last_j
+                box(last_j, i, j-last_j)
+
+    draw_chart: () ->
+        @x2.domain([0, @matrix.genes().length])
+
+        #xAxis2.tickFormat((d) -> genes[d])
+        @context.select(".x.axis").call(@xAxis2)
+
+        @draw_boxes(@mini)
+
+        @draw_boxes(@focus)
+        for i in [0 ... @matrix.strains().length]
             # draw strain labels
             @labels.append('text')
                 .text(@matrix.strains()[i])
@@ -146,48 +169,19 @@ class Pan
             # TODO: set font size to be same as row height?
             # TODO: right-align the text?
 
-            # paint where the gene is ABSENT
-            last_j = null
-            for j in [0 ... @matrix.genes().length]
-                p = @matrix.presence(i,j)
-                if p==1
-                    if last_j
-                        tot+=1
-                        @focus.append('rect')
-                           .attr('width',  (j-last_j)*bw)
-                           .attr('height', bh-1)
-                           .attr('x',last_j*bw)
-                           .attr('y',i*bh)
-                           .attr('fill', bcolouroff)
-                           #.attr('opacity', 1-p)
-                        last_j = null
-                    continue
-                if !last_j
-                    last_j=j
-
-            if last_j
-                tot+=1
-                @focus.append('rect')
-                   .attr('width',  (j-last_j)*bw)
-                   .attr('height', bh-1)
-                   .attr('x',last_j*bw)
-                   .attr('y',i*bh)
-                   .attr('fill', bcolouroff)
-                   #.attr('opacity', 1-p)
-
         # commence completely zoomed out
         @set_scale(0, @width/(bw*@matrix.genes().length))
 
     constructor: (@elem, @matrix) ->
         @create_elems()
-        @draw_boxes()
+        @draw_chart()
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
     resize: () ->
         @svg.remove()
         @create_elems()
-        @draw_boxes()
+        @draw_chart()
 
 class Gene
     constructor: (@name, @desc) ->

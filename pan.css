@@ -34,7 +34,8 @@ path {
 
 .brush .extent {
   stroke: #fff;
-  fill-opacity: .125;
+  fill-opacity: .3;
+  fill: red;
   shape-rendering: crispEdges;
 }
 
