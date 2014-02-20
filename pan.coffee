@@ -50,10 +50,7 @@ class Pan
         @height = tot_height - margin.top - margin.bottom
         @height2 = tot_height - margin2.top - margin2.bottom
 
-        @x = d3.scale.linear().range([0, @width])
         @x2 = d3.scale.linear().range([0, @width])
-        @y = d3.scale.linear().range([@height, 0])
-        @y2 = d3.scale.linear().range([@height2, 0])
 
         #x2.domain([0,2846])
         @xAxis2 = d3.svg.axis().scale(@x2).orient("bottom")
@@ -76,13 +73,6 @@ class Pan
             .attr('height',@height)
             .attr('x', 0)
             .attr('y', 0)
-
-        # svg.append("defs").append("clipPath")
-        #     .attr("id", "clip")
-        #   .append("rect")
-        #     .attr("width", width)
-        #     .attr("height", height);
-
 
         # set up SVG for gene content pane
 
@@ -117,34 +107,19 @@ class Pan
              .attr("width", margin.left)
              .attr("height", @height)
 
-        # set tooltip global variable
+        # set tooltip object
         @tooltip = d3.select("#tooltip")
 
 
-    draw_boxes: () ->
-        @x.domain([0, @matrix.genes().length])
-        @x2.domain([0, @matrix.genes().length])
-
-        #xAxis2.tickFormat((d) -> genes[d])
-        @context.select(".x.axis").call(@xAxis2)
-
-        tot=0
+    draw_boxes: (elem) ->
         for i in [0 ... @matrix.strains().length]
      	    # draw big rectangle first, then blank out missing genes
-            @focus.append('rect')
+            elem.append('rect')
                 .attr('width', bw*@matrix.genes().length)
                 .attr('height',bh-1)
                 .attr('x', 0)
                 .attr('y', i*bh)
                 .attr('fill', bcolouron)
-
-            # draw strain labels
-            @labels.append('text')
-                .text(@matrix.strains()[i])
-                .attr('x', 0)
-                .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
-            # TODO: set font size to be same as row height?
-            # TODO: right-align the text?
 
             # paint where the gene is ABSENT
             last_j = null
@@ -152,8 +127,7 @@ class Pan
                 p = @matrix.presence(i,j)
                 if p==1
                     if last_j
-                        tot+=1
-                        @focus.append('rect')
+                        elem.append('rect')
                            .attr('width',  (j-last_j)*bw)
                            .attr('height', bh-1)
                            .attr('x',last_j*bw)
@@ -166,8 +140,7 @@ class Pan
                     last_j=j
 
             if last_j
-                tot+=1
-                @focus.append('rect')
+                elem.append('rect')
                    .attr('width',  (j-last_j)*bw)
                    .attr('height', bh-1)
                    .attr('x',last_j*bw)
@@ -175,19 +148,36 @@ class Pan
                    .attr('fill', bcolouroff)
                    #.attr('opacity', 1-p)
 
+
+    draw_chart: () ->
+        @x2.domain([0, @matrix.genes().length])
+
+        #xAxis2.tickFormat((d) -> genes[d])
+        @context.select(".x.axis").call(@xAxis2)
+
+        @draw_boxes(@focus)
+        for i in [0 ... @matrix.strains().length]
+            # draw strain labels
+            @labels.append('text')
+                .text(@matrix.strains()[i])
+                .attr('x', 0)
+                .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
+            # TODO: set font size to be same as row height?
+            # TODO: right-align the text?
+
         # commence completely zoomed out
         @set_scale(0, @width/(bw*@matrix.genes().length))
 
     constructor: (@elem, @matrix) ->
         @create_elems()
-        @draw_boxes()
+        @draw_chart()
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
     resize: () ->
         @svg.remove()
         @create_elems()
-        @draw_boxes()
+        @draw_chart()
 
 class Gene
     constructor: (@name, @desc) ->
