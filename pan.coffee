@@ -33,14 +33,13 @@ class Pan
         col = Math.round(x/bw)  # dave didn't have /bw here -- because it was set to 1 ?
         strain = @matrix.strains()[row]
         gene = @matrix.genes()[col]
-        desc = @matrix.descs()[col]
         p = @matrix.presence(row,col)
     #    $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
-                   .html("Strain:#{strain}<br/>Gene:#{gene}</br>Product:#{desc}<br/>present:#{p}")
+                   .html("Strain:#{strain}<br/>Gene:#{gene.name}</br>Product:#{gene.desc}<br/>present:#{p}")
 
     create_elems: () ->
         tot_width = $(@elem).width()
@@ -190,15 +189,17 @@ class Pan
         @create_elems()
         @draw_boxes()
 
+class Gene
+    constructor: (@name, @desc) ->
+        # Pass
+
 class GeneMatrix
-    constructor: (@_strains, @_genes, @_descs, @_values) ->
+    constructor: (@_strains, @_genes, @_values) ->
         # Pass
     strains: () ->
         @_strains
     genes: () ->
         @_genes
-    descs: () ->
-        @_descs
     presence: (strain, gene) ->
         @_values[strain][gene]
 
@@ -207,14 +208,12 @@ class GeneMatrix
 parse_csv = (csv) ->
     strains = []
     values = []
-    descs = []
     genes = []
     i=0
     for row in csv
         i += 1
         if i==1
-            genes = d3.keys(row)
-            descs = d3.values(row)
+            genes = d3.keys(row).map((g) -> new Gene(g, row[g]))
             continue
         val_row = []
         values.push(val_row)
@@ -226,7 +225,7 @@ parse_csv = (csv) ->
             j+=1
             p = parseInt(v)
             val_row.push(p)
-    new GeneMatrix(strains,genes,descs,values)
+    new GeneMatrix(strains,genes,values)
 
 init = () ->
 
