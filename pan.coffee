@@ -203,8 +203,6 @@ class GeneMatrix
     presence: (strain, gene) ->
         @_values[strain][gene]
 
-
-
 parse_csv = (csv) ->
     strains = []
     values = []
