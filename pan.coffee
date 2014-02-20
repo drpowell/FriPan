@@ -14,7 +14,7 @@ class Pan
         diff = ex[1] - ex[0]
         if diff==0
             # Reset to full zoom
-            @set_scale(0, @width/(bw*@genes.length))
+            @set_scale(0, @width/(bw*@matrix.genes().length))
         else if diff > 1  # only sane scaling please
             sc = (@width / diff)
             #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
@@ -31,10 +31,10 @@ class Pan
         # convert from screen coordinates to matrix coordinates
         row = Math.round(y/bh)
         col = Math.round(x/bw)  # dave didn't have /bw here -- because it was set to 1 ?
-        strain = @strains[row]
-        gene = @genes[col]
-        desc = @descs[col]
-        p = @values[row][col]
+        strain = @matrix.strains()[row]
+        gene = @matrix.genes()[col]
+        desc = @matrix.descs()[col]
+        p = @matrix.presence(row,col)
     #    $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
@@ -123,17 +123,17 @@ class Pan
 
 
     draw_boxes: () ->
-        @x.domain([0, @genes.length])
-        @x2.domain([0, @genes.length])
+        @x.domain([0, @matrix.genes().length])
+        @x2.domain([0, @matrix.genes().length])
 
         #xAxis2.tickFormat((d) -> genes[d])
         @context.select(".x.axis").call(@xAxis2)
 
         tot=0
-        for i in [0 ... @strains.length]
+        for i in [0 ... @matrix.strains().length]
      	    # draw big rectangle first, then blank out missing genes
             @focus.append('rect')
-                .attr('width', bw*@genes.length)
+                .attr('width', bw*@matrix.genes().length)
                 .attr('height',bh-1)
                 .attr('x', 0)
                 .attr('y', i*bh)
@@ -141,7 +141,7 @@ class Pan
 
             # draw strain labels
             @labels.append('text')
-                .text(@strains[i])
+                .text(@matrix.strains()[i])
                 .attr('x', 0)
                 .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
             # TODO: set font size to be same as row height?
@@ -149,8 +149,8 @@ class Pan
 
             # paint where the gene is ABSENT
             last_j = null
-            for j in [0 ... @genes.length]
-                p = @values[i][j]
+            for j in [0 ... @matrix.genes().length]
+                p = @matrix.presence(i,j)
                 if p==1
                     if last_j
                         tot+=1
@@ -177,9 +177,9 @@ class Pan
                    #.attr('opacity', 1-p)
 
         # commence completely zoomed out
-        @set_scale(0, @width/(bw*@genes.length))
+        @set_scale(0, @width/(bw*@matrix.genes().length))
 
-    constructor: (@elem, @genes, @strains, @descs, @values) ->
+    constructor: (@elem, @matrix) ->
         @create_elems()
         @draw_boxes()
 
@@ -190,44 +190,60 @@ class Pan
         @create_elems()
         @draw_boxes()
 
+class GeneMatrix
+    constructor: (@_strains, @_genes, @_descs, @_values) ->
+        # Pass
+    strains: () ->
+        @_strains
+    genes: () ->
+        @_genes
+    descs: () ->
+        @_descs
+    presence: (strain, gene) ->
+        @_values[strain][gene]
 
+
+
+parse_csv = (csv) ->
+    strains = []
+    values = []
+    descs = []
+    genes = []
+    i=0
+    for row in csv
+        i += 1
+        if i==1
+            genes = d3.keys(row)
+            descs = d3.values(row)
+            continue
+        val_row = []
+        values.push(val_row)
+        j=0
+        for k,v of row
+            if k==''
+                strains.push(v)
+                continue
+            j+=1
+            p = parseInt(v)
+            val_row.push(p)
+    new GeneMatrix(strains,genes,descs,values)
 
 init = () ->
 
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
-    i=0
     d3.csv("pan.csv", (data) ->
-        strains = []
-        values = []
-        descs = []
-        genes = []
-        for row in data
-            i += 1
-            if i==1
-                genes = d3.keys(row)
-                descs = d3.values(row)
-                continue
-            val_row = []
-            values.push(val_row)
-            j=0
-            for k,v of row
-                if k==''
-                    strains.push(v)
-                    continue
-                j+=1
-                p = parseInt(v)
-                val_row.push(p)
+        matrix = parse_csv(data)
 
-        console.log "Features : ",genes
-        console.log "Strains : ",strains
+        console.log "Features : ",matrix.genes()
+        console.log "Strains : ",matrix.strains()
 
         d3.select("#topinfo")
-            .html("Loaded #{strains.length} strains and #{genes.length} ortholog clusters")
+            .html("Loaded #{matrix.strains().length} strains and #{matrix.genes().length} ortholog clusters")
 
 
-        pan = new Pan('#chart', genes, strains, descs, values)
+        pan = new Pan('#chart', matrix)
 
         $( window ).resize(() -> pan.resize())
     )
