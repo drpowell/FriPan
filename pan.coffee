@@ -80,14 +80,20 @@ class Pan
                      .attr("clip-path", "url(#circle1)")
                      .attr("transform", "translate(#{margin.left},#{margin.top})")
                    .append("g")
-                     .attr("transform","translate(0,0)scale(0.3,1)")   # what is 0.3 here?
+                     .attr("transform","translate(0,0)scale(1,1)")
                      .attr("class", "scale")
                      .on("mousemove", () => @detail())
                      .on("mouseout", () => @tooltip.style("display", "none"))
 
+
         # set up SVG for brush selection
         @context = @svg.append("g")
             .attr( "transform", "translate(#{margin2.left},#{margin2.top})" );
+
+        # Create - @mini a <g> to hold the small plot
+        # FIXME.  Factor out this scaling.  width should be like "set scale full".  Heightt should depend on number of strains
+        @mini = @context.append("g")
+                        .attr("transform","translate(0,0)scale(#{@width/(bw*@matrix.genes().length)},0.15)")
 
         @context.append("g")
             .attr("class", "x axis")
@@ -150,6 +156,8 @@ class Pan
 
         #xAxis2.tickFormat((d) -> genes[d])
         @context.select(".x.axis").call(@xAxis2)
+
+        @draw_boxes(@mini)
 
         @draw_boxes(@focus)
         for i in [0 ... @matrix.strains().length]
