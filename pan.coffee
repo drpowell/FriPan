@@ -45,7 +45,7 @@ class Pan
         tot_width = $(@elem).width()
         tot_height = 800
         margin = {top: 150, right: 10, bottom: 10, left: 140}
-        margin2 = {top: 10, right: margin.right, bottom: 700, left: margin.left}
+        margin2 = {top: 50, right: margin.right, bottom: 700, left: margin.left}
         @width = tot_width - margin.left - margin.right
         @height = tot_height - margin.top - margin.bottom
         @height2 = tot_height - margin2.top - margin2.bottom
@@ -93,7 +93,10 @@ class Pan
         # Create - @mini a <g> to hold the small plot
         # FIXME.  Factor out this scaling.  width should be like "set scale full".  Heightt should depend on number of strains
         @mini = @context.append("g")
-                        .attr("transform","translate(0,0)scale(#{@width/(bw*@matrix.genes().length)},0.15)")
+                        .attr("class", "minimap")
+                        .attr("transform","translate(0,0)
+                                           scale(#{@width/(bw*@matrix.genes().length)},
+                                           #{@height2/(bh*@matrix.strains().length)})")
 
         @context.append("g")
             .attr("class", "x axis")

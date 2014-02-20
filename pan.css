@@ -39,6 +39,10 @@ path {
   shape-rendering: crispEdges;
 }
 
+.minimap {
+  opacity: 0.3;
+}
+
 #tooltip {   
   display: none;
   position: absolute;           
