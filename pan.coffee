@@ -203,6 +203,9 @@ class GeneMatrix
     presence: (strain, gene) ->
         @_values[strain][gene]
 
+# Load a Torsty home-brew .CSV ortholog file
+# This needs to be deprecated, not sure how I generated it!
+
 parse_csv = (csv) ->
     strains = []
     values = []
@@ -225,13 +228,45 @@ parse_csv = (csv) ->
             val_row.push(p)
     new GeneMatrix(strains,genes,values)
 
+
+# Load a ProteinOrtho5 output file 
+# Please use -singles option to ensure singleton clusters are included!
+# http://www.bioinf.uni-leipzig.de/Software/proteinortho/
+
+parse_proteinortho = (tsv) ->
+    strains = []
+    values = []
+    genes = []
+    i=0
+    for row in tsv
+        i += 1
+        if i==1
+            strains = d3.keys(row)[3..] # skip first 3 junk columns
+            console.log "STRAINS: #{strains}"
+        genes.push( new Gene("cluster#{i}", "") ) 
+        values.push( strains.map( (s) -> if row[s]=='*' then 0 else 1) )
+
+    new GeneMatrix( strains, genes, d3.transpose(values) )
+
+
+# Load an OrthoMCL 1.4 output file  (2.0 not supported)
+# (does not output singleton clusters)
+# http://orthomcl.org/common/downloads/software/v2.0/
+
+parse_orthomcl = (tsv) ->
+	# FIXME
+
+
+# main()
+
 init = () ->
 
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
-    d3.csv("pan.csv", (data) ->
-        matrix = parse_csv(data)
+#    d3.csv("pan.csv", (data) ->
+    d3.tsv("pan.proteinortho", (data) ->
+        matrix = parse_proteinortho(data)
 
         console.log "Features : ",matrix.genes()
         console.log "Strains : ",matrix.strains()
@@ -246,3 +281,4 @@ init = () ->
     )
 
 $(document).ready(() -> init() )
+
