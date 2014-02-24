@@ -128,7 +128,7 @@ class Pan
     # Collapse the 'off' regions in a set of boxes with x and len
     collapse_off: (strain_id) ->
         res = []
-        last_p=0
+        last_p=1
         @matrix.genes().forEach((g) =>
             p = @matrix.presence(strain_id,g.id)
             if !p
