@@ -15,14 +15,14 @@ class Pan
         if diff==0
             # Reset to full zoom
             @set_scale(0, @width/(bw*@matrix.genes().length))
-            @redraw_pca(null)
+            @redraw_mds(null)
         else if diff > 1  # only sane scaling please
             sc = (@width / diff)
             #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
             @set_scale(ex[0], sc)
-            @redraw_pca(ex)
+            @redraw_mds(ex)
 
-    redraw_pca: (range) ->
+    redraw_mds: (range) ->
         range = [0, @matrix.genes().length-1] if !range
         range = [Math.floor(range[0]), Math.ceil(range[1])]
         console.log "drawing",range
@@ -193,8 +193,8 @@ class Pan
     constructor: (@elem, @matrix) ->
         @create_elems()
         @draw_chart()
-        @scatter = new ScatterPlot('#pca')
-        @redraw_pca(null)
+        @scatter = new ScatterPlot('#mds')
+        @redraw_mds(null)
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize

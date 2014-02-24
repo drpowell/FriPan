@@ -2,6 +2,7 @@
 # Calculate a MDS (classic) from a distnace matrix
 class MDS
     @distance: (mat, gene_range) ->
+        t1 = new Date
         dist = []
         for s1 in [0...mat.strains().length]
             for s2 in [0...mat.strains().length]
@@ -12,6 +13,7 @@ class MDS
 
         # Print as R code!
         #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
+        console.log "Distance took : #{new Date - t1}ms"
         dist
 
 
@@ -24,7 +26,9 @@ class MDS
         # row and col center matrix
         c = centre(numeric.transpose(centre(dist)))
         c = numeric.neg( numeric.div(c,2) )              # Not sure why, done by cmdscale
+        t1 = new Date
         eig = numeric.eig(c)
+        console.log "eig took : #{new Date - t1}ms"
         order = [0...c.length]
         order.sort((a,b) -> eig.lambda.x[b] - eig.lambda.x[a])
         ev = order.map((i) -> eig.lambda.x[i])
@@ -89,7 +93,7 @@ class ScatterPlot
             .attr("x", @width)
             .attr("y", 10)
             .style("text-anchor", "start")
-            .text("PCA dim #{dim1+1}");
+            .text("Dim #{dim1+1}");
 
         @svg.append("g")
             .attr("class", "y axis")
@@ -100,7 +104,7 @@ class ScatterPlot
             .attr("y", 6)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
-            .text("PCA dim #{dim2+1}");
+            .text("Dim #{dim2+1}");
 
         dots = @svg.selectAll(".dot")
                    .data(locs)
