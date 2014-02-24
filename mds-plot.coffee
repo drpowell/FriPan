@@ -123,7 +123,7 @@ class ScatterPlot
              #.style("fill", (d,i) => @color(labels[i].parent))
         dot_g.append("text")
              .attr('class', (d,i) -> "labels strain-#{i}")
-             .text((d,i) -> labels[i])
+             .text((d,i) -> labels[i].name)
              .attr('x',3)
              .attr('y',-3)
              #.style("fill", (d,i) => @color(labels[i]))

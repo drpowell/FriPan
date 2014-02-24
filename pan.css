@@ -71,6 +71,9 @@ path {
 //  background: lightgray;
 }
 
+.gene-row rect.on  { fill: green; }
+.gene-row rect.off { fill: lightgray; }
+
 .highlight {
   fill: red;
   font-weight: bold;

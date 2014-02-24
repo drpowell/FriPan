@@ -2,8 +2,6 @@
 # block width and heightl, one block per gene per species
 bw = 1
 bh = 10
-bcolouron = "green"
-bcolouroff = "lightgray"
 
 class Pan
     brushed: (brush) ->
@@ -38,16 +36,18 @@ class Pan
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
         row = Math.round(y/bh)
-        col = Math.round(x/bw)  # dave didn't have /bw here -- because it was set to 1 ?
-        strain = @matrix.strains()[row]
+        col = Math.round(x/bw)
+        strain_id = @matrix.strain_pos_to_id(row)
+        return if !strain_id?
+
+        strain = @matrix.strains()[strain_id]
         gene = @matrix.genes()[col]
-        p = @matrix.presence(row,col)
-    #    $('#info').text("Strain:#{strain}  Gene:#{gene}  present:#{p}")
+        p = @matrix.presence(strain_id,col)
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
-                   .html("<b>Strain:</b> #{strain}<br/><b>Gene:</b> #{gene.name}</br><b>Product:</b> #{gene.desc}<br/><b>Present:</b> #{p}")
+                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene.name}</br><b>Product:</b> #{gene.desc}<br/><b>Present:</b> #{p}")
 
     create_elems: () ->
         tot_width = $(@elem).width()
@@ -120,49 +120,72 @@ class Pan
 
         # set up label area
         @labels = @svg.append("g")
-             .attr("transform", "translate(0,#{margin.top})")
-             .attr("width", margin.left)
-             .attr("height", @height)
+             .attr("transform", "translate(#{margin.left-10},#{margin.top})")
 
         # set tooltip object
         @tooltip = d3.select("#tooltip")
 
+    # Collapse the 'off' regions in a set of boxes with x and len
+    collapse_off: (strain_id) ->
+        res = []
+        last_p=0
+        @matrix.genes().forEach((g) =>
+            p = @matrix.presence(strain_id,g.id)
+            if !p
+                if last_p
+                    res.push({x:g.id, len: 0})
+                res[res.length-1].len += 1
+            last_p = p
+        )
+        res
 
+    # Draw the per-gene 'on/off' boxes
     draw_boxes: (elem) ->
-        box = (x,y,w) ->
-                      elem.append('rect')
-                          .attr('width',  w*bw)
-      		              .attr('height', bh-1)
-      		              .attr('x',x*bw)
-      		              .attr('y',y*bh)
-      		              .attr('fill', bcolouroff)
-      		              #.attr('opacity', 1-p)
-
-        for i in [0 ... @matrix.strains().length]
-            do (i) =>
-         	    # draw big rectangle first, then blank out missing genes
-                elem.append('rect')
-                    .attr('width', bw*@matrix.genes().length)
+        row = elem.selectAll('g.gene-row')
+                  .data(@matrix.strains(), (s) -> s.id)
+        row.exit().remove()
+        # Create a <g> to hold each row
+        ngs = row.enter()
+                  .append('g')
+                   .attr('class',(s) -> "gene-row strain-#{s.id}")
+        # Each row has a <rect> for 'on'
+        ngs.append('rect')
+                   .attr('class','on')
+                   .attr('width', bw*@matrix.genes().length)
+                   .attr('height',bh-1)
+        # Then a bunch of <rect> for collapsed 'off'
+        ngs.selectAll('rect.off')
+            .data((s) => @collapse_off(s.id))
+            .enter().append('rect')
+                    .attr('class','off')
                     .attr('height',bh-1)
-                    .attr('x', 0)
-                    .attr('y', i*bh)
-                    .attr('fill', bcolouron)
-                    .attr('class', "row strain-#{i}")
+                    .attr('x', (p) -> p.x)
+                    .attr('width', (p) -> bw*p.len)
 
-                # paint where the gene is ABSENT
-                last_j = null
-                for j in [0 ... @matrix.genes().length]
-                    p = @matrix.presence(i,j)
-                    if p==1
-                        if last_j
-                            box(last_j, i, j-last_j)
-                            last_j = null
-                        continue
-                    if !last_j
-                        last_j=j
+        row.transition()
+           .attr('transform', (s) -> "translate(0,#{s.pos * bh})")
 
-                if last_j
-                    box(last_j, i, j-last_j)
+    # Draw the strain labels
+    draw_labels: (elem) ->
+        lbls = elem.selectAll('text.label')
+                   .data(@matrix.strains(), (s) -> s.id)
+        lbls.enter()
+            .append('text')
+             .attr('class',(s) -> "label strain-#{s.id}")
+             .attr('text-anchor','end')
+             .text((s) -> s.name)
+             .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
+             .on("mouseover", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true}))
+             .on("mouseout", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false}))
+        lbls.transition()
+            .attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
+        # TODO: set font size to be same as row height?
+
+    redraw: () ->
+        @draw_boxes(@mini)
+
+        @draw_boxes(@focus)
+        @draw_labels(@labels)
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
@@ -170,22 +193,7 @@ class Pan
         #xAxis2.tickFormat((d) -> genes[d])
         @context.select(".x.axis").call(@xAxis2)
 
-        @draw_boxes(@mini)
-
-        @draw_boxes(@focus)
-        for i in [0 ... @matrix.strains().length]
-            do (i) =>
-                # draw strain labels
-                @labels.append('text')
-                    .text(@matrix.strains()[i])
-                    .attr('class',"strain-#{i}")
-                    .attr('x', 0)
-                    .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
-                    .on("mouseover", () -> d3.selectAll(".strain-#{i}").classed({'highlight':true}))
-                    .on("mouseout", () -> d3.selectAll(".strain-#{i}").classed({'highlight':false}))
-
-            # TODO: set font size to be same as row height?
-            # TODO: right-align the text?
+        @redraw()
 
         # commence completely zoomed out
         @set_scale(0, @width/(bw*@matrix.genes().length))
@@ -203,19 +211,39 @@ class Pan
         @create_elems()
         @draw_chart()
 
-class Gene
-    constructor: (@name, @desc) ->
-        # Pass
-
 class GeneMatrix
     constructor: (@_strains, @_genes, @_values) ->
-        # Pass
+        # Give both genes and strains ids.
+        @_strains.forEach((s,i) -> s.id = s.pos = i)
+        @_genes.forEach((g,i) -> g.id = i)
+        @_build_by_pos()
+        window.gg = this
+
+    # Sort the strains by position order into a local array @_pos
+    # @_pos indexed by position, returns strain_id
+    _build_by_pos: () ->
+        @_pos = @_strains.map((s) -> s.pos)
+        @_pos.sort((a,b) -> a-b)
+
+    # Return array of strains ordered by id
     strains: () ->
         @_strains
+
+    # Return strain_id for the given strain_pos
+    strain_pos_to_id: (pos) -> @_pos[pos]
+
     genes: () ->
         @_genes
-    presence: (strain, gene) ->
-        @_values[strain][gene]
+
+    presence: (strain_id, gene_id) ->
+        @_values[strain_id][gene_id]
+
+    # Set the given strain id to be first in the list
+    set_first: (strain_id) ->
+        idx = @_pos.indexOf(strain_id)
+        @_pos.splice(idx, 1)         # Remove it from the list
+        @_pos.splice(0,0, strain_id) # And put it on the front
+        @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
 
 
 # Load a Torsty home-brew .CSV ortholog file
@@ -229,14 +257,14 @@ parse_csv = (csv) ->
     for row in csv
         i += 1
         if i==1
-            genes = d3.keys(row).map((g) -> new Gene(g, row[g]))
+            genes = d3.keys(row).map((g) -> {name:g, desc: row[g]})
             continue
         val_row = []
         values.push(val_row)
         j=0
         for k,v of row
             if k==''
-                strains.push(v)
+                strains.push({name:v})
                 continue
             j+=1
             p = parseInt(v)
@@ -257,9 +285,10 @@ parse_proteinortho = (tsv) ->
         i += 1
         if i==1
             strains = d3.keys(row)[3..] # skip first 3 junk columns
+                        .map((s) -> {name: s})
             console.log "STRAINS: #{strains}"
-        genes.push( new Gene("cluster#{i}", "") )
-        values.push( strains.map( (s) -> if row[s]=='*' then 0 else 1) )
+        genes.push( {name:"cluster#{i}", desc:""} )
+        values.push( strains.map( (s) -> if row[s.name]=='*' then 0 else 1) )
 
     new GeneMatrix( strains, genes, d3.transpose(values) )
 
@@ -269,7 +298,7 @@ parse_proteinortho = (tsv) ->
 # http://orthomcl.org/common/downloads/software/v2.0/
 
 parse_orthomcl = (tsv) ->
-	# FIXME
+    # FIXME
 
 
 # main()
