@@ -265,6 +265,11 @@ class GeneMatrix
         @_pos.splice(0,0, strain_id) # And put it on the front
         @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
 
+    # Set the complete order of strains
+    set_order: (order) ->
+        @_pos = order
+        @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
+
 
 # Load a Torsty home-brew .CSV ortholog file
 # This needs to be deprecated, not sure how I generated it!
