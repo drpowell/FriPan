@@ -28,8 +28,16 @@ class Pan
         #comp = MDS.pca(@matrix._values)
         #@scatter.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
 
-        mds = MDS.cmdscale(MDS.distance(@matrix, range))
-        @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
+        window.clearTimeout(@background_runner)
+        @background_runner = window.setTimeout(() =>
+            mds = MDS.cmdscale(MDS.distance(@matrix, range))
+            @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
+
+            ids = @matrix.strains().map((s) -> s.id)
+            ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
+            @matrix.set_order(ids)
+            @redraw()
+        ,1000)
 
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
