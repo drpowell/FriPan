@@ -31,13 +31,19 @@ class Pan
 
         window.clearTimeout(@background_runner)
         @background_runner = window.setTimeout(() =>
-            mds = MDS.cmdscale(MDS.distance(@matrix, range))
-            @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
+            $('#mds-thinking').show()
+            $('#mds').css('opacity','0.3')
+            window.setTimeout(() =>
+                mds = MDS.cmdscale(MDS.distance(@matrix, range))
+                @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
+                $('#mds-thinking').hide()
+                $('#mds').css('opacity','1.0')
 
-            ids = @matrix.strains().map((s) -> s.id)
-            ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
-            @matrix.set_order(ids)
-            @redraw()
+                ids = @matrix.strains().map((s) -> s.id)
+                ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
+                @matrix.set_order(ids)
+                @redraw()
+            ,0)
         ,1000)
 
     # should the x-translate NOT be scaled?
