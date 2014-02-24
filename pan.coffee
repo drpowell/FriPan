@@ -15,11 +15,19 @@ class Pan
         if diff==0
             # Reset to full zoom
             @set_scale(0, @width/(bw*@matrix.genes().length))
+            @redraw_pca(null)
         else if diff > 1  # only sane scaling please
             sc = (@width / diff)
             #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
             @set_scale(ex[0], sc)
+            @redraw_pca(ex)
 
+    redraw_pca: (range) ->
+        range = [0, @matrix.genes().length-1] if !range
+        range = [Math.floor(range[0]), Math.ceil(range[1])]
+        console.log "drawing",range
+        mds = MDS.cmdscale(MDS.distance(@matrix, range))
+        @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
 
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
@@ -178,6 +186,8 @@ class Pan
     constructor: (@elem, @matrix) ->
         @create_elems()
         @draw_chart()
+        @scatter = new ScatterPlot('#pca')
+        @redraw_pca(null)
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
@@ -199,6 +209,7 @@ class GeneMatrix
         @_genes
     presence: (strain, gene) ->
         @_values[strain][gene]
+
 
 # Load a Torsty home-brew .CSV ortholog file
 # This needs to be deprecated, not sure how I generated it!
@@ -226,7 +237,7 @@ parse_csv = (csv) ->
     new GeneMatrix(strains,genes,values)
 
 
-# Load a ProteinOrtho5 output file 
+# Load a ProteinOrtho5 output file
 # Please use -singles option to ensure singleton clusters are included!
 # http://www.bioinf.uni-leipzig.de/Software/proteinortho/
 
@@ -240,7 +251,7 @@ parse_proteinortho = (tsv) ->
         if i==1
             strains = d3.keys(row)[3..] # skip first 3 junk columns
             console.log "STRAINS: #{strains}"
-        genes.push( new Gene("cluster#{i}", "") ) 
+        genes.push( new Gene("cluster#{i}", "") )
         values.push( strains.map( (s) -> if row[s]=='*' then 0 else 1) )
 
     new GeneMatrix( strains, genes, d3.transpose(values) )
@@ -278,4 +289,3 @@ init = () ->
     )
 
 $(document).ready(() -> init() )
-
