@@ -239,7 +239,7 @@ class Pan
                      mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})
                     )
 
-                @redraw_mds(null)
+        @redraw_mds(null)
 
         $('#vscale input').on('keyup', (e) =>
             str = $(e.target).val()
