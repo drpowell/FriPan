@@ -28,10 +28,11 @@ class Pan
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
         row = Math.round(y/bh)
-        col = Math.round(x/bw)  # dave didn't have /bw here -- because it was set to 1 ?
-        strain = @matrix.strains()[row]
+        col = Math.round(x/bw)
+        strain_id = @matrix.strain_pos_to_id(row)
+        strain = @matrix.strains()[strain_id]
         gene = @matrix.genes()[col]
-        p = @matrix.presence(row,col)
+        p = @matrix.presence(strain_id,col)
     #    $('#info').text("Strain:#{strain}  Gene:#{gene.name}  present:#{p}")
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
@@ -211,13 +212,20 @@ class GeneMatrix
         @_pos = @_strains.map((s) -> s.pos)
         @_pos.sort((a,b) -> a-b)
 
+    # Return array of strains ordered by id
     strains: () ->
         @_strains
+
+    # Return strain_id for the given strain_pos
+    strain_pos_to_id: (pos) -> @_pos[pos]
+
     genes: () ->
         @_genes
+
     presence: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]
 
+    # Set the given strain id to be first in the list
     set_first: (strain_id) ->
         idx = @_pos.indexOf(strain_id)
         @_pos.splice(idx, 1)         # Remove it from the list
