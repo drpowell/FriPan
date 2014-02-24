@@ -152,19 +152,28 @@ class Pan
                     .attr('x', (p) -> p.x)
                     .attr('width', (p) -> bw*p.len)
 
-        row.attr('transform', (s) -> "translate(0,#{s.pos * bh})")
+        row.transition()
+           .attr('transform', (s) -> "translate(0,#{s.pos * bh})")
 
     # Draw the strain labels
     draw_labels: (elem) ->
         lbls = elem.selectAll('text.label')
                    .data(@matrix.strains(), (s) -> s.id)
-                   .enter()
-                   .append('text')
-                     .attr('class','label')
-                     .attr('text-anchor','end')
-                     .text((s) -> s.name)
-        lbls.attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
+        lbls.enter()
+            .append('text')
+             .attr('class','label')
+             .attr('text-anchor','end')
+             .text((s) -> s.name)
+             .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
+        lbls.transition()
+            .attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
+
+    redraw: () ->
+        @draw_boxes(@mini)
+
+        @draw_boxes(@focus)
+        @draw_labels(@labels)
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
@@ -172,10 +181,7 @@ class Pan
         #xAxis2.tickFormat((d) -> genes[d])
         @context.select(".x.axis").call(@xAxis2)
 
-        @draw_boxes(@mini)
-
-        @draw_boxes(@focus)
-        @draw_labels(@labels)
+        @redraw()
 
         # commence completely zoomed out
         @set_scale(0, @width/(bw*@matrix.genes().length))
@@ -196,6 +202,14 @@ class GeneMatrix
         # Give both genes and strains ids.
         @_strains.forEach((s,i) -> s.id = s.pos = i)
         @_genes.forEach((g,i) -> g.id = i)
+        @_build_by_pos()
+        window.gg = this
+
+    # Sort the strains by position order into a local array @_pos
+    # @_pos indexed by position, returns strain_id
+    _build_by_pos: () ->
+        @_pos = @_strains.map((s) -> s.pos)
+        @_pos.sort((a,b) -> a-b)
 
     strains: () ->
         @_strains
@@ -203,6 +217,12 @@ class GeneMatrix
         @_genes
     presence: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]
+
+    set_first: (strain_id) ->
+        idx = @_pos.indexOf(strain_id)
+        @_pos.splice(idx, 1)         # Remove it from the list
+        @_pos.splice(0,0, strain_id) # And put it on the front
+        @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
 
 # Load a Torsty home-brew .CSV ortholog file
 # This needs to be deprecated, not sure how I generated it!
