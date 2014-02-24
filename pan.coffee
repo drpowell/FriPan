@@ -169,6 +169,8 @@ class Pan
              .attr('text-anchor','end')
              .text((s) -> s.name)
              .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
+             .on("mouseover", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true}))
+             .on("mouseout", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false}))
         lbls.transition()
             .attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
