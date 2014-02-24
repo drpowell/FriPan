@@ -152,6 +152,7 @@ class Pan
         ngs = row.enter()
                   .append('g')
                    .attr('class',(s) -> "gene-row strain-#{s.id}")
+                   .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
         # Each row has a <rect> for 'on'
         ngs.append('rect')
                    .attr('class','on')
