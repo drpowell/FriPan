@@ -12,7 +12,7 @@ class Pan
         diff = ex[1] - ex[0]
         if diff==0
             # Reset to full zoom
-            @set_scale(0, @width/(bw*@matrix.genes().length))
+            @reset_scale()
         else if diff > 1  # only sane scaling please
             sc = (@width / diff)
             #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
@@ -21,8 +21,18 @@ class Pan
 
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
-      @svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0) scale(#{sc},1)")
+        if !pos?
+            pos = @last_pos
+            sc = @last_sc
 
+        @last_pos = pos
+        @last_sc = sc
+        @svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0)
+                                                   scale(#{sc},#{@vscale})")
+        @svg.selectAll(".label-scale").attr("transform", "scale(1,#{@vscale})")
+
+    reset_scale: () ->
+        @set_scale(0,@width/(bw*@matrix.genes().length))
 
     detail: () ->
         [x,y] = d3.mouse(@focus.node())
@@ -113,7 +123,10 @@ class Pan
 
         # set up label area
         @labels = @svg.append("g")
-             .attr("transform", "translate(#{margin.left-10},#{margin.top})")
+                       .attr("transform", "translate(#{margin.left-10},#{margin.top})")
+                      .append("g")
+                       .attr('class','label-scale')
+                       .attr("transform", "scale(1,#{@vscale})")
 
         # set tooltip object
         @tooltip = d3.select("#tooltip")
@@ -190,11 +203,20 @@ class Pan
         @redraw()
 
         # commence completely zoomed out
-        @set_scale(0, @width/(bw*@matrix.genes().length))
+        @reset_scale()
 
     constructor: (@elem, @matrix) ->
+        @vscale = 1.0
         @create_elems()
         @draw_chart()
+
+        $('#vscale input').on('keyup', (e) =>
+            str = $(e.target).val()
+            val = parseFloat(str)
+            if val>0 && val<2
+                @vscale = val
+                @set_scale()
+        )
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
@@ -209,7 +231,6 @@ class GeneMatrix
         @_strains.forEach((s,i) -> s.id = s.pos = i)
         @_genes.forEach((g,i) -> g.id = i)
         @_build_by_pos()
-        window.gg = this
 
     # Sort the strains by position order into a local array @_pos
     # @_pos indexed by position, returns strain_id
