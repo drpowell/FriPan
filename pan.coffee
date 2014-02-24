@@ -172,11 +172,16 @@ class Pan
 
         @draw_boxes(@focus)
         for i in [0 ... @matrix.strains().length]
-            # draw strain labels
-            @labels.append('text')
-                .text(@matrix.strains()[i])
-                .attr('x', 0)
-                .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
+            do (i) =>
+                # draw strain labels
+                @labels.append('text')
+                    .text(@matrix.strains()[i])
+                    .attr('class',"strain-#{i}")
+                    .attr('x', 0)
+                    .attr('y', (i+1)*bh-1)   # i+1 as TEXT is from baseline not top
+                    .on("mouseover", () -> d3.selectAll(".strain-#{i}").classed({'highlight':true}))
+                    .on("mouseout", () -> d3.selectAll(".strain-#{i}").classed({'highlight':false}))
+
             # TODO: set font size to be same as row height?
             # TODO: right-align the text?
 

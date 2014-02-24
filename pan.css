@@ -71,3 +71,7 @@ path {
 //  background: lightgray;
 }
 
+.highlight {
+  fill: red;
+  font-weight: bold;
+}
