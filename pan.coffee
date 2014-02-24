@@ -45,12 +45,14 @@ class Pan
         strain = @matrix.strains()[strain_id]
         gene = @matrix.genes()[col]
         p = @matrix.presence(strain_id,col)
+        gene_name_pri = @matrix.gene_name(col)
+        gene_name_strain = @matrix.strain_gene_name(strain_id,col)
     #    $('#info').text("Strain:#{strain}  Gene:#{gene.name}  present:#{p}")
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
-                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene.name}</br><b>Product:</b> #{gene.desc}<br/><b>Present:</b> #{p}")
+                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}")
 
     create_elems: () ->
         tot_width = $(@elem).width()
@@ -226,6 +228,10 @@ class Pan
         @draw_chart()
 
 class GeneMatrix
+    # strains - array of strain objects.  Should have 'name'
+    # genes - array of gene objects.  Should have 'name'
+    # values - 2d array, 1 row per strain. 1 col per gene.  value should be null
+    #          for not-present.  Otherwise may use a per-gene name
     constructor: (@_strains, @_genes, @_values) ->
         # Give both genes and strains ids.
         @_strains.forEach((s,i) -> s.id = s.pos = i)
@@ -249,7 +255,17 @@ class GeneMatrix
         @_genes
 
     presence: (strain_id, gene_id) ->
+        @_values[strain_id][gene_id]?
+
+    strain_gene_name: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]
+
+    # Find a name for the gene - searching by "pos" (ie. from the top)
+    gene_name: (gene_id) ->
+        for idx in @_pos
+            n = @strain_gene_name(idx,gene_id)
+            return n if n?
+        "not found"
 
     # Set the given strain id to be first in the list
     set_first: (strain_id) ->
@@ -280,7 +296,7 @@ parse_csv = (csv) ->
                 continue
             j+=1
             p = parseInt(v)
-            val_row.push(p)
+            val_row.push(if p==0 then null else true)
     new GeneMatrix(strains,genes,values)
 
 
@@ -300,7 +316,7 @@ parse_proteinortho = (tsv) ->
                         .map((s) -> {name: s})
             console.log "STRAINS: #{strains}"
         genes.push( {name:"cluster#{i}", desc:""} )
-        values.push( strains.map( (s) -> if row[s.name]=='*' then 0 else 1) )
+        values.push( strains.map( (s) -> if row[s.name]=='*' then null else row[s.name]) )
 
     new GeneMatrix( strains, genes, d3.transpose(values) )
 
