@@ -30,6 +30,8 @@ class Pan
         row = Math.round(y/bh)
         col = Math.round(x/bw)
         strain_id = @matrix.strain_pos_to_id(row)
+        return if !strain_id?
+
         strain = @matrix.strains()[strain_id]
         gene = @matrix.genes()[col]
         p = @matrix.presence(strain_id,col)
