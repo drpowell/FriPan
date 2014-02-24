@@ -24,6 +24,10 @@ class Pan
         range = [0, @matrix.genes().length-1] if !range
         range = [Math.floor(range[0]), Math.ceil(range[1])]
         console.log "drawing",range
+
+        #comp = MDS.pca(@matrix._values)
+        #@scatter.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
+
         mds = MDS.cmdscale(MDS.distance(@matrix, range))
         @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
 
