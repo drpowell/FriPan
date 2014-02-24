@@ -201,8 +201,15 @@ class Pan
     constructor: (@elem, @matrix) ->
         @create_elems()
         @draw_chart()
-        @scatter = new ScatterPlot('#mds')
-        @redraw_mds(null)
+
+        @scatter = new ScatterPlot(
+                     elem: '#mds'
+                     click: (s) => @matrix.set_first(s.id) ; @redraw()
+                     mouseover: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true})
+                     mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})
+                    )
+
+                @redraw_mds(null)
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize

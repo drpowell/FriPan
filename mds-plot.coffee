@@ -44,10 +44,17 @@ class MDS
 class ScatterPlot
     width = 300
     right = left = 200
-    constructor: (elem, tot_width=width+left+right, tot_height=300) ->
+    constructor: (@opts) ->
+        @opts.elem       ?= 'svg'
+        @opts.tot_width  ?= width+left+right
+        @opts.tot_height ?= 300
+        @opts.callback    = {}
+        ['click','mouseover','mousemove','mouseout'].forEach((s) =>
+            @opts.callback[s] = @opts[s])
+
         margin = {top: 20, right: right, bottom: 40, left: left}
-        @width = tot_width - margin.left - margin.right
-        @height = tot_height - margin.top - margin.bottom
+        @width =  @opts.tot_width - margin.left - margin.right
+        @height = @opts.tot_height - margin.top - margin.bottom
 
         @x = d3.scale.linear()
                .range([0, @width])
@@ -65,7 +72,7 @@ class ScatterPlot
                    .scale(@y)
                    .orient("left");
 
-        @svg = d3.select(elem).append("svg")
+        @svg = d3.select(@opts.elem).append("svg")
                  .attr("width", @width + margin.left + margin.right)
                  .attr("height", @height + margin.top + margin.bottom)
                 .append("g")
@@ -118,8 +125,9 @@ class ScatterPlot
              .attr("r", 3.5)
              .attr("cx",0)
              .attr("cy",0)
-             .on("mouseover", (_,i) -> d3.selectAll(".strain-#{i}").classed({'highlight':true}))
-             .on("mouseout", (_,i) -> d3.selectAll(".strain-#{i}").classed({'highlight':false}))
+             .on("click", (_,i)     => @_event('click',labels[i]))
+             .on("mouseover", (_,i) => @_event('mouseover',labels[i]))
+             .on("mouseout", (_,i)  => @_event('mouseout',labels[i]))
              #.style("fill", (d,i) => @color(labels[i].parent))
         dot_g.append("text")
              .attr('class', (d,i) -> "labels strain-#{i}")
@@ -133,6 +141,9 @@ class ScatterPlot
             .duration(10)
             .attr("transform", (d) => "translate(#{@x(d[dim1])},#{@y(d[dim2])})")
 
+    _event: (typ, arg) ->
+        if @opts.callback[typ]
+            @opts.callback[typ](arg)
 
 window.MDS = MDS
 window.ScatterPlot = ScatterPlot
