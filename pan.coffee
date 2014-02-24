@@ -21,8 +21,9 @@ class Pan
             @redraw_mds(ex)
 
     redraw_mds: (range) ->
-        range = [0, @matrix.genes().length-1] if !range
-        range = [Math.floor(range[0]), Math.ceil(range[1])]
+        ngenes = @matrix.genes().length
+        range = [0, ngenes-1] if !range
+        range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
         console.log "drawing",range
 
         #comp = MDS.pca(@matrix._values)
