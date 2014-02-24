@@ -43,9 +43,9 @@ class Pan
 
     create_elems: () ->
         tot_width = $(@elem).width()
-        tot_height = 800
+        tot_height = bh * @matrix.strains().length + 200
         margin = {top: 150, right: 10, bottom: 10, left: 140}
-        margin2 = {top: 50, right: margin.right, bottom: 700, left: margin.left}
+        margin2 = {top: 50, right: margin.right, bottom: tot_height - 100, left: margin.left}
         @width = tot_width - margin.left - margin.right
         @height = tot_height - margin.top - margin.bottom
         @height2 = tot_height - margin2.top - margin2.bottom
