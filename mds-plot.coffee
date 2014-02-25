@@ -152,6 +152,9 @@ class ScatterPlot
              .text((d,i) -> labels[i].name)
              .attr('x',3)
              .attr('y',-3)
+             .on("click", (_,i)     => @_event('click',labels[i]))
+             .on("mouseover", (_,i) => @_event('mouseover',labels[i]))
+             .on("mouseout", (_,i)  => @_event('mouseout',labels[i]))
              #.style("fill", (d,i) => @color(labels[i]))
 
         # Position the dots
