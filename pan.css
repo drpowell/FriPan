@@ -84,4 +84,5 @@ path {
 
 #vscale { float: right; }
 
-#mds-thinking { position: absolute; font-size: 50px; top: 200px; left: 600px; }
+#mds, #mds2 { display: inline-block; }
+#mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }

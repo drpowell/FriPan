@@ -24,27 +24,40 @@ class Pan
         ngenes = @matrix.genes().length
         range = [0, ngenes-1] if !range
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
-        console.log "drawing",range
+        #console.log "drawing",range
 
-        #comp = MDS.pca(@matrix._values)
-        #@scatter.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
+        comp = MDS.pca(@matrix, range)
+        @scatter2.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
 
+        # Callback to reorder rows
         window.clearTimeout(@background_runner)
         @background_runner = window.setTimeout(() =>
-            $('#mds-thinking').show()
-            $('#mds').css('opacity','0.3')
-            window.setTimeout(() =>
-                mds = MDS.cmdscale(MDS.distance(@matrix, range))
-                @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
-                $('#mds-thinking').hide()
-                $('#mds').css('opacity','1.0')
-
-                ids = @matrix.strains().map((s) -> s.id)
-                ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
-                @matrix.set_order(ids)
-                @redraw()
-            ,0)
+            comp = MDS.pca(@matrix, range)     # Recompute.  Really should store this from before
+            comp = numeric.transpose(comp)
+            ids = @matrix.strains().map((s) -> s.id)
+            ids.sort((a,b) -> comp[0][a] - comp[0][b])
+            @matrix.set_order(ids)
+            @redraw()
         ,1000)
+
+
+        # cmdscale is slow, do it in a callback
+        # window.clearTimeout(@background_runner)
+        # @background_runner = window.setTimeout(() =>
+        #     $('#mds-thinking').show()
+        #     $('#mds').css('opacity','0.3')
+        #     window.setTimeout(() =>
+        #         mds = MDS.cmdscale(MDS.distance(@matrix, range))
+        #         @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
+        #         $('#mds-thinking').hide()
+        #         $('#mds').css('opacity','1.0')
+
+        #         ids = @matrix.strains().map((s) -> s.id)
+        #         ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
+        #         @matrix.set_order(ids)
+        #         @redraw()
+        #     ,0)
+        # ,1000)
 
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
@@ -238,8 +251,14 @@ class Pan
         @create_elems()
         @draw_chart()
 
-        @scatter = new ScatterPlot(
-                     elem: '#mds'
+        #@scatter = new ScatterPlot(
+        #             elem: '#mds'
+        #             click: (s) => @matrix.set_first(s.id) ; @redraw()
+        #             mouseover: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true})
+        #             mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})
+        #            )
+        @scatter2 = new ScatterPlot(
+                     elem: '#mds2'
                      click: (s) => @matrix.set_first(s.id) ; @redraw()
                      mouseover: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true})
                      mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})

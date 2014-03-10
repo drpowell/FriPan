@@ -12,7 +12,7 @@ class MDS
                 (dist[s1] ||= [])[s2] = d
 
         # Print as R code!
-        console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
+        #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
         #mat.strains().forEach((s1,i) -> mat.strains().map((s2,j) -> console.log s1,s2,dist[i][j]))
         #console.log mat.strains(),dist[0]
         console.log "Distance took : #{new Date - t1}ms"
@@ -20,8 +20,14 @@ class MDS
         dist
 
 
-    @pca: (matrix) ->
+    @pca: (mat, gene_range) ->
         t1= new Date
+        matrix = []
+        for s in [0...mat.strains().length]
+            matrix.push(row = [])
+            for g in [gene_range[0] .. gene_range[1]]
+                row.push(mat.presence(s,g))
+
         # We expect 1 row per sample.  Each column is a different gene
         # Subtract column-wise mean (need zero-mean for PCA).
         X = numeric.transpose(numeric.transpose(matrix).map((r) -> mean = 1.0*numeric.sum(r)/r.length; numeric.sub(r,mean)))
@@ -29,8 +35,8 @@ class MDS
 
         sigma = numeric.dot(X,numeric.transpose(X))
         svd = numeric.svd(sigma)
-        r = numeric.dot(svd.V, numeric.sqrt(numeric.diag(svd.S)))
-        console.log svd.S,svd,r
+        r = numeric.dot(svd.V, numeric.diag(svd.S))   # No sqrt - means we are using manhattan distance(?)
+        #r = numeric.dot(svd.V, numeric.sqrt(numeric.diag(svd.S)))
         console.log "SVD took : #{new Date - t1}ms"
         r
 
@@ -50,7 +56,7 @@ class MDS
         #order.sort((a,b) -> eig.lambda.x[b] - eig.lambda.x[a])  # FIXME - we're not selecting the largest eigenvalues!
         ev = order.map((i) -> eig.lambda.x[i])
         evec = order.map((i) -> eig.E.x[i])
-        console.log ev
+        #console.log ev
 
         dim = (idx) ->
             numeric.mul(numeric.transpose(evec)[idx], Math.sqrt(ev[idx]))
