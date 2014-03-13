@@ -223,8 +223,8 @@ class Pan
              .attr('text-anchor','end')
              .text((s) -> s.name)
              .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
-             .on("mouseover", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true}))
-             .on("mouseout", (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false}))
+             .on("mouseover", (s) => @highlight(s))
+             .on("mouseout", (s) => @unhighlight())
         lbls.transition()
             .attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
@@ -246,6 +246,15 @@ class Pan
         # commence completely zoomed out
         @reset_scale()
 
+    # Highlight the strain in the MDS plot, and in the table
+    highlight: (strain) ->
+        d3.selectAll(".strain-#{strain.id}").classed({'highlight':true})
+        @scatter2.highlight("strain-#{strain.id}")
+
+    unhighlight: () ->
+        d3.selectAll(".highlight").classed({'highlight':false})
+        @scatter2.unhighlight()
+
     constructor: (@elem, @matrix) ->
         @vscale = 1.0
         @create_elems()
@@ -260,8 +269,8 @@ class Pan
         @scatter2 = new ScatterPlot(
                      elem: '#mds2'
                      click: (s) => @matrix.set_first(s.id) ; @redraw()
-                     mouseover: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true})
-                     mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})
+                     mouseover: (s) => @highlight(s)
+                     mouseout: (s) => @unhighlight()
                     )
 
         @redraw_mds(null)
