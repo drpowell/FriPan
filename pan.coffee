@@ -74,6 +74,10 @@ class Pan
     reset_scale: () ->
         @set_scale(0,@width/(bw*@matrix.genes().length))
 
+    detail_off: () ->
+        @tooltip.style("display", "none")
+        @unhighlight()
+
     detail: () ->
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
@@ -83,6 +87,8 @@ class Pan
         return if !strain_id?
 
         strain = @matrix.strains()[strain_id]
+        @unhighlight()
+        @highlight(strain)
         gene = @matrix.genes()[col]
         p = @matrix.presence(strain_id,col)
         gene_name_pri = @matrix.gene_name(col)
@@ -135,7 +141,7 @@ class Pan
                      .attr("transform","translate(0,0)scale(1,1)")
                      .attr("class", "scale")
                      .on("mousemove", () => @detail())
-                     .on("mouseout", () => @tooltip.style("display", "none"))
+                     .on("mouseout", () => @detail_off())
 
 
         # set up SVG for brush selection
