@@ -86,3 +86,9 @@ path {
 
 #mds, #mds2 { display: inline-block; }
 #mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
+
+.mds-scatter svg { position: absolute; }
+.mds-scatter svg.overlay { pointer-events: none; }
+
+.mds-scatter rect { fill: none; }
+.mds-scatter .highlight rect { fill: #ddd; stroke: black; }

@@ -96,9 +96,23 @@ class ScatterPlot
                    .scale(@y)
                    .orient("left");
 
-        @svg = d3.select(@opts.elem).append("svg")
+        div = d3.select(@opts.elem).append("div")
+                .style(
+                    width: (@width + margin.left + margin.right)+"px"
+                    height: (@height + margin.top + margin.bottom)+"px")
+                .attr("class","mds-scatter")
+        @svg = div.append("svg")
                  .attr("width", @width + margin.left + margin.right)
                  .attr("height", @height + margin.top + margin.bottom)
+                 .attr("class","main")
+                .append("g")
+                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+        # Create an SVG "overlay" layer.  Only drawn on for highlighting to show stuff on top
+        @svg_overlay = div.append('svg')
+                 .attr("width", @width + margin.left + margin.right)
+                 .attr("height", @height + margin.top + margin.bottom)
+                 .attr("class","overlay")
                 .append("g")
                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -143,7 +157,14 @@ class ScatterPlot
 
         # Create the dots and labels
         dot_g = dots.enter().append("g")
-                    .attr("class", "dot")
+                    .attr('class', (d,i) -> "dot strain-#{i}")
+        dot_g.append("rect")
+             .attr("width",80)
+             .attr("height",13)
+             .attr('x',-3)
+             .attr('y',-3-10)
+             .attr('rx',5)
+             .attr('ry',5)
         dot_g.append("circle")
              .attr('class', (d,i) -> "strain-#{i}")
              .attr("r", 3.5)
@@ -167,6 +188,15 @@ class ScatterPlot
         dots.transition()
             .duration(10)
             .attr("transform", (d) => "translate(#{@x(d[dim1])},#{@y(d[dim2])})")
+
+    highlight: (cls) ->
+        elem = @svg.select(".dot.#{cls}")
+        @svg_overlay[0][0].appendChild(elem[0][0].cloneNode(true))
+
+    unhighlight: () ->
+        @svg_overlay.html('')
+
+
 
     _event: (typ, arg) ->
         if @opts.callback[typ]
