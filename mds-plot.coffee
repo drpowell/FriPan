@@ -73,7 +73,7 @@ class ScatterPlot
         @opts.tot_width  ?= width+left+right
         @opts.tot_height ?= 300
         @opts.callback    = {}
-        ['click','mouseover','mousemove','mouseout'].forEach((s) =>
+        ['click','mouseover','mousemove','mouseout','brush'].forEach((s) =>
             @opts.callback[s] = @opts[s])
 
         margin = {top: 20, right: right, bottom: 40, left: left}
@@ -115,6 +115,27 @@ class ScatterPlot
                  .attr("class","overlay")
                 .append("g")
                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+        gBrush = @svg.append('g')
+        @mybrush = d3.svg.brush()
+                     .x(@x)
+                     .y(@y)
+                     .clamp([false,false])
+                     .on("brush",  () => @_brushed())
+        gBrush.call(@mybrush)
+
+    _brushed: () ->
+        sel = @_selected()
+        @_event('brush', sel)
+
+    _selected: () ->
+        if @mybrush.empty()
+            null
+        else
+            ex = @mybrush.extent()
+            sel = @locs.filter((d) -> d.x>=ex[0][0] && d.x<=ex[1][0] && d.y>=ex[0][1] && d.y<=ex[1][1])
+            sel.map((d) -> d.item)
+
 
     # draw(data,labels)
     #   data - array of rows.  First row is all x-coordinates (dimension 1)
@@ -188,6 +209,9 @@ class ScatterPlot
         dots.transition()
             .duration(10)
             .attr("transform", (d) => "translate(#{@x(d[dim1])},#{@y(d[dim2])})")
+
+        # Record the dot positions (needed for the brush)
+        @locs = locs.map((d,i) => {x: d[dim1], y: d[dim2], item: labels[i]})
 
     highlight: (cls) ->
         elem = @svg.select(".dot.#{cls}")

@@ -263,6 +263,13 @@ class Pan
         d3.selectAll(".highlight").classed({'highlight':false})
         @scatter2.unhighlight()
 
+    mds_brushed: (strains) ->
+        d3.selectAll(".brushed").classed({'brushed':false})
+        if strains
+            strains.map((strain) ->
+                d3.selectAll(".strain-#{strain.id}").classed({'brushed':true})
+            )
+
     constructor: (@elem, @matrix) ->
         @vscale = 1.0
         @create_elems()
@@ -279,6 +286,7 @@ class Pan
                      click: (s) => @matrix.set_first(s.id) ; @redraw()
                      mouseover: (s) => @highlight(s)
                      mouseout: (s) => @unhighlight()
+                     brush: (s) => @mds_brushed(s)
                     )
 
         @redraw_mds(null)

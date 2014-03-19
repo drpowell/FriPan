@@ -73,13 +73,11 @@ path {
 .gene-row rect.on  { fill: green; }
 .gene-row rect.off { fill: lightgray; }
 
-.gene-row.highlight rect.on  { fill: red; }
-.gene-row.highlight rect.off { fill: lightgray; }
+.gene-row.highlight rect.on  { fill: red !important; }
+.gene-row.brushed rect.on  { fill: #058; }
 
-.highlight {
-  fill: red;
-  font-weight: bold;
-}
+.highlight { fill: red !important; font-weight: bold; }
+.brushed { fill: #058; font-weight: bold; }
 
 #vscale { float: right; }
 
@@ -91,3 +89,9 @@ path {
 
 .mds-scatter rect { fill: none; }
 .mds-scatter .highlight rect { fill: #ddd; stroke: black; }
+
+.mds-scatter .extent {
+  fill: #000;
+  fill-opacity: .2;
+  stroke: #fff;
+}
