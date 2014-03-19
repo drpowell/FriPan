@@ -93,11 +93,13 @@ class Pan
         p = @matrix.presence(strain_id,col)
         gene_name_pri = @matrix.gene_name(col)
         gene_name_strain = @matrix.strain_gene_name(strain_id,col)
+        desc_pri = @matrix.get_desc_non_hypot(col)
+        desc = @matrix.get_desc(gene_name_strain)
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
-                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}")
+                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/><b>Desc:</b> #{desc}")
 
     create_elems: () ->
         tot_width = $(@elem).width()
@@ -306,6 +308,7 @@ class GeneMatrix
         @_strains.forEach((s,i) -> s.id = s.pos = i)
         @_genes.forEach((g,i) -> g.id = i)
         @_build_by_pos()
+        @_desc = {}
 
     # Sort the strains by position order into a local array @_pos
     # @_pos indexed by position, returns strain_id
@@ -335,6 +338,31 @@ class GeneMatrix
             n = @strain_gene_name(idx,gene_id)
             return n if n?
         "not found"
+
+    # Set gene description for the given gene name
+    set_desc: (gene_name, desc) ->
+        @_desc[gene_name] = desc
+
+    # Find the first description that is not "hypothetical protein"
+    get_desc_non_hypot: (gene_id) ->
+        fst = ""
+        for idx in @_pos
+            n = @strain_gene_name(idx,gene_id)
+            continue if !n?
+            desc = @get_desc(n)
+            fst = desc if fst.length==0
+            return desc if desc.length>0 && !desc.match('hypothetical')
+        fst
+
+    # Get description by gene name
+    get_desc: (gene_name) ->
+        names = (gene_name || '').split(',')
+        res = ""
+        names.forEach((n) =>
+            res += " # " if res.length>0
+            res += @_desc[n] if @_desc[n]
+        )
+        res
 
     # Set the given strain id to be first in the list
     set_first: (strain_id) ->
@@ -404,7 +432,19 @@ parse_orthomcl = (tsv) ->
     # FIXME
 
 
-# main()
+# Load gene descriptions from a file 'gene-desc.txt'
+load_desc = (matrix) ->
+    d3.text("gene-desc.txt", (data) ->
+        lines = data.split("\n")
+
+        lines.forEach( (l) ->
+            match = />(.*?) (.*)/.exec(l)
+            if match
+                matrix.set_desc(match[1], match[2])
+            else
+                console.log "BAD LINE: #{l}"
+        )
+    )
 
 init = () ->
 
@@ -417,6 +457,7 @@ init = () ->
 
         console.log "Features : ",matrix.genes()
         console.log "Strains : ",matrix.strains()
+        load_desc(matrix)
 
         d3.select("#topinfo")
             .html("Loaded #{matrix.strains().length} strains and #{matrix.genes().length} ortholog clusters")
