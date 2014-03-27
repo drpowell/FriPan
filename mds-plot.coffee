@@ -226,5 +226,5 @@ class ScatterPlot
         if @opts.callback[typ]
             @opts.callback[typ](arg)
 
-window.MDS = MDS
-window.ScatterPlot = ScatterPlot
+@MDS = MDS
+@ScatterPlot = ScatterPlot
