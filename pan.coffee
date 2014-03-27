@@ -203,7 +203,7 @@ class Pan
         ngs = row.enter()
                   .append('g')
                    .attr('class',(s) -> "gene-row strain-#{s.id}")
-                   .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
+                   .on('click', (s) => @matrix.set_first(s.id))
         # Each row has a <rect> for 'on'
         ngs.append('rect')
                    .attr('class','on')
@@ -230,7 +230,7 @@ class Pan
              .attr('class',(s) -> "label strain-#{s.id}")
              .attr('text-anchor','end')
              .text((s) -> s.name)
-             .on('click', (s) => @matrix.set_first(s.id) ; @redraw())
+             .on('click', (s) => @matrix.set_first(s.id))
              .on("mouseover", (s) => @highlight(s))
              .on("mouseout", (s) => @unhighlight())
         lbls.transition()
@@ -275,21 +275,21 @@ class Pan
         @create_elems()
         @draw_chart()
 
-        #@scatter = new ScatterPlot(
-        #             elem: '#mds'
-        #             click: (s) => @matrix.set_first(s.id) ; @redraw()
-        #             mouseover: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':true})
-        #             mouseout: (s) -> d3.selectAll(".strain-#{s.id}").classed({'highlight':false})
-        #            )
+        @matrix.on('order_changed', () => @redraw())
+
         @scatter2 = new ScatterPlot(
                      elem: '#mds2'
-                     click: (s) => @matrix.set_first(s.id) ; @redraw()
+                     click: (s) => @matrix.set_first(s.id)
                      mouseover: (s) => @highlight(s)
                      mouseout: (s) => @unhighlight()
                      brush: (s) => @mds_brushed(s)
                     )
 
-        @redraw_mds(null)
+        @mds = new MDSHandler(@matrix)
+        @mds.on('redraw', (comp) =>
+             @scatter2.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
+        )
+        @mds.update(null)
 
         $('#vscale input').on('keyup', (e) =>
             str = $(e.target).val()

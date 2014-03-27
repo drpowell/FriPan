@@ -9,11 +9,14 @@ class GeneMatrix
         @_genes.forEach((g,i) -> g.id = i)
         @_build_by_pos()
         @_desc = {}
+        # @dispatch is used to send events when the order of rows changes
         @dispatch = d3.dispatch("order_changed") if d3?
 
+    # Convert GeneMatrix to a hash (for transport to a web-worker)
     as_hash: () ->
         {strains: @_strains, genes: @_genes, values: @_values, desc: @_desc}
 
+    # Create a GeneMatrix from a hash (created from above)
     @from_hash: (hsh) ->
         res = new GeneMatrix(hsh.strains, hsh.genes, hsh.values)
         res._desc = hsh.desc
