@@ -21,11 +21,11 @@ class LatestWorker
             if cur_data != @_last_data
                 @_computing = 1
                 @_last_data = cur_data
-                console.log "Sending", cur_data
+                console.log "Sending worker:", cur_data
                 @worker.postMessage(data: cur_data)
 
     done: (res) ->
-        console.log "Received", res
+        console.log "Received results"
         @_computing = 0
         @dispatch.updated(res)
 

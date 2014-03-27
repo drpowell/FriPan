@@ -15,7 +15,7 @@ class MDS
         #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
         #mat.strains().forEach((s1,i) -> mat.strains().map((s2,j) -> console.log s1,s2,dist[i][j]))
         #console.log mat.strains(),dist[0]
-        console.log "Distance took : #{new Date - t1}ms"
+        our_log "Distance took : #{new Date - t1}ms"
 
         dist
 
@@ -37,7 +37,7 @@ class MDS
         svd = numeric.svd(sigma)
         r = numeric.dot(svd.V, numeric.diag(svd.S))   # No sqrt - means we are using manhattan distance(?)
         #r = numeric.dot(svd.V, numeric.sqrt(numeric.diag(svd.S)))
-        console.log "SVD took : #{new Date - t1}ms"
+        our_log "SVD took : #{new Date - t1}ms"
         r
 
 
@@ -51,7 +51,7 @@ class MDS
         c = numeric.neg( numeric.div(c,2) )              # Not sure why, done by cmdscale
         t1 = new Date
         eig = numeric.eig(c)
-        console.log "eig took : #{new Date - t1}ms"
+        our_log "eig took : #{new Date - t1}ms"
         order = [0...c.length]
         #order.sort((a,b) -> eig.lambda.x[b] - eig.lambda.x[a])  # FIXME - we're not selecting the largest eigenvalues!
         ev = order.map((i) -> eig.lambda.x[i])
