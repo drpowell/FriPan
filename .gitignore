@@ -3,3 +3,4 @@ pan.js
 mds-plot.js
 mds-worker.js
 gene-matrix.js
+util.js
