@@ -60,7 +60,6 @@ class MDSHandler
             ids = @matrix.strains().map((s) -> s.id)
             ids.sort((a,b) -> comp[0][a] - comp[0][b])
             @matrix.set_order(ids)
-            @redraw()
         ,1000)
 
         # cmdscale is slow, do it in a callback
@@ -328,7 +327,7 @@ class Pan
 
         @mds = new MDSHandler(@matrix)
         @mds.on('redraw', (comp) =>
-             @scatter2.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
+            @scatter2.draw(comp, @matrix.strains(), [0,1])
         )
         @mds.update(null)
 
