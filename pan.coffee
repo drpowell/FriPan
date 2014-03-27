@@ -1,45 +1,67 @@
 
-# block width and heightl, one block per gene per species
+# block width and height, one block per gene per species
 bw = 1
 bh = 10
 
-class Pan
-    brushed: (brush) ->
-        #x.domain(if brush.empty() then x2.domain() else brush.extent())
-        # focus.select("path").attr("d", area)
-        #focus.select(".x.axis").call(xAxis)
-        ex = brush.extent()
-        diff = ex[1] - ex[0]
-        if diff==0
-            # Reset to full zoom
-            @reset_scale()
-            @redraw_mds(null)
-        else if diff > 1  # only sane scaling please
-            sc = (@width / diff)
-            #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
-            @set_scale(ex[0], sc)
-            @redraw_mds(ex)
+# A worker that will only compute new values if the web worker is not busy
+# and the parameters have changed
+class LatestWorker
+    constructor: (@worker, @get_current_data) ->
+        @dispatch = d3.dispatch("updated")
+        @_computing = 0
+        @_last_data = null
+        @worker.addEventListener('message', (ev) => @done(ev.data))
 
-    redraw_mds: (range) ->
+    on: (t,func) ->
+        @dispatch.on(t, func)
+
+    update: () ->
+        if !@_computing
+            cur_data = @get_current_data()
+            if cur_data != @_last_data
+                @_computing = 1
+                @_last_data = cur_data
+                console.log "Sending", cur_data
+                @worker.postMessage(data: cur_data)
+
+    done: (res) ->
+        console.log "Received", res
+        @_computing = 0
+        @dispatch.updated(res)
+
+# MDSHandler takes "update" events and sends them to the 'LatestWorker'
+# It dispatches "redraw" events when the the computation is done
+class MDSHandler
+    constructor: (@matrix) ->
+        @dispatch = d3.dispatch("redraw")
+        @_current_range = null
+        worker = new Worker('mds-worker.js')
+        worker.postMessage(init: @matrix.as_hash())
+        @latest_worker = new LatestWorker(worker, () => @_current_range)
+        @latest_worker.on('updated', (comp) => @redraw(comp))
+
+    on: (t,func) ->
+        @dispatch.on(t, func)
+
+    update: (range) ->
         ngenes = @matrix.genes().length
-        range = [0, ngenes-1] if !range
+        range = [0, ngenes-1] if !range?
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
+        @_current_range = range
         #console.log "drawing",range
+        @latest_worker.update()
 
-        comp = MDS.pca(@matrix, range)
-        @scatter2.draw(numeric.transpose(comp), @matrix.strains(), [0,1])
+    redraw: (comp) ->
+        @dispatch.redraw(comp)
 
         # Callback to reorder rows
         window.clearTimeout(@background_runner)
         @background_runner = window.setTimeout(() =>
-            comp = MDS.pca(@matrix, range)     # Recompute.  Really should store this from before
-            comp = numeric.transpose(comp)
             ids = @matrix.strains().map((s) -> s.id)
             ids.sort((a,b) -> comp[0][a] - comp[0][b])
             @matrix.set_order(ids)
             @redraw()
         ,1000)
-
 
         # cmdscale is slow, do it in a callback
         # window.clearTimeout(@background_runner)
@@ -58,6 +80,25 @@ class Pan
         #         @redraw()
         #     ,0)
         # ,1000)
+
+
+
+class Pan
+    brushed: (brush) ->
+        #x.domain(if brush.empty() then x2.domain() else brush.extent())
+        # focus.select("path").attr("d", area)
+        #focus.select(".x.axis").call(xAxis)
+        ex = brush.extent()
+        diff = ex[1] - ex[0]
+        if diff==0
+            # Reset to full zoom
+            @reset_scale()
+            @mds.update(null)
+        else if diff > 1  # only sane scaling please
+            sc = (@width / diff)
+            #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
+            @set_scale(ex[0], sc)
+            @mds.update(ex)
 
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
