@@ -47,6 +47,16 @@ class GeneMatrix
     strain_gene_name: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]
 
+    search_gene: (str, max) ->
+        res = []
+        for i in @_pos
+            for j in [0 ... @_values[i].length]
+                n =  @_values[i][j]
+                if n? && n.indexOf(str)>=0
+                    res.push({label:n, value:j})
+                return res if res.length>=max
+        return res
+
     # Find a name for the gene - searching by "pos" (ie. from the top)
     gene_name: (gene_id) ->
         for idx in @_pos
