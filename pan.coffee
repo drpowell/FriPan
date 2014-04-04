@@ -118,8 +118,8 @@ class Pan
     detail: () ->
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
-        row = Math.round(y/@bh)
-        col = Math.round(x/@bw)
+        row = Math.floor(y/@bh)
+        col = Math.floor(x/@bw)
         strain_id = @matrix.strain_pos_to_id(row)
         return if !strain_id?
 
