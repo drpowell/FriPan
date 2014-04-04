@@ -1,8 +1,4 @@
 
-# block width and height, one block per gene per species
-bw = 1
-bh = 10
-
 # A worker that will only compute new values if the web worker is not busy
 # and the parameters have changed
 class LatestWorker
@@ -112,7 +108,7 @@ class Pan
         @svg.selectAll(".label-scale").attr("transform", "scale(1,#{@vscale})")
 
     reset_scale: () ->
-        @set_scale(0,@width/(bw*@matrix.genes().length))
+        @set_scale(0,@width/(@bw*@matrix.genes().length))
 
     detail_off: () ->
         @tooltip.style("display", "none")
@@ -121,8 +117,8 @@ class Pan
     detail: () ->
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
-        row = Math.round(y/bh)
-        col = Math.round(x/bw)
+        row = Math.round(y/@bh)
+        col = Math.round(x/@bw)
         strain_id = @matrix.strain_pos_to_id(row)
         return if !strain_id?
 
@@ -143,7 +139,7 @@ class Pan
 
     create_elems: () ->
         tot_width = $(@elem).width()
-        tot_height = bh * @matrix.strains().length + 200
+        tot_height = @bh * @matrix.strains().length + 200
         margin = {top: 150, right: 10, bottom: 10, left: 140}
         margin2 = {top: 50, right: margin.right, bottom: tot_height - 100, left: margin.left}
         @width = tot_width - margin.left - margin.right
@@ -195,8 +191,8 @@ class Pan
         @mini = @context.append("g")
                         .attr("class", "minimap")
                         .attr("transform","translate(0,0)
-                                           scale(#{@width/(bw*@matrix.genes().length)},
-                                           #{@height2/(bh*@matrix.strains().length)})")
+                                           scale(#{@width/(@bw*@matrix.genes().length)},
+                                           #{@height2/(@bh*@matrix.strains().length)})")
 
         @context.append("g")
             .attr("class", "x axis")
@@ -247,19 +243,19 @@ class Pan
         # Each row has a <rect> for 'on'
         ngs.append('rect')
                    .attr('class','on')
-                   .attr('width', bw*@matrix.genes().length)
-                   .attr('height',bh-1)
+                   .attr('width', @bw*@matrix.genes().length)
+                   .attr('height',@bh-1)
         # Then a bunch of <rect> for collapsed 'off'
         ngs.selectAll('rect.off')
             .data((s) => @collapse_off(s.id))
             .enter().append('rect')
                     .attr('class','off')
-                    .attr('height',bh-1)
+                    .attr('height',@bh-1)
                     .attr('x', (p) -> p.x)
-                    .attr('width', (p) -> bw*p.len)
+                    .attr('width', (p) => @bw*p.len)
 
         row.transition()
-           .attr('transform', (s) -> "translate(0,#{s.pos * bh})")
+           .attr('transform', (s) => "translate(0,#{s.pos * @bh})")
 
     # Draw the strain labels
     draw_labels: (elem) ->
@@ -274,7 +270,7 @@ class Pan
              .on("mouseover", (s) => @highlight(s))
              .on("mouseout", (s) => @unhighlight())
         lbls.transition()
-            .attr('y', (s) -> (s.pos+1)*bh-1)   # i+1 as TEXT is from baseline not top
+            .attr('y', (s) => (s.pos+1)*@bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
 
     redraw: () ->
@@ -311,6 +307,10 @@ class Pan
             )
 
     constructor: (@elem, @matrix) ->
+        # block width and height, one block per gene per species
+        @bw = 1
+        @bh = 10
+
         @vscale = 1.0
         @create_elems()
         @draw_chart()
