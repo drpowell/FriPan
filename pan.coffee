@@ -163,7 +163,7 @@ class Pan
         # Add a clip rectangle to keep the area inside
         @svg.append("svg:defs")
            .append("svg:clipPath")
-            .attr("id", "circle1")  # what is circle1?
+            .attr("id", "draw-region")
            .append('rect')
             .attr('width', @width)
             .attr('height',@height)
@@ -173,7 +173,7 @@ class Pan
         # set up SVG for gene content pane
 
         @focus = @svg.append("g")
-                     .attr("clip-path", "url(#circle1)")
+                     .attr("clip-path", "url(#draw-region)")
                      .attr("transform", "translate(#{margin.left},#{margin.top})")
                    .append("g")
                      .attr("transform","translate(0,0)scale(1,1)")
