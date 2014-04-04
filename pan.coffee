@@ -161,18 +161,29 @@ class Pan
             .attr("width", tot_width)
             .attr("height", tot_height)
 
+        defs = @svg.append("svg:defs")
         # Add a clip rectangle to keep the area inside
-        @svg.append("svg:defs")
-           .append("svg:clipPath")
-            .attr("id", "draw-region")
-           .append('rect')
-            .attr('width', @width)
-            .attr('height',@height)
-            .attr('x', 0)
-            .attr('y', 0)
+        defs.append("svg:clipPath")
+             .attr("id", "draw-region")
+            .append('rect')
+             .attr('width', @width)
+             .attr('height',@height)
+             .attr('x', 0)
+             .attr('y', 0)
+        defs.append("marker")
+             .attr("id","arrowhead")
+             .attr("viewBox","0 0 10 10")
+             .attr("refX","1")
+             .attr("refY","5")
+             .attr("markerUnits","strokeWidth")
+             .attr("orient","auto")
+             .attr("markerWidth","4")
+             .attr("markerHeight","3")
+            .append("polyline")
+             .attr("points","0,0 10,5 0,10 1,5")
+             .attr("fill","red")
 
         # set up SVG for gene content pane
-
         main = @svg.append("g")
                      .attr("clip-path", "url(#draw-region)")
                      .attr("transform", "translate(#{margin.left},#{margin.top})")
@@ -292,6 +303,34 @@ class Pan
             .style('stroke','white')
             .style('stroke-width','0.1')
 
+    # Draw a pointing indicator to a specific gene on both minimap and main display
+    _show_gene: (id) ->
+        pointer = @mini.selectAll('line.pointer')
+                        .data([1])
+        pointer.enter()
+            .append('line')
+            .attr('class','pointer')
+            .attr("marker-end", "url(#arrowhead)")
+        pointer.attr('x1', id+0.5)
+               .attr('x2', id+0.5)
+               .attr('y1',-100)
+               .attr('y2',-30)
+               .style('stroke','red')
+               .style('stroke-width',10)
+
+        pointer = @focus.selectAll('line.pointer')
+                        .data([1])
+        pointer.enter()
+            .append('line')
+            .attr('class','pointer')
+        pointer.attr('x1', id+0.5)
+               .attr('x2', id+0.5)
+               .attr('y1', 0)
+               .attr('y2', @bh*@matrix.strains().length)
+               .style('stroke','red')
+               .style('stroke-width',1)
+               .style('opacity', 0.8)
+
     redraw: () ->
         @draw_boxes(@mini)
 
@@ -350,6 +389,7 @@ class Pan
         )
         @mds.update(null)
 
+        @_init_search()
         $('#vscale input').on('keyup', (e) =>
             str = $(e.target).val()
             val = parseFloat(str)
@@ -358,12 +398,29 @@ class Pan
                 @set_scale()
         )
 
+
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
     resize: () ->
         @svg.remove()
         @create_elems()
         @draw_chart()
+
+    _init_search: () ->
+        $( "#search" ).autocomplete(
+          source: (req,resp) =>
+            lst = @matrix.search_gene(req.term,20)
+            resp(lst)
+        focus: (event, ui) =>
+            console.log "Showing",ui.item
+            @_show_gene(ui.item.value)
+            $("#search").val(ui.item.label)
+            false
+        select: (event, ui) =>
+            console.log "Showing",ui.item
+            @_show_gene(ui.item.value)
+            false
+        )
 
 # Load a Torsty home-brew .CSV ortholog file
 # This needs to be deprecated, not sure how I generated it!

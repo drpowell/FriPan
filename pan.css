@@ -18,6 +18,11 @@
   display: none; 
 }
 
+#search-div { font-size: 9pt; float: right; }
+#vscale { font-size: 9pt; float: right; }
+
+.ui-menu-item { font-size: 9pt; }
+
 svg {
   font: 10px sans-serif;
 }
@@ -78,8 +83,6 @@ path {
 
 .highlight { fill: red !important; font-weight: bold; }
 .brushed { fill: #058; font-weight: bold; }
-
-#vscale { float: right; }
 
 #mds, #mds2 { display: inline-block; }
 #mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
