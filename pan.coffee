@@ -106,7 +106,7 @@ class Pan
         @svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0)
                                                    scale(#{sc},#{@vscale})")
         @svg.selectAll(".label-scale").attr("transform", "scale(1,#{@vscale})")
-        $('g.gene-sep').toggle(sc>4)  # Hide the gene separator lines when zoomed out
+        $('g.gene-gap').toggle(sc>4)  # Hide the gene separator lines when zoomed out
 
     reset_scale: () ->
         @set_scale(0,@width/(@bw*@matrix.genes().length))
@@ -176,11 +176,16 @@ class Pan
         main = @svg.append("g")
                      .attr("clip-path", "url(#draw-region)")
                      .attr("transform", "translate(#{margin.left},#{margin.top})")
-        @focus = main.append("g")
+                   .append("g")
                      .attr("transform","translate(0,0)scale(1,1)")
                      .attr("class", "scale")
                      .on("mousemove", () => @detail())
                      .on("mouseout", () => @detail_off())
+        @focus = main.append("g")
+
+        gene_gaps = main.append("g")
+                        .attr("class","gene-gap")
+        @draw_gaps(gene_gaps)
 
         # set up SVG for brush selection
         @context = @svg.append("g")
@@ -274,16 +279,12 @@ class Pan
         # TODO: set font size to be same as row height?
 
     draw_gaps: (elem) ->
-        elem.selectAll('g.gene-sep').remove()
-        g = elem.append('g')
-                .attr('class','gene-sep')
-
-        col = g.selectAll('line.gene-sep')
+        col = elem.selectAll('line.gene-gap')
                   .data(@matrix.genes(), ((g) -> g.id))
         col.exit().remove()
         col.enter()
             .append('line')
-            .attr('class','gene-sep')
+            .attr('class','gene-gap')
             .attr('x1',(g,i) => i)
             .attr('x2',(g,i) => i)
             .attr('y1',0)
@@ -296,7 +297,6 @@ class Pan
 
         @draw_boxes(@focus)
         @draw_labels(@labels)
-        @draw_gaps(@focus)
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
