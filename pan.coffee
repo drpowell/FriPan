@@ -21,7 +21,6 @@ class LatestWorker
                 @worker.postMessage(data: cur_data)
 
     done: (res) ->
-        console.log "Received results"
         @_computing = 0
         @dispatch.updated(res)
 
@@ -95,6 +94,12 @@ class Pan
             @set_scale(ex[0], sc)
             @mds.update(ex)
 
+        # Draw or hide the gene gaps depending on the scale
+        if diff<=300
+            @draw_gaps(ex)
+        else
+            @hide_gaps()
+
     # should the x-translate NOT be scaled?
     set_scale: (pos,sc) ->
         if !pos?
@@ -106,7 +111,6 @@ class Pan
         @svg.selectAll(".scale").attr("transform","translate(#{-pos*sc},0)
                                                    scale(#{sc},#{@vscale})")
         @svg.selectAll(".label-scale").attr("transform", "scale(1,#{@vscale})")
-        $('g.gene-gap').toggle(sc>4)  # Hide the gene separator lines when zoomed out
 
     reset_scale: () ->
         @set_scale(0,@width/(@bw*@matrix.genes().length))
@@ -194,16 +198,15 @@ class Pan
                      .on("mouseout", () => @detail_off())
         @focus = main.append("g")
 
-        gene_gaps = main.append("g")
-                        .attr("class","gene-gap")
-        @draw_gaps(gene_gaps)
+        @gene_gaps = main.append("g")
+                         .attr("class","gene-gap")
 
         # set up SVG for brush selection
         @context = @svg.append("g")
             .attr( "transform", "translate(#{margin2.left},#{margin2.top})" );
 
         # Create - @mini a <g> to hold the small plot
-        # FIXME.  Factor out this scaling.  width should be like "set scale full".  Heightt should depend on number of strains
+        # FIXME.  Factor out this scaling.  width should be like "set scale full".  Height should depend on number of strains
         @mini = @context.append("g")
                         .attr("class", "minimap")
                         .attr("transform","translate(0,0)
@@ -289,15 +292,20 @@ class Pan
             .attr('y', (s) => (s.pos+1)*@bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
 
-    draw_gaps: (elem) ->
-        col = elem.selectAll('line.gene-gap')
-                  .data(@matrix.genes(), ((g) -> g.id))
+    hide_gaps: () ->
+        @gene_gaps.selectAll('line.gene-gap').remove()
+
+    draw_gaps: (ex) ->
+        in_range = @matrix.genes().filter((g) -> g.id >= ex[0] && g.id<=ex[1])
+        console.log "drawing gaps : ",in_range.length
+        col = @gene_gaps.selectAll('line.gene-gap')
+                        .data(in_range, ((g) -> g.id))
         col.exit().remove()
         col.enter()
             .append('line')
             .attr('class','gene-gap')
-            .attr('x1',(g,i) => i)
-            .attr('x2',(g,i) => i)
+            .attr('x1',(g,i) => g.id)
+            .attr('x2',(g,i) => g.id)
             .attr('y1',0)
             .attr('y2',@bh * @matrix.strains().length)
             .style('stroke','white')
