@@ -430,32 +430,6 @@ class Pan
             false
         )
 
-# Load a Torsty home-brew .CSV ortholog file
-# This needs to be deprecated, not sure how I generated it!
-
-parse_csv = (csv) ->
-    strains = []
-    values = []
-    genes = []
-    i=0
-    for row in csv
-        i += 1
-        if i==1
-            genes = d3.keys(row).map((g) -> {name:g, desc: row[g]})
-            continue
-        val_row = []
-        values.push(val_row)
-        j=0
-        for k,v of row
-            if k==''
-                strains.push({name:v})
-                continue
-            j+=1
-            p = parseInt(v)
-            val_row.push(if p==0 then null else true)
-    new GeneMatrix(strains,genes,values)
-
-
 # Load a ProteinOrtho5 output file
 # Please use -singles option to ensure singleton clusters are included!
 # http://www.bioinf.uni-leipzig.de/Software/proteinortho/
@@ -487,12 +461,12 @@ parse_orthomcl = (tsv) ->
 
 # Load gene descriptions from a file 'gene-desc.txt'
 load_desc = (matrix) ->
-    d3.text("gene-desc.txt", (data) ->
+    d3.text("pan.descriptions", (data) ->
         lines = data.split("\n")
 
         lines.forEach( (l) ->
             return if l.match(/^\s*$/)
-            match = />(.*?) (.*)/.exec(l)
+            match = /(.*?) (.*)/.exec(l)
             if match
                 matrix.set_desc(match[1], match[2])
             else
@@ -505,7 +479,6 @@ init = () ->
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
-#    d3.csv("pan.csv", (data) ->
     d3.tsv("pan.proteinortho", (data) ->
         matrix = parse_proteinortho(data)
 
