@@ -466,7 +466,7 @@ load_desc = (matrix) ->
 
         lines.forEach( (l) ->
             return if l.match(/^\s*$/)
-            match = /(.*?) (.*)/.exec(l)
+            match = /^(.*?) (.*)$/.exec(l)
             if match
                 matrix.set_desc(match[1], match[2])
             else
