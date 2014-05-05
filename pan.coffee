@@ -459,14 +459,14 @@ parse_orthomcl = (tsv) ->
     # FIXME
 
 
-# Load gene descriptions from a file 'gene-desc.txt'
+# Load gene labels from XXXX.descriptions file that ProteinOrtho5 produces
 load_desc = (matrix) ->
     d3.text("pan.descriptions", (data) ->
         lines = data.split("\n")
 
         lines.forEach( (l) ->
             return if l.match(/^\s*$/)
-            match = /^(.*?) (.*)$/.exec(l)
+            match = /^(.*?)\t(.*)$/.exec(l)
             if match
                 matrix.set_desc(match[1], match[2])
             else
