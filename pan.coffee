@@ -38,6 +38,10 @@ class MDSHandler
     on: (t,func) ->
         @dispatch.on(t, func)
 
+    enable_sort: (enable) ->
+        @sort_enabled = enable
+        @reorder()
+
     update: (range) ->
         ngenes = @matrix.genes().length
         range = [0, ngenes-1] if !range?
@@ -47,15 +51,20 @@ class MDSHandler
         @latest_worker.update()
 
     redraw: (comp) ->
+        @last_comp = comp
         @dispatch.redraw(comp)
+        @reorder()
 
-        # Callback to reorder rows
-        window.clearTimeout(@background_runner)
-        @background_runner = window.setTimeout(() =>
-            ids = @matrix.strains().map((s) -> s.id)
-            ids.sort((a,b) -> comp[0][a] - comp[0][b])
-            @matrix.set_order(ids)
-        ,1000)
+    reorder: () ->
+        if @last_comp? && @sort_enabled
+            comp = @last_comp
+            # Callback to reorder rows
+            window.clearTimeout(@background_runner)
+            @background_runner = window.setTimeout(() =>
+                ids = @matrix.strains().map((s) -> s.id)
+                ids.sort((a,b) -> comp[0][a] - comp[0][b])
+                @matrix.set_order(ids)
+            ,1000)
 
         # cmdscale is slow, do it in a callback
         # window.clearTimeout(@background_runner)
@@ -372,7 +381,7 @@ class Pan
                 d3.selectAll(".strain-#{strain.id}").classed({'brushed':true})
             )
 
-    constructor: (@elem, @matrix) ->
+    constructor: (@elem, @matrix, @strains) ->
         # block width and height, one block per gene per species
         @bw = 1
         @bh = 10
@@ -398,7 +407,7 @@ class Pan
         @mds.update(null)
 
         @_init_search()
-        $('#vscale input').on('keyup', (e) =>
+        $('input#vscale').on('keyup', (e) =>
             str = $(e.target).val()
             val = parseFloat(str)
             if val>0 && val<2
@@ -406,6 +415,36 @@ class Pan
                 @set_scale()
         )
 
+        $('select#strain-colour').on('change', (e) =>
+            v = $(e.target).val()
+            console.log v
+        )
+
+        $('select#strain-sort').on('change', (e) =>
+            @sort_order = $(e.target).val()
+            @reorder()
+        )
+
+        @sort_order = $('select#strain-sort option:selected').val()
+        @reorder
+
+
+    reorder: () ->
+        if @sort_order=='mds'
+            @mds.enable_sort(true)
+        else
+            @mds.enable_sort(false)
+            fld = @sort_order
+            strains = @strains.as_array()
+
+            console.log fld,strains
+            if fld=='fixed'
+                strains.sort((a,b) -> a.id - b.id)
+            else
+                strains.sort((a,b) -> a[fld].localeCompare(b[fld]))
+
+            ids = strains.map((s) -> s.id)
+            @matrix.set_order(ids)
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
@@ -462,6 +501,7 @@ parse_orthomcl = (tsv) ->
 # Load gene labels from XXXX.descriptions file that ProteinOrtho5 produces
 load_desc = (matrix) ->
     d3.text("pan.descriptions", (data) ->
+        return if !data?
         lines = data.split("\n")
 
         lines.forEach( (l) ->
@@ -474,23 +514,66 @@ load_desc = (matrix) ->
         )
     )
 
-init = () ->
+load_strains = (strainInfo) ->
+    d3.tsv("pan.strains", (data) ->
+        return if !data?
+        strainInfo.set_info(data)
 
+        # Add a separator to the "select" groups
+        if strainInfo.columns.length > 0
+            opt= "<option disabled>──────────</option>"
+            $('select#strain-sort').append(opt)
+            $('select#strain-colour').append(opt)
+
+        # Add a selector for each column of strain info
+        for c in strainInfo.columns
+            opt = "<option value=\"#{c}\">#{c}</option>"
+            $('select#strain-sort').append(opt)
+            $('select#strain-colour').append(opt)
+    )
+
+class StrainInfo
+    constructor: (@strains) ->
+        # Pass
+
+    as_array: () ->
+        @strains[..]
+
+    find_strain_by_name: (name) ->
+        @strains.filter((s) -> s.name == name)[0]
+
+    set_info: (@matrix) ->
+        @columns = d3.keys(@matrix[0])
+        if 'ID' != @columns.shift()
+            log_error("No ID column in pan.strains")
+            @columns = []
+            return
+        console.log "Read info on #{@matrix.length}.  Columns=#{@columns}"
+        for row in @matrix
+            s = @find_strain_by_name(row['ID'])
+            for c in @columns
+                s[c] = row[c]
+
+init = () ->
+    window.title = "FriPan"
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
     d3.tsv("pan.proteinortho", (data) ->
         matrix = parse_proteinortho(data)
 
+        strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
         console.log "Features : ",matrix.genes()
         console.log "Strains : ",matrix.strains()
+
         load_desc(matrix)
+        load_strains(strains)
 
         d3.select("#topinfo")
             .html("Loaded #{matrix.strains().length} strains and #{matrix.genes().length} ortholog clusters")
 
 
-        pan = new Pan('#chart', matrix)
+        pan = new Pan('#chart', matrix, strains)
 
         $( window ).resize(() -> pan.resize())
     )

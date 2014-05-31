@@ -18,8 +18,7 @@
   display: none; 
 }
 
-#search-div { font-size: 9pt; float: right; }
-#vscale { font-size: 9pt; float: right; }
+.option { font-size: 9pt; float: right; }
 
 .ui-menu-item { font-size: 9pt; }
 
