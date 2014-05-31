@@ -1,6 +1,9 @@
 
 # Calculate a MDS (classic) from a distnace matrix
 class MDS
+
+    # Calculate a "distance" based on presence/absence of genes
+    # Returns an array of array of distances
     @distance: (mat, gene_range) ->
         t1 = new Date
         dist = []
