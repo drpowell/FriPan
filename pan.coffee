@@ -426,7 +426,7 @@ class Pan
         )
 
         @sort_order = $('select#strain-sort option:selected').val()
-        @reorder
+        @reorder()
 
     make_colour_legend: (scale, fld) ->
         vals = scale.domain().sort()
