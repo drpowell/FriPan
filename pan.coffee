@@ -417,7 +417,7 @@ class Pan
 
         $('select#strain-colour').on('change', (e) =>
             v = $(e.target).val()
-            console.log v
+            @colour_by(v)
         )
 
         $('select#strain-sort').on('change', (e) =>
@@ -428,6 +428,18 @@ class Pan
         @sort_order = $('select#strain-sort option:selected').val()
         @reorder
 
+    colour_by: (fld) ->
+        scale = d3.scale.category10()
+        strains = @strains.as_array()
+        for s in strains
+            col = if fld=='none' then '' else scale(s[fld])
+
+            $(".strain-#{s.id} rect.on").css('fill', col)
+            $(".label.strain-#{s.id}").css('fill', col)
+
+            # mds
+            $(".mds-scatter .labels.strain-#{s.id}").css('fill', col)
+            $(".mds-scatter .dot.strain-#{s.id}").css('fill', col)
 
     reorder: () ->
         if @sort_order=='mds'
@@ -437,7 +449,6 @@ class Pan
             fld = @sort_order
             strains = @strains.as_array()
 
-            console.log fld,strains
             if fld=='fixed'
                 strains.sort((a,b) -> a.id - b.id)
             else
