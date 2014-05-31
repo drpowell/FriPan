@@ -437,10 +437,11 @@ class Pan
         elem.append('div')
             .attr('class','title')
             .text("Colour legend : #{fld}")
-        elem.selectAll('div')
+        elem.selectAll('div.elem')
             .data(vals)
             .enter()
             .append('div')
+              .attr('class','elem')
               .style('color', (v) -> scale(v))
               .text((v) -> v)
             .append('div')
@@ -514,7 +515,7 @@ parse_proteinortho = (tsv) ->
         if i==1
             strains = d3.keys(row)[3..] # skip first 3 junk columns
                         .map((s) -> {name: s})
-            console.log "STRAINS: #{strains}"
+            #console.log "STRAINS: #{strains}"
         genes.push( {name:"cluster#{i}", desc:""} )
         values.push( strains.map( (s) -> if row[s.name]=='*' then null else row[s.name]) )
 
@@ -579,11 +580,20 @@ class StrainInfo
             log_error("No ID column in pan.strains")
             @columns = []
             return
+
+        # Fill in an "unknown" for all
+        for s in @strains
+            for c in @columns
+                s[c] = '_not-set_'
+
         console.log "Read info on #{@matrix.length}.  Columns=#{@columns}"
         for row in @matrix
             s = @find_strain_by_name(row['ID'])
-            for c in @columns
-                s[c] = row[c]
+            if !s?
+                console.log "Unable to find strain for #{row['ID']}"
+            else
+                for c in @columns
+                    s[c] = row[c]
 
 init = () ->
     window.title = "FriPan"
@@ -594,8 +604,8 @@ init = () ->
         matrix = parse_proteinortho(data)
 
         strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
-        console.log "Features : ",matrix.genes()
-        console.log "Strains : ",matrix.strains()
+        #console.log "Features : ",matrix.genes()
+        #console.log "Strains : ",matrix.strains()
 
         load_desc(matrix)
         load_strains(strains)
