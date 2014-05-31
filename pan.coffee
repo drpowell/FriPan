@@ -495,4 +495,4 @@ init = () ->
         $( window ).resize(() -> pan.resize())
     )
 
-$(document).ready(() -> init() )
+$(document).ready(() -> add_browser_warning() ; init() )
