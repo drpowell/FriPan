@@ -29,6 +29,8 @@ An example ProteinOrtho5 result is provided: `pan.proteinortho.example` and `pan
 To view a different result just rename them `pan.proteinortho` and `pan.descriptions`. and overwrite the example file, 
 or edit the `pan.coffee` script to change the files it loads.
 
+It is also possible to give arbitrary information on strains for sorting or colouring.  See the `pan.strains.example` file for an example.  This is expected to be a tab separated file with the first column named "ID" with the strain names matching those in pan.`proteinortho`.  Create such a tab separated file and put name it `pan.strains`.
+
 ### Authors
 * David Powell
 * Torsten Seemann
