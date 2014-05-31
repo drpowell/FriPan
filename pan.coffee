@@ -428,8 +428,27 @@ class Pan
         @sort_order = $('select#strain-sort option:selected').val()
         @reorder
 
+    make_colour_legend: (scale, fld) ->
+        vals = scale.domain().sort()
+        elem = d3.select('#colour-legend')
+        elem.html('')
+        return if vals.length==0
+
+        elem.append('div')
+            .attr('class','title')
+            .text("Colour legend : #{fld}")
+        elem.selectAll('div')
+            .data(vals)
+            .enter()
+            .append('div')
+              .style('color', (v) -> scale(v))
+              .text((v) -> v)
+            .append('div')
+            .attr('class','box')
+              .style('background-color', (v) -> scale(v))
+
     colour_by: (fld) ->
-        scale = d3.scale.category10()
+        scale = d3.scale.category20()
         strains = @strains.as_array()
         for s in strains
             col = if fld=='none' then '' else scale(s[fld])
@@ -440,6 +459,7 @@ class Pan
             # mds
             $(".mds-scatter .labels.strain-#{s.id}").css('fill', col)
             $(".mds-scatter .dot.strain-#{s.id}").css('fill', col)
+        @make_colour_legend(scale, fld)
 
     reorder: () ->
         if @sort_order=='mds'
