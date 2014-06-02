@@ -71,8 +71,8 @@ class TreeBuilder
 
 class Dendrogram
     constructor: (@opts) ->
-        @opts.tot_width ||= 500
-        @opts.tot_height ||= 400
+        @opts.width ||= 500
+        @opts.height ||= 500
         @opts.label_width ||= 180
         @opts.h_pad ||= 20
         @opts.w_pad ||= 10
@@ -80,10 +80,10 @@ class Dendrogram
         @opts.label_pad ||= 5
         @svg = d3.select(@opts.elem).append("svg")
             .attr("class", "dendrogram")
-            .attr("width", @opts.tot_width)
-            .attr("height", @opts.tot_height)
+            .attr("width", @opts.width)
+            .attr("height", @opts.height)
            #.append("g")
-           #.attr("transform","rotate(90 #{@opts.tot_width/2} #{@opts.tot_height/2})")
+           #.attr("transform","rotate(90 #{@opts.width/2} #{@opts.height/2})")
 
     _calc_pos: (node, leaf_pos) ->
         if node.leaf
@@ -99,6 +99,7 @@ class Dendrogram
             return leaf_pos
 
     draw: (builder) ->
+        @svg.html('')
         root = builder.tree
         all = builder.flattened
         nodes = all.filter((n) -> !n.leaf)
@@ -107,11 +108,11 @@ class Dendrogram
         num_leaf = @_calc_pos(root,0)
 
         x=d3.scale.linear()
-                  .range([ @opts.tot_width-@opts.label_width-@opts.w_pad, 0])
+                  .range([ @opts.width-@opts.label_width-@opts.w_pad, 0])
                   .domain([0, root.dist])
 
         y=d3.scale.linear()
-                  .range([0, @opts.tot_height-@opts.h_pad-@opts.axis_height])
+                  .range([0, @opts.height-@opts.h_pad-@opts.axis_height])
                   .domain([0, num_leaf])
         g = @svg.append("g")
                 .attr("transform","translate(#{@opts.w_pad},#{@opts.h_pad+@opts.axis_height})")

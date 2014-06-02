@@ -84,6 +84,30 @@ class MDSHandler
         #     ,0)
         # ,1000)
 
+class DendrogramWrapper
+    constructor: (@matrix) ->
+        @widget = new Dendrogram(
+                        elem: '#dendrogram'
+                        width: 600
+                        height: 300
+                        )
+
+    update: (range) ->
+        ngenes = @matrix.genes().length
+        range = [0, ngenes-1] if !range?
+        range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
+        dist_arr = MDS.distance(@matrix, range)
+        dist_hash = {}
+
+        # Put the strain names back in.  (why does MDS.distance remove this? FIXME)
+        dist_arr.forEach((r,i) =>
+            r.forEach((d,j) =>
+                [s1,s2] = [@matrix.strains()[i], @matrix.strains()[j]]
+                (dist_hash[s1.name]||={})[s2.name] = d
+            ))
+        #console.log dist_arr,dist_hash
+        tree = new TreeBuilder(dist_hash)
+        @widget.draw(tree)
 
 
 class Pan
@@ -97,11 +121,13 @@ class Pan
             # Reset to full zoom
             @reset_scale()
             @mds.update(null)
+            @dendrogram.update(null)
         else if diff > 1  # only sane scaling please
             sc = (@width / diff)
             #console.log "brushed", brush.extent(), diff, "scale=", sc, "width", width
             @set_scale(ex[0], sc)
             @mds.update(ex)
+            @dendrogram.update(ex)
 
         # Draw or hide the gene gaps depending on the scale
         if diff<=300
@@ -405,6 +431,9 @@ class Pan
             @scatter2.draw(comp, @matrix.strains(), [0,1])
         )
         @mds.update(null)
+
+        @dendrogram = new DendrogramWrapper(@matrix)
+        @dendrogram.update(null)
 
         @_init_search()
         $('input#vscale').on('keyup', (e) =>

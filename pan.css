@@ -20,6 +20,11 @@
 
 .option { font-size: 9pt; float: right; }
 
+.columns > div {
+  display: inline-block;
+}
+
+
 #colour-legend { float: right; margin-right: 100px;}
 #colour-legend .title { font-weight: bold; }
 #colour-legend .box {float: left; height: 10px; width: 10px; margin: 3px;}
