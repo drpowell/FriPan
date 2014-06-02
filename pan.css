@@ -35,10 +35,6 @@ svg {
   font: 10px sans-serif;
 }
 
-path {
-  fill: green;
-}
-
 .axis path, .axis line {
   fill: none;
   stroke: #000;
