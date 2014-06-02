@@ -8,11 +8,13 @@ class MDS
         t1 = new Date
         dist = []
         for s1 in [0...mat.strains().length]
-            for s2 in [0...mat.strains().length]
+            (dist[s1]||=[])[s1] = 0
+            for s2 in [0...s1]
                 d = 0
                 for g in [gene_range[0] .. gene_range[1]]
                     d += Math.abs(mat.presence(s1,g) - mat.presence(s2,g))
                 (dist[s1] ||= [])[s2] = d
+                (dist[s2] ||= [])[s1] = d
 
         # Print as R code!
         #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"

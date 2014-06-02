@@ -651,7 +651,6 @@ init = () ->
         d3.select("#topinfo")
             .html("Loaded #{matrix.strains().length} strains and #{matrix.genes().length} ortholog clusters")
 
-
         pan = new Pan('#chart', matrix, strains)
 
         $( window ).resize(() -> pan.resize())
