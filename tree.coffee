@@ -161,6 +161,71 @@ class Dendrogram
             .attr("transform", "translate(#{@opts.w_pad},#{@opts.h_pad})")
             .call(axis)
 
+    draw2: (builder, lbl_to_id) ->
+        @svg.html('')
+        root = builder.tree
+        all = builder.flattened
+        nodes = all.filter((n) -> !n.leaf)
+        leaves = all.filter((n) -> n.leaf)
+
+        num_leaf = @_calc_pos(root,0)
+
+        radius = 150
+
+        x=d3.scale.linear()
+                  .range([ radius, 0 ])
+                  .domain([0, root.dist])
+
+        y=d3.scale.linear()
+                  .range([0, 359])
+                  .domain([0, num_leaf])
+        g = @svg.append("g")
+                .attr("transform","translate(#{radius + 100},#{radius + 100}) rotate(-90)")
+
+        node2line = (n) -> [{x:n.children[0].dist, y:n.children[0].y},
+                            {x:n.dist, y:n.children[0].y},
+                            {x:n.dist, y:n.children[1].y},
+                            {x:n.children[1].dist, y:n.children[1].y}]
+        #mk_line = d3.svg.line.radial()
+        #          .radius((d) -> x(d.x))
+        #          .angle((d) -> y(d.y) * Math.PI/180)
+        #          #.interpolate("basis")
+
+        mk_line = (n) ->
+            f = d3.svg.arc()
+              .innerRadius((d) -> x(d.dist))
+              .outerRadius((d) -> x(d.dist))
+              .startAngle((d) -> y(d.children[0].y) * (Math.PI/180)) #converting from degs to radians
+              .endAngle((d) -> y(d.children[1].y) * (Math.PI/180)) #converting from degs to radians
+            f2 = d3.svg.line.radial()
+            f(n)+
+              f2([[x(n.children[0].dist), y(n.children[0].y)* (Math.PI/180)], [x(n.dist), y(n.children[0].y)* (Math.PI/180)]]) +
+              f2([[x(n.children[1].dist), y(n.children[1].y)* (Math.PI/180)], [x(n.dist), y(n.children[1].y)* (Math.PI/180)]])
+
+        # Draw the dendrogram
+        g.selectAll('path.link')
+            .data(nodes)
+            .enter()
+            .append('path')
+              .attr('class','link')
+              .attr('d', (d) -> mk_line(d)) # node2line(d)))
+              .on('mouseover', (d) -> console.log d)
+
+        # Text for leaves
+        g.selectAll('text.leaf')
+            .data(leaves)
+            .enter()
+             .append("g")
+              .attr("transform",(d) => r=y(d.y) ; if r<180 then "rotate(#{r} 0 0)" else "rotate(#{-r} 0 0)")
+             .append("text")
+              .attr("class",(d) -> "leaf strain-#{lbl_to_id(d.name)}")
+              .attr("text-anchor", (d) -> r=y(d.y); if r < 180 then "start" else "end")
+              .attr("dominant-baseline", "central")
+              .attr("x", (d) => r=y(d.y); if r < 180 then @opts.label_pad + x(d.dist) else -x(d.dist) )
+              .text((d) -> d.name)
+              .on('mouseover', (d) -> console.log d)
+
+
 window.Dendrogram = Dendrogram
 
 window.TreeBuilder = TreeBuilder
