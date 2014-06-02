@@ -12,7 +12,7 @@ init = () ->
         )
 
         tree = new TreeBuilder(dist)
-        new Dendrogram({elem: '#dendrogram'}).draw(tree)
+        new Dendrogram({elem: '#dendrogram'}).draw(tree, ()->"")
     )
 
 $(document).ready(() -> init() )
