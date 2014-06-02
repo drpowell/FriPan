@@ -18,7 +18,15 @@
   display: none; 
 }
 
-.option { font-size: 9pt; float: right; }
+.option { 
+  font-size: 9pt;
+  float: right;
+  border: 1px solid;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #eee;
+}
+.option label { display: inline-block; width: 70px; }
 
 .columns > div {
   display: inline-block;
