@@ -1,5 +1,6 @@
 pan.descriptions
 pan.proteinortho
+pan.strains
 pan.js
 mds-plot.js
 mds-worker.js
