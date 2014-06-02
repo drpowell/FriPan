@@ -1,5 +1,6 @@
 
 class TreeBuilder
+    # Dist - should be a square distance matrix,
     constructor: (dist) ->
         to_join = d3.keys(dist)
         tree = []
@@ -24,11 +25,9 @@ class TreeBuilder
             to_join.splice(to_join.indexOf(min.n2), 1)
             to_join.push(n.name)
 
-        #console.log "Tree",tree
         # Convert tree to having children[] as node links rather than just names
         @flattened = []
         @tree = @_mk_subtree(tree[-1..][0], @flattened)
-        console.log @flattened
 
     _mk_subtree: (node, flattened) ->
         children = if node.children?
@@ -98,7 +97,7 @@ class Dendrogram
             node.y = 0.5*(c1.y + c2.y)
             return leaf_pos
 
-    draw: (builder) ->
+    draw: (builder, lbl_to_id) ->
         @svg.html('')
         root = builder.tree
         all = builder.flattened
@@ -138,7 +137,7 @@ class Dendrogram
             .data(leaves)
             .enter()
               .append("text")
-              .attr("class","leaf")
+              .attr("class",(d) -> "leaf strain-#{lbl_to_id(d.name)}")
               .attr("text-anchor", "start")
               .attr("dominant-baseline", "central")
               .attr("x", (d) => @opts.label_pad + x(d.dist))

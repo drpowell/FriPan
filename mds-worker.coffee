@@ -10,7 +10,7 @@ importScripts('gene-matrix.js')
         @matrix = GeneMatrix.from_hash(ev.data.init)
     else if ev.data.data?
         range = ev.data.data
-        our_log "WORKER: #{range}"
+        #our_log "WORKER: #{range}"
         comp = MDS.pca(@matrix, range)
         comp = numeric.transpose(comp)
         postMessage(comp)

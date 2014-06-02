@@ -17,7 +17,7 @@ class LatestWorker
             if cur_data != @_last_data
                 @_computing = 1
                 @_last_data = cur_data
-                console.log "Sending worker:", cur_data
+                #console.log "Sending worker:", cur_data
                 @worker.postMessage(data: cur_data)
 
     done: (res) ->
@@ -93,6 +93,7 @@ class DendrogramWrapper
                         )
 
     update: (range) ->
+        t1 = new Date()
         ngenes = @matrix.genes().length
         range = [0, ngenes-1] if !range?
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
@@ -105,9 +106,15 @@ class DendrogramWrapper
                 [s1,s2] = [@matrix.strains()[i], @matrix.strains()[j]]
                 (dist_hash[s1.name]||={})[s2.name] = d
             ))
-        #console.log dist_arr,dist_hash
+        t2 = new Date()
         tree = new TreeBuilder(dist_hash)
-        @widget.draw(tree)
+        t3 = new Date()
+        # FIXME - ugly handling of for colouring
+        strain_names = {}
+        @matrix.strains().forEach((s) -> strain_names[s.name]=s)
+        @widget.draw(tree, (n) -> strain_names[n].id)
+        t4 = new Date()
+        console.log "Dendrogram: distance=#{t2-t1}ms tree=#{t3-t2}ms draw=#{t4-t3}ms"
 
 
 class Pan
@@ -332,7 +339,6 @@ class Pan
 
     draw_gaps: (ex) ->
         in_range = @matrix.genes().filter((g) -> g.id >= ex[0] && g.id<=ex[1])
-        console.log "drawing gaps : ",in_range.length
         col = @gene_gaps.selectAll('line.gene-gap')
                         .data(in_range, ((g) -> g.id))
         col.exit().remove()
@@ -489,6 +495,9 @@ class Pan
             # mds
             $(".mds-scatter .labels.strain-#{s.id}").css('fill', col)
             $(".mds-scatter .dot.strain-#{s.id}").css('fill', col)
+
+            # dendrogram
+            $(".dendrogram .leaf.strain-#{s.id}").css('fill', col)
         @make_colour_legend(scale, fld)
 
     reorder: () ->
