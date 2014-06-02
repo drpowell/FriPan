@@ -1,7 +1,13 @@
 
 class TreeBuilder
     # Dist - should be a square distance matrix,
-    constructor: (dist) ->
+    # 'method' - one of 'max', 'min', 'avg'.  Default is 'max'
+    #   This determines how to calculate the distance between an internal node and other nodes.
+    #     max - the maximum of all pairwise distance between the nodes' members
+    #     min - the minimum of all pairwise distance between the nodes' members
+    #     abg - the average of all pairwise distance between the nodes' members
+    constructor: (dist, method) ->
+        method = {max: d3.max, min: d3.min, avg: d3.min}[method || 'max']
         to_join = d3.keys(dist)
         tree = []
 
@@ -52,15 +58,11 @@ class TreeBuilder
     _get_dist: (n1,n2) ->
         return @dist[n1][n2] if @dist[n1]? && @dist[n1][n2]?
         if @by_name[n1].children?
-            children = @by_name[n1].children
-            d=0
-            children.forEach((c) => d += @_get_dist(c,n2))
-            d = d / children.length
-        else if @by_name[n2].children?
+            [n1,n2] = [n2,n1]
+        if @by_name[n2].children?
             children = @by_name[n2].children
-            d=0
-            children.forEach((c) => d += @_get_dist(n1,c))
-            d = d / children
+            dists = children.map((c) => @_get_dist(n1,c))
+            d = d3.max(dists)
         else
             console.log "Can't find distance between #{n1} and #{n2}"
             die
@@ -126,13 +128,16 @@ class Dendrogram
                   .y((d) -> y(d.y))
                   #.interpolate("basis")
 
+        # Draw the dendrogram
         g.selectAll('path.link')
             .data(nodes)
             .enter()
             .append('path')
               .attr('class','link')
               .attr('d', (d) -> mk_line(node2line(d)))
+              .on('mouseover', (d) -> console.log d)
 
+        # Text for leaves
         g.selectAll('text.leaf')
             .data(leaves)
             .enter()
@@ -143,7 +148,9 @@ class Dendrogram
               .attr("x", (d) => @opts.label_pad + x(d.dist))
               .attr("y", (d,i) -> y(d.y))
               .text((d) -> d.name)
+              .on('mouseover', (d) -> console.log d)
 
+        # Draw the axis
         axis = d3.svg.axis()
                    .scale(x)
                    .orient("top")
