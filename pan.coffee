@@ -86,6 +86,12 @@ class MDSHandler
 
 class DendrogramWrapper
     constructor: (@widget, @matrix) ->
+        @_current_range = null
+        worker = new Worker('mds-worker.js')
+        worker.postMessage(init: @matrix.as_hash())
+        @latest_worker = new LatestWorker(worker, () => {dist: @_current_range})
+        @latest_worker.on('updated', (d) => @_calc_done(d))
+
         @typ = 'radial'
         @colours = []
 
@@ -99,7 +105,10 @@ class DendrogramWrapper
         ngenes = @matrix.genes().length
         range = [0, ngenes-1] if !range?
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
-        dist_arr = MDS.distance(@matrix, range)
+        @_current_range = range
+        @latest_worker.update()
+
+    _calc_done: (dist_arr) ->
         @tree = new TreeBuilder(dist_arr)
         @redraw()
 
