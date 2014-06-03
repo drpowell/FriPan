@@ -85,7 +85,7 @@ class Dendrogram
             @opts.callback[s] = @opts[s])
 
         zoom = d3.behavior.zoom()
-                 .scaleExtent([0.5,10])
+                 .scaleExtent([0.2,10])
                  .on("zoom", () => @_zoomed())
 
         @svg = d3.select(@opts.elem).append("svg")
@@ -166,7 +166,7 @@ class Dendrogram
                   .domain([0, root.dist])
 
         y=d3.scale.linear()
-                  .range([0, @opts.height-@opts.h_pad-@opts.axis_height])
+                  .range([0, d3.max([leaves.length*10, @opts.height-@opts.h_pad-@opts.axis_height])])
                   .domain([0, leaves.length])
         g = @g.append("g")
                 .attr("transform","translate(#{@opts.w_pad},#{@opts.h_pad+@opts.axis_height})")
