@@ -85,13 +85,7 @@ class MDSHandler
         # ,1000)
 
 class DendrogramWrapper
-    constructor: (@matrix) ->
-        @widget = new Dendrogram(
-                        elem: '#dendrogram'
-                        width: 600
-                        height: 400
-                        radius: 100
-                        )
+    constructor: (@widget, @matrix) ->
         @typ = 'radial'
         @colours = []
 
@@ -114,6 +108,7 @@ class DendrogramWrapper
                           text:s.name
                           colour: @colours[i] || 'black'
                           clazz: "strain-#{s.id}"
+                          strain: s
                         )
 
         @widget.draw(@typ, @tree, strain_info)
@@ -186,6 +181,26 @@ class Pan
                .style("top", (d3.event.pageY) + "px")
                .select("#tooltip-text")
                    .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/><b>Desc:</b> #{desc}")
+
+    dendrogram_mouseover: ([nodes,d]) ->
+        @tooltip = d3.select("#tooltip")
+        if nodes?
+            @mds_brushed(nodes.map((n) -> n.strain))
+            str = if nodes.length==1
+                    "<b>Name:</b>#{nodes[0].strain.name}"
+                  else
+                    "<b>Selected:</b>#{nodes.length}"
+
+            @tooltip.style("display", "block") # un-hide it (display: none <=> block)
+               .style("left", (d3.event.pageX) + "px")
+               .style("top", (d3.event.pageY) + "px")
+               .select("#tooltip-text")
+                   .html("#{str}<br/><b>Dist:</b>#{d.dist}")
+        else
+            @mds_brushed([])
+            @tooltip.style("display","none")
+
+
 
     create_elems: () ->
         tot_width = $(@elem).width()
@@ -444,7 +459,16 @@ class Pan
         )
         @mds.update(null)
 
-        @dendrogram = new DendrogramWrapper(@matrix)
+        dendrogramWidget = new Dendrogram(
+                        elem: '#dendrogram'
+                        width: 600
+                        height: 400
+                        radius: 100
+                        mouseover: (d) => @dendrogram_mouseover(d)
+                        mouseout:  () => @dendrogram_mouseover([])
+                        )
+
+        @dendrogram = new DendrogramWrapper(dendrogramWidget, @matrix)
         @dendrogram.set_type($('select#dendrogram-type option:selected').val())
         @dendrogram.update(null)
 

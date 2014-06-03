@@ -80,6 +80,9 @@ class Dendrogram
         @opts.axis_height = 10
         @opts.label_pad ||= 5
         @opts.radius ||= 150
+        @opts.callback = {}
+        ['mouseover','mouseout'].forEach((s) =>
+            @opts.callback[s] = @opts[s])
 
         zoom = d3.behavior.zoom()
                  .scaleExtent([0.5,10])
@@ -116,17 +119,6 @@ class Dendrogram
             leaf_pos = @_calc_pos(c2, leaf_pos)
             node.y = 0.5*(c1.y + c2.y)
             return leaf_pos
-
-    show_tip: (node) ->
-        @tooltip = d3.select("#tooltip")
-        if node?
-            @tooltip.style("display", "block") # un-hide it (display: none <=> block)
-               .style("left", (d3.event.pageX) + "px")
-               .style("top", (d3.event.pageY) + "px")
-               .select("#tooltip-text")
-                   .html("<b>Name:</b>#{node.name}<br/><b>Dist:</b>#{node.dist}")
-        else
-            @tooltip.style("display","none")
 
     _prep_tree: (builder) ->
         root = builder.tree
@@ -183,8 +175,8 @@ class Dendrogram
             .append('path')
               .attr('class','link')
               .attr('d', (d) -> mk_line(node2line(d)))
-              .on('mouseover', (d) => @show_tip(d))
-              .on('mouseout', () => @show_tip(null))
+              .on('mouseover', (d) => @_mouseover(node_info, d))
+              .on('mouseout', (d) => @_mouseout(node_info, d))
 
         get = (d,fld,def) ->
             if node_info[d.name]?
@@ -209,8 +201,8 @@ class Dendrogram
               .attr("y", (d) -> y(d.y))
               .attr("fill", (d) -> col(d))
               .text((d) -> text(d))
-              .on('mouseover', (d) => @show_tip(d))
-              .on('mouseout', () => @show_tip(null))
+              .on('mouseover', (d) => @_mouseover(node_info, d))
+              .on('mouseout', (d) => @_mouseout(node_info, d))
 
         # Draw the axis
         axis = d3.svg.axis()
@@ -264,8 +256,8 @@ class Dendrogram
             .append('path')
               .attr('class','link')
               .attr('d', (d) -> mk_line(d))
-              .on('mouseover', (d) => @show_tip(d))
-              .on('mouseout', () => @show_tip(null))
+              .on('mouseover', (d) => @_mouseover(node_info, d))
+              .on('mouseout', (d) => @_mouseout(node_info, d))
 
         # Simple function, will the given angle rotate text to lookup upright?
         isTxtUp = (r) -> r>=0 && r<180
@@ -294,8 +286,24 @@ class Dendrogram
               .attr("x", (d) => (@opts.label_pad + x(d.dist)) * if isTxtUp(yTxt(d.y)) then 1 else -1)
               .attr("fill", (d) -> col(d))
               .text((d) -> text(d))
-              .on('mouseover', (d) => @show_tip(d))
-              .on('mouseout', () => @show_tip(null))
+              .on('mouseover', (d) => @_mouseover(node_info, d))
+              .on('mouseout', (d) => @_mouseout(node_info, d))
+
+    _mouseover: (node_info, d) ->
+        trav = (n,res) ->
+            res.push(node_info[n.name]) if node_info[n.name]
+            n.children.forEach((c) -> trav(c, res))
+
+        leaves = []
+        trav(d, leaves)
+        @_event('mouseover', leaves, d)
+
+    _mouseout: (node_info, d) ->
+        @_event('mouseout', node_info[d.name], d)
+
+    _event: (typ, args...) ->
+        if @opts.callback[typ]
+            @opts.callback[typ](args)
 
 
 window.Dendrogram = Dendrogram
