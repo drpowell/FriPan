@@ -99,6 +99,18 @@ class Dendrogram
             node.y = 0.5*(c1.y + c2.y)
             return leaf_pos
 
+    show_tip: (node) ->
+        @tooltip = d3.select("#tooltip")
+        if node?
+            @tooltip.style("display", "block") # un-hide it (display: none <=> block)
+               .style("left", (d3.event.pageX) + "px")
+               .style("top", (d3.event.pageY) + "px")
+               .select("#tooltip-text")
+                   .html("<b>Name:</b>#{node.name}<br/><b>Dist:</b>#{node.dist}")
+        else
+            @tooltip.style("display","none")
+
+
     draw: (builder, lbl_to_id) ->
         @svg.html('')
         root = builder.tree
@@ -135,7 +147,8 @@ class Dendrogram
             .append('path')
               .attr('class','link')
               .attr('d', (d) -> mk_line(node2line(d)))
-              .on('mouseover', (d) -> console.log d)
+              .on('mouseover', (d) => @show_tip(d))
+              .on('mouseout', () => @show_tip(null))
 
         # Text for leaves
         g.selectAll('text.leaf')
@@ -148,7 +161,8 @@ class Dendrogram
               .attr("x", (d) => @opts.label_pad + x(d.dist))
               .attr("y", (d,i) -> y(d.y))
               .text((d) -> d.name)
-              .on('mouseover', (d) -> console.log d)
+              .on('mouseover', (d) => @show_tip(d))
+              .on('mouseout', () => @show_tip(null))
 
         # Draw the axis
         axis = d3.svg.axis()
@@ -209,7 +223,8 @@ class Dendrogram
             .append('path')
               .attr('class','link')
               .attr('d', (d) -> mk_line(d)) # node2line(d)))
-              .on('mouseover', (d) -> console.log d)
+              .on('mouseover', (d) => @show_tip(d))
+              .on('mouseout', () => @show_tip(null))
 
         # Text for leaves
         g.selectAll('text.leaf')
@@ -223,7 +238,8 @@ class Dendrogram
               .attr("dominant-baseline", "central")
               .attr("x", (d) => r=y(d.y); if r < 180 then @opts.label_pad + x(d.dist) else -x(d.dist) )
               .text((d) -> d.name)
-              .on('mouseover', (d) -> console.log d)
+              .on('mouseover', (d) => @show_tip(d))
+              .on('mouseout', () => @show_tip(null))
 
 
 window.Dendrogram = Dendrogram
