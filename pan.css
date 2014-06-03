@@ -97,7 +97,7 @@ svg {
 .gene-row.brushed rect.on  { fill: red !important; }
 
 .highlight { fill: red !important; font-weight: bold; }
-.brushed { fill: red !important; font-weight: bold; }
+circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
 
 #mds, #mds2 { display: inline-block; }
 #mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
@@ -124,6 +124,9 @@ svg.dendrogram {
   fill: none;
   stroke-width: 1.5px;
 }
+
+.dendrogram path.brushed { stroke: red !important; }
+
 
 /*  ****************************************************/
 .warning-popover {

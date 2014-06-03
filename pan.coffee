@@ -182,14 +182,17 @@ class Pan
                .select("#tooltip-text")
                    .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/><b>Desc:</b> #{desc}")
 
-    dendrogram_mouseover: ([nodes,d]) ->
+    dendrogram_mouseover: ([leaves,d,nodes]) ->
         @tooltip = d3.select("#tooltip")
-        if nodes?
-            @mds_brushed(nodes.map((n) -> n.strain))
-            str = if nodes.length==1
-                    "<b>Name:</b>#{nodes[0].strain.name}"
+        if leaves?
+            @mds_brushed(leaves.map((n) -> n.strain))
+            if nodes.length>0
+                d3.selectAll(nodes.join(',')).classed({'brushed':true})
+
+            str = if leaves.length==1
+                    "<b>Name:</b>#{leaves[0].strain.name}"
                   else
-                    "<b>Selected:</b>#{nodes.length}"
+                    "<b>Selected:</b>#{leaves.length}"
 
             @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                .style("left", (d3.event.pageX) + "px")

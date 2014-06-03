@@ -22,7 +22,7 @@ class TreeBuilder
 
         while to_join.length>1
             min = @_pick_min(to_join)
-            n = {name: "Node:#{tree.length}", children: [min.n1, min.n2], dist: min.val}
+            n = {name: "_node_#{tree.length}", children: [min.n1, min.n2], dist: min.val}
             tree.push(n)
             @by_name[n.name] = n
 
@@ -160,7 +160,6 @@ class Dendrogram
         @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
         @_attach_colours(root, node_info)
-        console.log nodes
 
         x=d3.scale.linear()
                   .range([ @opts.width-@opts.label_width-@opts.w_pad, 0])
@@ -187,7 +186,7 @@ class Dendrogram
             .data(nodes)
             .enter()
             .append('path')
-              .attr('class','link')
+              .attr('class', (d) -> 'link '+d.name)
               .attr("stroke", (d) -> d.colour)
               .attr('d', (d) -> mk_line(node2line(d)))
               .on('mouseover', (d) => @_mouseover(node_info, d))
@@ -269,7 +268,7 @@ class Dendrogram
             .data(nodes)
             .enter()
             .append('path')
-              .attr('class','link')
+              .attr('class', (d) -> 'link '+d.name)
               .attr("stroke", (d) -> d.colour)
               .attr('d', (d) -> mk_line(d))
               .on('mouseover', (d) => @_mouseover(node_info, d))
@@ -304,14 +303,22 @@ class Dendrogram
               .on('mouseover', (d) => @_mouseover(node_info, d))
               .on('mouseout', (d) => @_mouseout(node_info, d))
 
+    # Call the mouseover defined in @opts
+    #   Will pass:  leaves - an array of node_info[] objects for the moused-over leaves
+    #               d - the actual node (includes the 'dist')
+    #               nodes - an array of CSS selectors for the moused-over nodes
     _mouseover: (node_info, d) ->
-        trav = (n,res) ->
-            res.push(node_info[n.name]) if node_info[n.name]
-            n.children.forEach((c) -> trav(c, res))
+        trav = (n,leaves,nodes) ->
+            if n.leaf
+                leaves.push(node_info[n.name])
+            else
+                nodes.push("path.link.#{n.name}")
+            n.children.forEach((c) -> trav(c, leaves, nodes))
 
         leaves = []
-        trav(d, leaves)
-        @_event('mouseover', leaves, d)
+        nodes = []
+        trav(d, leaves, nodes)
+        @_event('mouseover', leaves, d, nodes)
 
     _mouseout: (node_info, d) ->
         @_event('mouseout', node_info[d.name], d)
