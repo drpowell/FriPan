@@ -190,31 +190,27 @@ class Dendrogram
                   .range([ radius, 0 ])
                   .domain([0, root.dist])
 
-        y=d3.scale.linear()
-                  .range([0, 359])
-                  .domain([0, num_leaf])
+        # Convert leaf position to angle
+        y = d3.scale.linear().range([0, 359]).domain([0, num_leaf])
+
+        # Same conversion, but -90 degrees.  We draw text horizontal, so 0 degrees is East
+        # Whilst the rest of SVG has 0 degrees as North
+        yTxt = d3.scale.linear().range([-90, 359-90]).domain([0, num_leaf])
+
+        # Same as y(), but it radians.  For some reason D3 uses radians...
+        yRad = (v) -> y(v) * Math.PI/180
+
         g = @svg.append("g")
                 .attr("transform","translate(#{radius + 100},#{radius + 100}) rotate(-90)")
-
-        node2line = (n) -> [{x:n.children[0].dist, y:n.children[0].y},
-                            {x:n.dist, y:n.children[0].y},
-                            {x:n.dist, y:n.children[1].y},
-                            {x:n.children[1].dist, y:n.children[1].y}]
-        #mk_line = d3.svg.line.radial()
-        #          .radius((d) -> x(d.x))
-        #          .angle((d) -> y(d.y) * Math.PI/180)
-        #          #.interpolate("basis")
 
         mk_line = (n) ->
             f = d3.svg.arc()
               .innerRadius((d) -> x(d.dist))
               .outerRadius((d) -> x(d.dist))
-              .startAngle((d) -> y(d.children[0].y) * (Math.PI/180)) #converting from degs to radians
-              .endAngle((d) -> y(d.children[1].y) * (Math.PI/180)) #converting from degs to radians
-            f2 = d3.svg.line.radial()
-            f(n)+
-              f2([[x(n.children[0].dist), y(n.children[0].y)* (Math.PI/180)], [x(n.dist), y(n.children[0].y)* (Math.PI/180)]]) +
-              f2([[x(n.children[1].dist), y(n.children[1].y)* (Math.PI/180)], [x(n.dist), y(n.children[1].y)* (Math.PI/180)]])
+              .startAngle((d) -> yRad(d.children[0].y))
+              .endAngle((d) -> yRad(d.children[1].y))
+            f2 = (n,i) -> d3.svg.line.radial()([[x(n.children[i].dist), yRad(n.children[i].y)], [x(n.dist), yRad(n.children[i].y)]])
+            f(n)+f2(n,0)+f2(n,1)
 
         # Draw the dendrogram
         g.selectAll('path.link')
@@ -226,17 +222,21 @@ class Dendrogram
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
 
+        # Simple function, will the given angle rotate text to lookup upright?
+        isTxtUp = (r) -> r>=0 && r<180
+
         # Text for leaves
+        # Be careful to position the text upright on both sides of the circle
         g.selectAll('text.leaf')
             .data(leaves)
             .enter()
              .append("g")
-              .attr("transform",(d) => r=y(d.y) ; if r<180 then "rotate(#{r} 0 0)" else "rotate(#{-r} 0 0)")
+              .attr("transform",(d) => r=yTxt(d.y) ; "rotate(#{if isTxtUp(r) then r else 180+r} 0 0)")
              .append("text")
               .attr("class",(d) -> "leaf strain-#{lbl_to_id(d.name)}")
-              .attr("text-anchor", (d) -> r=y(d.y); if r < 180 then "start" else "end")
+              .attr("text-anchor", (d) -> r=yTxt(d.y); if isTxtUp(r) then "start" else "end")
               .attr("dominant-baseline", "central")
-              .attr("x", (d) => r=y(d.y); if r < 180 then @opts.label_pad + x(d.dist) else -x(d.dist) )
+              .attr("x", (d) => (@opts.label_pad + x(d.dist)) * if isTxtUp(yTxt(d.y)) then 1 else -1)
               .text((d) -> d.name)
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
