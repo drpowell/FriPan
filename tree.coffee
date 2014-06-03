@@ -130,6 +130,18 @@ class Dendrogram
 
         [root, nodes, leaves]
 
+    _attach_colours: (node, node_info) ->
+        if node.leaf
+            node.colour = if node_info[node.name]?
+                              node_info[node.name].colour
+                          else
+                              'black'
+        else
+            node.children.forEach((n) => @_attach_colours(n, node_info))
+            col1 = node.children[0].colour
+            col2 = node.children[1].colour
+            node.colour = if col1==col2 then col1 else 'black'
+
     # typ - 'horz' or 'radial'
     # builder - A TreeBuilder object
     # node_info - A hash with keys as for distance matrix passed to TreeBuilder
@@ -147,6 +159,8 @@ class Dendrogram
     draw_horz: (builder, node_info) ->
         @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
+        @_attach_colours(root, node_info)
+        console.log nodes
 
         x=d3.scale.linear()
                   .range([ @opts.width-@opts.label_width-@opts.w_pad, 0])
@@ -174,6 +188,7 @@ class Dendrogram
             .enter()
             .append('path')
               .attr('class','link')
+              .attr("stroke", (d) -> d.colour)
               .attr('d', (d) -> mk_line(node2line(d)))
               .on('mouseover', (d) => @_mouseover(node_info, d))
               .on('mouseout', (d) => @_mouseout(node_info, d))
@@ -184,7 +199,6 @@ class Dendrogram
             else
                 def
 
-        col = (d)  -> get(d, 'colour', 'black')
         text = (d) -> get(d, 'text', d.name)
         clazz = (d)-> get(d, 'clazz', '')
 
@@ -199,7 +213,7 @@ class Dendrogram
               .attr("dominant-baseline", "central")
               .attr("x", (d) => @opts.label_pad + x(d.dist))
               .attr("y", (d) -> y(d.y))
-              .attr("fill", (d) -> col(d))
+              .attr("fill", (d) -> d.colour)
               .text((d) -> text(d))
               .on('mouseover', (d) => @_mouseover(node_info, d))
               .on('mouseout', (d) => @_mouseout(node_info, d))
@@ -218,6 +232,7 @@ class Dendrogram
     draw_radial: (builder, node_info) ->
         @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
+        @_attach_colours(root, node_info)
 
         x=d3.scale.linear()
                   .range([ @opts.radius, 0 ])
@@ -255,6 +270,7 @@ class Dendrogram
             .enter()
             .append('path')
               .attr('class','link')
+              .attr("stroke", (d) -> d.colour)
               .attr('d', (d) -> mk_line(d))
               .on('mouseover', (d) => @_mouseover(node_info, d))
               .on('mouseout', (d) => @_mouseout(node_info, d))
@@ -268,7 +284,6 @@ class Dendrogram
             else
                 def
 
-        col = (d)  -> get(d, 'colour', 'black')
         text = (d) -> get(d, 'text', d.name)
         clazz = (d)-> get(d, 'clazz', '')
 
@@ -284,7 +299,7 @@ class Dendrogram
               .attr("text-anchor", (d) -> r=yTxt(d.y); if isTxtUp(r) then "start" else "end")
               .attr("dominant-baseline", "central")
               .attr("x", (d) => (@opts.label_pad + x(d.dist)) * if isTxtUp(yTxt(d.y)) then 1 else -1)
-              .attr("fill", (d) -> col(d))
+              .attr("fill", (d) -> d.colour)
               .text((d) -> text(d))
               .on('mouseover', (d) => @_mouseover(node_info, d))
               .on('mouseout', (d) => @_mouseout(node_info, d))
