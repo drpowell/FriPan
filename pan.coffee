@@ -18,7 +18,7 @@ class LatestWorker
                 @_computing = 1
                 @_last_data = cur_data
                 #console.log "Sending worker:", cur_data
-                @worker.postMessage(data: cur_data)
+                @worker.postMessage(msg: cur_data)
 
     done: (res) ->
         @_computing = 0
@@ -32,7 +32,7 @@ class MDSHandler
         @_current_range = null
         worker = new Worker('mds-worker.js')
         worker.postMessage(init: @matrix.as_hash())
-        @latest_worker = new LatestWorker(worker, () => @_current_range)
+        @latest_worker = new LatestWorker(worker, () => {mds: @_current_range})
         @latest_worker.on('updated', (comp) => @redraw(comp))
 
     on: (t,func) ->
