@@ -99,6 +99,7 @@ svg {
 #mds, #mds2 { display: inline-block; }
 #mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
 
+.mds-scatter { border: 1px solid #ccc; }
 .mds-scatter svg { position: absolute; }
 .mds-scatter svg.overlay { pointer-events: none; }
 
@@ -112,6 +113,10 @@ svg {
 }
 
 /*  ****************************************************/
+svg.dendrogram {
+  border: 1px solid #ccc;
+}
+
 .dendrogram path {
   fill: none;
   stroke: black;

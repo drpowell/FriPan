@@ -81,12 +81,28 @@ class Dendrogram
         @opts.label_pad ||= 5
         @opts.radius ||= 150
 
+        zoom = d3.behavior.zoom()
+                 .scaleExtent([0.5,10])
+                 .on("zoom", () => @_zoomed())
+
         @svg = d3.select(@opts.elem).append("svg")
             .attr("class", "dendrogram")
             .attr("width", @opts.width)
             .attr("height", @opts.height)
-           #.append("g")
-           #.attr("transform","rotate(90 #{@opts.width/2} #{@opts.height/2})")
+            .call(zoom)
+
+        # Create a full size rect to capture zoom events not otherwise on an element
+        @svg.append("rect")
+            .attr("width", @opts.width)
+            .attr("height", @opts.height)
+            .style("fill", "none")
+            .style("pointer-events", "all")
+
+        # Container <g> that will be scaled and translated
+        @g = @svg.append("g")
+
+    _zoomed: () ->
+        @g.attr("transform", "translate(#{d3.event.translate})scale(#{d3.event.scale})")
 
     _calc_pos: (node, leaf_pos) ->
         if node.leaf
@@ -94,7 +110,7 @@ class Dendrogram
             return leaf_pos+1
         else
             [c1,c2] = node.children
-            if (c1.dist > c2.dist)
+            if (c1.dist > c2.dist)    # Order sub trees by smallest distance first
                 [c2,c1] = [c1,c2]
             leaf_pos = @_calc_pos(c1, leaf_pos)
             leaf_pos = @_calc_pos(c2, leaf_pos)
@@ -132,7 +148,7 @@ class Dendrogram
             log_error("Unknown dendrogram type : #{typ}")
 
     draw_horz: (builder, lbl_to_id) ->
-        @svg.html('')
+        @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
 
         x=d3.scale.linear()
@@ -142,7 +158,7 @@ class Dendrogram
         y=d3.scale.linear()
                   .range([0, @opts.height-@opts.h_pad-@opts.axis_height])
                   .domain([0, leaves.length])
-        g = @svg.append("g")
+        g = @g.append("g")
                 .attr("transform","translate(#{@opts.w_pad},#{@opts.h_pad+@opts.axis_height})")
 
         node2line = (n) -> [{x:n.children[0].dist, y:n.children[0].y},
@@ -184,14 +200,14 @@ class Dendrogram
                    .scale(x)
                    .orient("top")
                    .ticks(4)
-        @svg.selectAll(".axis").remove()
-        @svg.append("g")
+        @g.selectAll(".axis").remove()
+        @g.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(#{@opts.w_pad},#{@opts.h_pad})")
             .call(axis)
 
     draw_radial: (builder, lbl_to_id) ->
-        @svg.html('')
+        @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
 
         x=d3.scale.linear()
@@ -208,7 +224,7 @@ class Dendrogram
         # Same as y(), but it radians.  For some reason D3 uses radians...
         yRad = (v) -> y(v) * Math.PI/180
 
-        g = @svg.append("g")
+        g = @g.append("g")
                 .attr("transform","translate(#{@opts.width/2},#{@opts.height/2}) rotate(-90)")
 
         mk_line = (n) ->
