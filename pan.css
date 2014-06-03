@@ -18,9 +18,12 @@
   display: none; 
 }
 
+.right {
+  float: right;
+}
+
 .option { 
   font-size: 9pt;
-  float: right;
   border: 1px solid;
   padding: 5px;
   border-radius: 5px;

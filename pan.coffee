@@ -89,7 +89,7 @@ class DendrogramWrapper
         @widget = new Dendrogram(
                         elem: '#dendrogram'
                         width: 600
-                        height: 300
+                        height: 400
                         radius: 100
                         )
         @typ = 'radial'
