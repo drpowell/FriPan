@@ -578,10 +578,12 @@ parse_proteinortho = (tsv) ->
 parse_orthomcl = (tsv) ->
     # FIXME
 
+get_stem = () ->
+    get_url_params() || 'pan'
 
 # Load gene labels from XXXX.descriptions file that ProteinOrtho5 produces
 load_desc = (matrix) ->
-    d3.text("pan.descriptions", (data) ->
+    d3.text("#{get_stem()}.descriptions", (data) ->
         return if !data?
         lines = data.split("\n")
 
@@ -596,7 +598,7 @@ load_desc = (matrix) ->
     )
 
 load_strains = (strainInfo) ->
-    d3.tsv("pan.strains", (data) ->
+    d3.tsv("#{get_stem()}.strains", (data) ->
         return if !data?
         strainInfo.set_info(data)
 
@@ -626,7 +628,7 @@ class StrainInfo
     set_info: (@matrix) ->
         @columns = d3.keys(@matrix[0])
         if 'ID' != @columns.shift()
-            log_error("No ID column in pan.strains")
+            log_error("No ID column in #{get_stem()}.strains")
             @columns = []
             return
 
@@ -649,7 +651,12 @@ init = () ->
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
-    d3.tsv("pan.proteinortho", (data) ->
+    url = "#{get_stem()}.proteinortho"
+    d3.tsv(url, (data) ->
+        if !data?
+            $('#chart').text("Unable to load : #{url}")
+            return
+        $('#chart').html('')
         matrix = parse_proteinortho(data)
 
         strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))

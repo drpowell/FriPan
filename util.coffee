@@ -33,3 +33,7 @@ html_warning = """
             $('body').prepend('<div class="warning-popover browser-warning-outer"></div>')
             outer = $('.browser-warning-outer')
         outer.append(html_warning)
+
+@get_url_params = () ->
+    hash = window.location.search
+    hash.substring(1)               # remove '?'
