@@ -94,10 +94,10 @@ svg {
 .gene-row rect.off { fill: lightgray; }
 
 .gene-row.highlight rect.on  { fill: red !important; }
-.gene-row.brushed rect.on  { fill: #058; }
+.gene-row.brushed rect.on  { fill: red !important; }
 
 .highlight { fill: red !important; font-weight: bold; }
-.brushed { fill: #058; font-weight: bold; }
+.brushed { fill: red !important; font-weight: bold; }
 
 #mds, #mds2 { display: inline-block; }
 #mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
