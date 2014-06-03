@@ -200,8 +200,6 @@ class Pan
             @mds_brushed([])
             @tooltip.style("display","none")
 
-
-
     create_elems: () ->
         tot_width = $(@elem).width()
         tot_height = @bh * @matrix.strains().length + 200
@@ -494,6 +492,7 @@ class Pan
         $('select#dendrogram-type').on('change', (e) =>
             v = $(e.target).val()
             @dendrogram.set_type(v)
+            @dendrogram.redraw()
         )
 
         @sort_order = $('select#strain-sort option:selected').val()
