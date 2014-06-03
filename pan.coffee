@@ -90,7 +90,12 @@ class DendrogramWrapper
                         elem: '#dendrogram'
                         width: 600
                         height: 300
+                        radius: 100
                         )
+        @typ = 'radial'
+
+    set_type: (@typ) ->
+        # pass
 
     update: (range) ->
         t1 = new Date()
@@ -112,7 +117,7 @@ class DendrogramWrapper
         # FIXME - ugly handling of for colouring
         strain_names = {}
         @matrix.strains().forEach((s) -> strain_names[s.name]=s)
-        @widget.draw(tree, (n) -> strain_names[n].id)
+        @widget.draw(tree, ((n) -> strain_names[n].id), @typ)
         t4 = new Date()
         console.log "Dendrogram: distance=#{t2-t1}ms tree=#{t3-t2}ms draw=#{t4-t3}ms"
 
@@ -439,6 +444,7 @@ class Pan
         @mds.update(null)
 
         @dendrogram = new DendrogramWrapper(@matrix)
+        @dendrogram.set_type($('select#dendrogram-type option:selected').val())
         @dendrogram.update(null)
 
         @_init_search()
@@ -458,6 +464,11 @@ class Pan
         $('select#strain-sort').on('change', (e) =>
             @sort_order = $(e.target).val()
             @reorder()
+        )
+
+        $('select#dendrogram-type').on('change', (e) =>
+            v = $(e.target).val()
+            @dendrogram.set_type(v)
         )
 
         @sort_order = $('select#strain-sort option:selected').val()

@@ -79,6 +79,8 @@ class Dendrogram
         @opts.w_pad ||= 10
         @opts.axis_height = 10
         @opts.label_pad ||= 5
+        @opts.radius ||= 150
+
         @svg = d3.select(@opts.elem).append("svg")
             .attr("class", "dendrogram")
             .attr("width", @opts.width)
@@ -110,15 +112,28 @@ class Dendrogram
         else
             @tooltip.style("display","none")
 
-
-    draw: (builder, lbl_to_id) ->
-        @svg.html('')
+    _prep_tree: (builder) ->
         root = builder.tree
         all = builder.flattened
         nodes = all.filter((n) -> !n.leaf)
         leaves = all.filter((n) -> n.leaf)
 
-        num_leaf = @_calc_pos(root,0)
+        @_calc_pos(root,0)
+
+        [root, nodes, leaves]
+
+    draw: (builder, lbl_to_id, typ) ->
+        typ ||= 'horz'
+        if typ=='horz'
+            @draw_horz(builder, lbl_to_id)
+        else if typ=='radial'
+            @draw_radial(builder, lbl_to_id)
+        else
+            log_error("Unknown dendrogram type : #{typ}")
+
+    draw_horz: (builder, lbl_to_id) ->
+        @svg.html('')
+        [root, nodes, leaves] = @_prep_tree(builder)
 
         x=d3.scale.linear()
                   .range([ @opts.width-@opts.label_width-@opts.w_pad, 0])
@@ -126,7 +141,7 @@ class Dendrogram
 
         y=d3.scale.linear()
                   .range([0, @opts.height-@opts.h_pad-@opts.axis_height])
-                  .domain([0, num_leaf])
+                  .domain([0, leaves.length])
         g = @svg.append("g")
                 .attr("transform","translate(#{@opts.w_pad},#{@opts.h_pad+@opts.axis_height})")
 
@@ -175,41 +190,38 @@ class Dendrogram
             .attr("transform", "translate(#{@opts.w_pad},#{@opts.h_pad})")
             .call(axis)
 
-    draw2: (builder, lbl_to_id) ->
+    draw_radial: (builder, lbl_to_id) ->
         @svg.html('')
-        root = builder.tree
-        all = builder.flattened
-        nodes = all.filter((n) -> !n.leaf)
-        leaves = all.filter((n) -> n.leaf)
-
-        num_leaf = @_calc_pos(root,0)
-
-        radius = 150
+        [root, nodes, leaves] = @_prep_tree(builder)
 
         x=d3.scale.linear()
-                  .range([ radius, 0 ])
+                  .range([ @opts.radius, 0 ])
                   .domain([0, root.dist])
 
         # Convert leaf position to angle
-        y = d3.scale.linear().range([0, 359]).domain([0, num_leaf])
+        y = d3.scale.linear().range([0, 359]).domain([0, leaves.length])
 
         # Same conversion, but -90 degrees.  We draw text horizontal, so 0 degrees is East
         # Whilst the rest of SVG has 0 degrees as North
-        yTxt = d3.scale.linear().range([-90, 359-90]).domain([0, num_leaf])
+        yTxt = d3.scale.linear().range([-90, 359-90]).domain([0, leaves.length])
 
         # Same as y(), but it radians.  For some reason D3 uses radians...
         yRad = (v) -> y(v) * Math.PI/180
 
         g = @svg.append("g")
-                .attr("transform","translate(#{radius + 100},#{radius + 100}) rotate(-90)")
+                .attr("transform","translate(#{@opts.width/2},#{@opts.height/2}) rotate(-90)")
 
         mk_line = (n) ->
+            # f() generates the arc part
             f = d3.svg.arc()
               .innerRadius((d) -> x(d.dist))
               .outerRadius((d) -> x(d.dist))
               .startAngle((d) -> yRad(d.children[0].y))
               .endAngle((d) -> yRad(d.children[1].y))
-            f2 = (n,i) -> d3.svg.line.radial()([[x(n.children[i].dist), yRad(n.children[i].y)], [x(n.dist), yRad(n.children[i].y)]])
+            # f2() generates one radial line for the given child
+            f2 = (n,i) -> d3.svg.line.radial()(
+                              [[x(n.children[i].dist), yRad(n.children[i].y)],
+                               [x(n.dist), yRad(n.children[i].y)]])
             f(n)+f2(n,0)+f2(n,1)
 
         # Draw the dendrogram
@@ -218,7 +230,7 @@ class Dendrogram
             .enter()
             .append('path')
               .attr('class','link')
-              .attr('d', (d) -> mk_line(d)) # node2line(d)))
+              .attr('d', (d) -> mk_line(d))
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
 
