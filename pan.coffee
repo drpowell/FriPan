@@ -93,33 +93,31 @@ class DendrogramWrapper
                         radius: 100
                         )
         @typ = 'radial'
+        @colours = []
 
     set_type: (@typ) ->
         # pass
 
+    set_colours: (@colours) ->
+        # pass
+
     update: (range) ->
-        t1 = new Date()
         ngenes = @matrix.genes().length
         range = [0, ngenes-1] if !range?
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
         dist_arr = MDS.distance(@matrix, range)
-        dist_hash = {}
+        @tree = new TreeBuilder(dist_arr)
+        @redraw()
 
-        # Put the strain names back in.  (why does MDS.distance remove this? FIXME)
-        dist_arr.forEach((r,i) =>
-            r.forEach((d,j) =>
-                [s1,s2] = [@matrix.strains()[i], @matrix.strains()[j]]
-                (dist_hash[s1.name]||={})[s2.name] = d
-            ))
-        t2 = new Date()
-        tree = new TreeBuilder(dist_hash)
-        t3 = new Date()
-        # FIXME - ugly handling of for colouring
-        strain_names = {}
-        @matrix.strains().forEach((s) -> strain_names[s.name]=s)
-        @widget.draw(tree, ((n) -> strain_names[n].id), @typ)
-        t4 = new Date()
-        console.log "Dendrogram: distance=#{t2-t1}ms tree=#{t3-t2}ms draw=#{t4-t3}ms"
+    redraw: () ->
+        strain_info = @matrix.strains().map((s,i) =>
+                          text:s.name
+                          colour: @colours[i] || 'black'
+                          clazz: "strain-#{s.id}"
+                        )
+
+        @widget.draw(@typ, @tree, strain_info)
+        #console.log "Dendrogram: distance=#{t2-t1}ms tree=#{t3-t2}ms draw=#{t4-t3}ms"
 
 
 class Pan
@@ -500,6 +498,7 @@ class Pan
     colour_by: (fld) ->
         scale = d3.scale.category20()
         strains = @strains.as_array()
+        strain_colour = []
         for s in strains
             col = if fld=='none' then '' else scale(s[fld])
 
@@ -510,9 +509,12 @@ class Pan
             $(".mds-scatter .labels.strain-#{s.id}").css('fill', col)
             $(".mds-scatter .dot.strain-#{s.id}").css('fill', col)
 
-            # dendrogram
-            $(".dendrogram .leaf.strain-#{s.id}").css('fill', col)
+            # for the dendrogram
+            strain_colour[s.id] = col
+
         @make_colour_legend(scale, fld)
+        @dendrogram.set_colours(strain_colour)
+        @dendrogram.redraw()
 
     reorder: () ->
         if @sort_order=='mds'

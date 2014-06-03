@@ -138,16 +138,21 @@ class Dendrogram
 
         [root, nodes, leaves]
 
-    draw: (builder, lbl_to_id, typ) ->
+    # typ - 'horz' or 'radial'
+    # builder - A TreeBuilder object
+    # node_info - A hash with keys as for distance matrix passed to TreeBuilder
+    #             value is an object like:  {text: "leaf label", colour: "leaf colour"}
+    #             This object will also be passed back on 'mouseover' events
+    draw: (typ, builder, node_info={}) ->
         typ ||= 'horz'
         if typ=='horz'
-            @draw_horz(builder, lbl_to_id)
+            @draw_horz(builder, node_info)
         else if typ=='radial'
-            @draw_radial(builder, lbl_to_id)
+            @draw_radial(builder, node_info)
         else
-            log_error("Unknown dendrogram type : #{typ}")
+            log_error("Unknown dendrogram type",typ)
 
-    draw_horz: (builder, lbl_to_id) ->
+    draw_horz: (builder, node_info) ->
         @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
 
@@ -181,17 +186,29 @@ class Dendrogram
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
 
+        get = (d,fld,def) ->
+            if node_info[d.name]?
+                node_info[d.name][fld]
+            else
+                def
+
+        col = (d)  -> get(d, 'colour', 'black')
+        text = (d) -> get(d, 'text', d.name)
+        clazz = (d)-> get(d, 'clazz', '')
+
+
         # Text for leaves
         g.selectAll('text.leaf')
             .data(leaves)
             .enter()
               .append("text")
-              .attr("class",(d) -> "leaf strain-#{lbl_to_id(d.name)}")
+              .attr("class",(d) -> "leaf "+clazz(d))
               .attr("text-anchor", "start")
               .attr("dominant-baseline", "central")
               .attr("x", (d) => @opts.label_pad + x(d.dist))
-              .attr("y", (d,i) -> y(d.y))
-              .text((d) -> d.name)
+              .attr("y", (d) -> y(d.y))
+              .attr("fill", (d) -> col(d))
+              .text((d) -> text(d))
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
 
@@ -206,7 +223,7 @@ class Dendrogram
             .attr("transform", "translate(#{@opts.w_pad},#{@opts.h_pad})")
             .call(axis)
 
-    draw_radial: (builder, lbl_to_id) ->
+    draw_radial: (builder, node_info) ->
         @g.html('')
         [root, nodes, leaves] = @_prep_tree(builder)
 
@@ -253,6 +270,16 @@ class Dendrogram
         # Simple function, will the given angle rotate text to lookup upright?
         isTxtUp = (r) -> r>=0 && r<180
 
+        get = (d,fld,def) ->
+            if node_info[d.name]?
+                node_info[d.name][fld]
+            else
+                def
+
+        col = (d)  -> get(d, 'colour', 'black')
+        text = (d) -> get(d, 'text', d.name)
+        clazz = (d)-> get(d, 'clazz', '')
+
         # Text for leaves
         # Be careful to position the text upright on both sides of the circle
         g.selectAll('text.leaf')
@@ -261,11 +288,12 @@ class Dendrogram
              .append("g")
               .attr("transform",(d) => r=yTxt(d.y) ; "rotate(#{if isTxtUp(r) then r else 180+r} 0 0)")
              .append("text")
-              .attr("class",(d) -> "leaf strain-#{lbl_to_id(d.name)}")
+              .attr("class",(d) -> "leaf "+clazz(d))
               .attr("text-anchor", (d) -> r=yTxt(d.y); if isTxtUp(r) then "start" else "end")
               .attr("dominant-baseline", "central")
               .attr("x", (d) => (@opts.label_pad + x(d.dist)) * if isTxtUp(yTxt(d.y)) then 1 else -1)
-              .text((d) -> d.name)
+              .attr("fill", (d) -> col(d))
+              .text((d) -> text(d))
               .on('mouseover', (d) => @show_tip(d))
               .on('mouseout', () => @show_tip(null))
 
