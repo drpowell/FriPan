@@ -26,8 +26,9 @@ you can put it all in your `public_html` folder if you are running Apache alread
 ## Input file
 An example ProteinOrtho5 result is provided: `pan.proteinortho.example` and `pan.descriptions.example` .
 
-To view a different result just rename them `pan.proteinortho` and `pan.descriptions`. and overwrite the example file, 
-or edit the `pan.coffee` script to change the files it loads.
+
+
+To view results just rename them `pan.proteinortho` and `pan.descriptions`. You can view other files by naming them with a consistent stem, for example `my-pan1.proteinortho` and `my-pan1.descriptions`.  Then you view them by using the url `pan.html?my-pan1`.  Note the suffix of the filenames are important.
 
 It is also possible to give arbitrary information on strains for sorting or colouring.  See the `pan.strains.example` file for an example.  This is expected to be a tab separated file with the first column named "ID" with the strain names matching those in pan.`proteinortho`.  Create such a tab separated file and put name it `pan.strains`.
 
