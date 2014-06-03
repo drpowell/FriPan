@@ -431,6 +431,9 @@ class Pan
 
         @scatter2 = new ScatterPlot(
                      elem: '#mds2'
+                     width: 500
+                     height: 400
+                     left: 50
                      click: (s) => @matrix.set_first(s.id)
                      mouseover: (s) => @highlight(s)
                      mouseout: (s) => @unhighlight()

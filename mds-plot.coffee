@@ -71,19 +71,19 @@ class MDS
 
 # Very simple scatter plot
 class ScatterPlot
-    width = 300
-    right = left = 200
     constructor: (@opts) ->
-        @opts.elem       ?= 'svg'
-        @opts.tot_width  ?= width+left+right
-        @opts.tot_height ?= 300
-        @opts.callback    = {}
+        @opts.elem     ?= 'svg'
+        @opts.width    ?= 500
+        @opts.height   ?= 400
+        @opts.left     ?= 100
+        @opts.right    ?= 100
+        @opts.callback = {}
         ['click','mouseover','mousemove','mouseout','brush'].forEach((s) =>
             @opts.callback[s] = @opts[s])
 
-        margin = {top: 20, right: right, bottom: 40, left: left}
-        @width =  @opts.tot_width - margin.left - margin.right
-        @height = @opts.tot_height - margin.top - margin.bottom
+        margin = {top: 20, right: @opts.right, bottom: 40, left: @opts.left}
+        @width =  @opts.width - margin.left - margin.right
+        @height = @opts.height - margin.top - margin.bottom
 
         @x = d3.scale.linear()
                .range([0, @width])
