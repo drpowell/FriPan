@@ -100,7 +100,7 @@ svg {
 circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
 
 #mds, #mds2 { display: inline-block; }
-#mds-thinking { display: none; position: absolute; font-size: 50px; top: 200px; left: 600px; }
+#mds-thinking, #dendrogram-thinking { display: none; position: absolute; font-size: 50px; }
 
 .mds-scatter { border: 1px solid #ccc; }
 .mds-scatter svg { position: absolute; }

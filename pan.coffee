@@ -56,6 +56,9 @@ class MDSHandler
         @latest_worker = new LatestWorker(worker, () => {mds: @_current_range})
         @latest_worker.on('updated', (comp) => @redraw(comp))
 
+        @latest_worker.on('started.think', () => @think_elem.start())
+        @latest_worker.on('updated.think', () => @think_elem.done())
+
     on: (t,func) ->
         @dispatch.on(t, func)
 
@@ -79,7 +82,7 @@ class MDSHandler
     reorder: () ->
         if @last_comp? && @sort_enabled
             comp = @last_comp
-            # Callback to reorder rows
+            # Callback to reorder rows.  Do it occasionally, otherwise very disconcerting
             window.clearTimeout(@background_runner)
             @background_runner = window.setTimeout(() =>
                 ids = @matrix.strains().map((s) -> s.id)
@@ -87,31 +90,15 @@ class MDSHandler
                 @matrix.set_order(ids)
             ,1000)
 
-        # cmdscale is slow, do it in a callback
-        # window.clearTimeout(@background_runner)
-        # @background_runner = window.setTimeout(() =>
-        #     $('#mds-thinking').show()
-        #     $('#mds').css('opacity','0.3')
-        #     window.setTimeout(() =>
-        #         mds = MDS.cmdscale(MDS.distance(@matrix, range))
-        #         @scatter.draw([mds.xs,mds.ys], @matrix.strains(), [0,1])
-        #         $('#mds-thinking').hide()
-        #         $('#mds').css('opacity','1.0')
-
-        #         ids = @matrix.strains().map((s) -> s.id)
-        #         ids.sort((a,b) -> mds.xs[a] - mds.xs[b])
-        #         @matrix.set_order(ids)
-        #         @redraw()
-        #     ,0)
-        # ,1000)
-
 class DendrogramWrapper
-    constructor: (@widget, @matrix) ->
+    constructor: (@widget, @matrix, @think_elem) ->
         @_current_range = null
         worker = new Worker('mds-worker.js')
         worker.postMessage(init: @matrix.as_hash())
         @latest_worker = new LatestWorker(worker, () => {dist: @_current_range})
         @latest_worker.on('updated', (d) => @_calc_done(d))
+        @latest_worker.on('started.think', () => @think_elem.start())
+        @latest_worker.on('updated.think', () => @think_elem.done())
 
         @typ = 'radial'
         @colours = []
@@ -502,7 +489,7 @@ class Pan
                      brush: (s) => @mds_brushed(s)
                     )
 
-        @mds = new MDSHandler(@matrix)
+        @mds = new MDSHandler(@matrix, new ThinkingElement('#mds2', '#mds-thinking'))
         @mds.on('redraw', (comp) =>
             @scatter2.draw(comp, @matrix.strains(), [0,1])
         )
@@ -517,7 +504,8 @@ class Pan
                         mouseout:  () => @dendrogram_mouseover([])
                         )
 
-        @dendrogram = new DendrogramWrapper(dendrogramWidget, @matrix)
+        @dendrogram = new DendrogramWrapper(dendrogramWidget, @matrix,
+                                            new ThinkingElement('#dendrogram', '#dendrogram-thinking'))
         @dendrogram.set_type($('select#dendrogram-type option:selected').val())
         @dendrogram.update(null)
 
