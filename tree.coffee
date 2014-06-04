@@ -142,6 +142,10 @@ class Dendrogram
             col2 = node.children[1].colour
             node.colour = if col1==col2 then col1 else 'black'
 
+    clear: () ->
+        # @g.html('') # seems not to work on Safari?!?
+        @g.selectAll('*').remove()
+
     # typ - 'horz' or 'radial'
     # builder - A TreeBuilder object
     # node_info - A hash with keys as for distance matrix passed to TreeBuilder
@@ -157,7 +161,7 @@ class Dendrogram
             log_error("Unknown dendrogram type",typ)
 
     draw_horz: (builder, node_info) ->
-        @g.html('')
+        @clear()
         [root, nodes, leaves] = @_prep_tree(builder)
         @_attach_colours(root, node_info)
 
@@ -229,7 +233,7 @@ class Dendrogram
             .call(axis)
 
     draw_radial: (builder, node_info) ->
-        @g.html('')
+        @clear()
         [root, nodes, leaves] = @_prep_tree(builder)
         @_attach_colours(root, node_info)
 
