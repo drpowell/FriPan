@@ -168,6 +168,18 @@ class Pan
         @tooltip.style("display", "none")
         @unhighlight()
 
+    _detail_position: (e) ->
+        [x,y] = [d3.event.pageX, d3.event.pageY]
+
+        r_edge = $(@elem).offset().left+$(@elem).width()
+        b_edge = $(@elem).offset().top+$(@elem).height()
+        w = e[0][0].offsetWidth
+        h = e[0][0].offsetHeight
+
+        x = x-w if x+w > r_edge
+        y = y-h if y+h > b_edge
+        e.style('left', x + "px").style('top', y + "px")
+
     detail: () ->
         [x,y] = d3.mouse(@focus.node())
         # convert from screen coordinates to matrix coordinates
@@ -185,11 +197,17 @@ class Pan
         gene_name_strain = @matrix.strain_gene_name(strain_id,col)
         desc_pri = @matrix.get_desc_non_hypot(col)
         desc = @matrix.get_desc(gene_name_strain)
+        txt = """<b>Strain:</b> #{strain.name}<br/>
+                 <b>Gene:</b> #{gene_name_pri}</br>
+                 <b>Gene from strain:</b> #{gene_name_strain}<br/>
+                 <b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/>
+                 <b>Desc:</b> #{desc}
+                """
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
-               .style("left", (d3.event.pageX) + "px")
-               .style("top", (d3.event.pageY) + "px")
-               .select("#tooltip-text")
-                   .html("<b>Strain:</b> #{strain.name}<br/><b>Gene:</b> #{gene_name_pri}</br><b>Gene from strain:</b> #{gene_name_strain}<br/><b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/><b>Desc:</b> #{desc}")
+                .select("#tooltip-text")
+                  .html(txt)
+        @_detail_position(@tooltip)
+
 
     dendrogram_mouseover: ([leaves,d,nodes]) ->
         @tooltip = d3.select("#tooltip")
