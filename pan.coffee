@@ -3,7 +3,7 @@
 # and the parameters have changed
 class LatestWorker
     constructor: (@worker, @get_current_data) ->
-        @dispatch = d3.dispatch("updated")
+        @dispatch = d3.dispatch("started","updated")
         @_computing = 0
         @_last_data = null
         @worker.addEventListener('message', (ev) => @done(ev.data))
@@ -14,20 +14,41 @@ class LatestWorker
     update: () ->
         if !@_computing
             cur_data = @get_current_data()
-            if cur_data != @_last_data
+            if !@deep_cmp(cur_data, @_last_data)
                 @_computing = 1
                 @_last_data = cur_data
                 #console.log "Sending worker:", cur_data
+                @dispatch.started()
                 @worker.postMessage(msg: cur_data)
+
+    # A slow deep compare (but easy to write!)
+    deep_cmp: (a,b) ->
+        JSON.stringify(a) == JSON.stringify(b)
 
     done: (res) ->
         @_computing = 0
         @dispatch.updated(res)
+        # Now check if the data changed in between, may need to recompute!
+        @update()
+
+class ThinkingElement
+    constructor: (@main_elem, @think_elem) ->
+        # pass
+    start: () ->
+        @background_runner = window.setTimeout(() =>
+            $(@think_elem).show()
+            $(@main_elem).css('opacity','0.3')
+        , 500)
+
+    done: () ->
+        window.clearTimeout(@background_runner)
+        $(@think_elem).hide()
+        $(@main_elem).css('opacity','1.0')
 
 # MDSHandler takes "update" events and sends them to the 'LatestWorker'
 # It dispatches "redraw" events when the the computation is done
 class MDSHandler
-    constructor: (@matrix) ->
+    constructor: (@matrix, @think_elem) ->
         @dispatch = d3.dispatch("redraw")
         @_current_range = null
         worker = new Worker('mds-worker.js')
