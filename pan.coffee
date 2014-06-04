@@ -705,7 +705,7 @@ class StrainInfo
                     s[c] = row[c]
 
 init = () ->
-    window.title = "FriPan"
+    document.title = "FriPan : #{get_stem()}"
     $('.by').mouseover(() -> $('.gravatar').show())
     $('.by').mouseout(() -> $('.gravatar').hide())
 
