@@ -62,19 +62,36 @@ svg {
 .minimap {
 }
 
+/* ------------------------------------------------------------ */
+/* Tool tip */
 #tooltip {   
   display: none;
   position: absolute;           
   text-align: left;           
- // width: 160px;                  
- // height: 45px;                 
+  max-width: 500px;
   padding: 1ex;             
   font: 12px sans-serif;        
-  background: lemonchiffon;   
+  background: #FFFACD; /* lemonchiffon; */
   border: solid 1px black;
   border-radius: 8px;           
   pointer-events: none;         
 }
+#tooltip td {
+  word-wrap: break-word;
+}
+#tooltip table {   
+  table-layout: fixed;
+  width: 500px;
+}
+#tooltip tr:nth-child(even) {
+  background-color: #dfdaad;
+}
+#tooltip th {
+  width: 10em;
+  text-align: right
+}
+
+/* ------------------------------------------------------------ */
 
 #topinfo {
   display: block;

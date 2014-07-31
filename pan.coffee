@@ -205,11 +205,14 @@ class Pan
         gene_name_strain = @matrix.strain_gene_name(strain_id,col)
         desc_pri = @matrix.get_desc_non_hypot(col)
         desc = @matrix.get_desc(gene_name_strain)
-        txt = """<b>Strain:</b> #{strain.name}<br/>
-                 <b>Gene:</b> #{gene_name_pri}</br>
-                 <b>Gene from strain:</b> #{gene_name_strain}<br/>
-                 <b>Present:</b> #{p}<br/><b>Desc (pri):</b> #{desc_pri}<br/>
-                 <b>Desc:</b> #{desc}
+        txt = """<table>
+                 <tr><th>Strain:<td>#{strain.name}
+                 <tr><th>Gene (pri):<td> #{gene_name_pri}
+                 <tr><th>Gene:<td> #{gene_name_strain}
+                 <tr><th>Present:<td>#{p}
+                 <tr><th>Desc (pri):<td>#{desc_pri}
+                 <tr><th>Desc:<td>#{desc}
+                 </table>
                 """
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                 .select("#tooltip-text")
