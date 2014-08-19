@@ -1,6 +1,6 @@
 class GeneMatrix
     # strains - array of strain objects.  Should have 'name'
-    # genes - array of gene objects.  Should have 'name'
+    # genes - array of gene objects.  Should have 'name'.  This array is the "pan-genome"
     # values - 2d array, 1 row per strain. 1 col per gene.  value should be null
     #          for not-present.  Otherwise may use a per-gene name
     constructor: (@_strains, @_genes, @_values) ->
@@ -107,7 +107,7 @@ class GeneMatrix
         @dispatch.order_changed()
 
     # Set the complete order of strains
-    set_order: (order) ->
+    set_strain_order: (order) ->
         @_pos = order
         @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
         @dispatch.order_changed()

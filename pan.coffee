@@ -90,7 +90,7 @@ class MDSHandler
             @background_runner = window.setTimeout(() =>
                 ids = @matrix.strains().map((s) -> s.id)
                 ids.sort((a,b) -> comp[0][a] - comp[0][b])
-                @matrix.set_order(ids)
+                @matrix.set_strain_order(ids)
             ,1000)
 
 class DendrogramWrapper
@@ -621,7 +621,7 @@ class Pan
                 strains.sort((a,b) -> a[fld].localeCompare(b[fld]))
 
             ids = strains.map((s) -> s.id)
-            @matrix.set_order(ids)
+            @matrix.set_strain_order(ids)
 
     # Resize.  Just redraw everything!
     # TODO : Would be nice to maintain current brush on resize
@@ -646,6 +646,7 @@ class Pan
             false
         )
 
+# ------------------------------------------------------------
 # Load a ProteinOrtho5 output file
 # Please use -singles option to ensure singleton clusters are included!
 # http://www.bioinf.uni-leipzig.de/Software/proteinortho/
@@ -666,14 +667,8 @@ parse_proteinortho = (tsv) ->
 
     new GeneMatrix( strains, genes, d3.transpose(values) )
 
-
-# Load an OrthoMCL 1.4 output file  (2.0 not supported)
-# (does not output singleton clusters)
-# http://orthomcl.org/common/downloads/software/v2.0/
-
-parse_orthomcl = (tsv) ->
-    # FIXME
-
+# ------------------------------------------------------------
+#
 get_stem = () ->
     get_url_params() || 'pan'
 
