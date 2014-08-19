@@ -245,7 +245,7 @@ class Pan
         tot_width = $(@elem).width()
         tot_height = @bh * @matrix.strains().length + 200
         margin = {top: 150, right: 10, bottom: 10, left: 140}
-        margin2 = {top: 50, right: margin.right, bottom: tot_height - 100, left: margin.left}
+        margin2 = {top: 30, right: margin.right, bottom: tot_height - 100, left: margin.left}
         @width = tot_width - margin.left - margin.right
         @height = tot_height - margin.top - margin.bottom
         @height2 = tot_height - margin2.top - margin2.bottom
@@ -311,6 +311,24 @@ class Pan
                         .attr("transform","translate(0,0)
                                            scale(#{@width/(@bw*@matrix.genes().length)},
                                            #{@height2/(@bh*@matrix.strains().length)})")
+
+        # Add the pointer arrow
+        @mini.append("g")
+               .attr("class","arrow")
+               .attr("transform", "translate(0,0)")
+               .attr("display","none")
+             .append("g")
+               .attr("transform", "scale(#{0.5*(@bw*@matrix.genes().length)/@width},
+                                         #{0.5*(@bh*@matrix.strains().length)/@height2})")
+             .append('line')
+               .attr('class','pointer')
+               .attr("marker-end", "url(#arrowhead)")
+               .attr('x1', 0)
+               .attr('x2', 0)
+               .attr('y1',-50)
+               .attr('y2',-25)
+               .style('stroke','red')
+               .style('stroke-width',10)
 
         @context.append("g")
             .attr("class", "x axis")
@@ -411,18 +429,10 @@ class Pan
 
     # Draw a pointing indicator to a specific gene on both minimap and main display
     _show_gene: (id) ->
-        pointer = @mini.selectAll('line.pointer')
+        arrow = @context.selectAll("g.arrow")
                         .data([1])
-        pointer.enter()
-            .append('line')
-            .attr('class','pointer')
-            .attr("marker-end", "url(#arrowhead)")
-        pointer.attr('x1', id+0.5)
-               .attr('x2', id+0.5)
-               .attr('y1',-100)
-               .attr('y2',-30)
-               .style('stroke','red')
-               .style('stroke-width',10)
+        arrow.attr('transform', "translate(#{id}+0.5)")
+             .attr('display', null)
 
         pointer = @focus.selectAll('line.pointer')
                         .data([1])
