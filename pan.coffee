@@ -677,6 +677,17 @@ parse_orthomcl = (tsv) ->
 get_stem = () ->
     get_url_params() || 'pan'
 
+load_json = (matrix) ->
+    d3.json("#{get_stem()}.json", (err, json) ->
+        if (err)
+            console.log("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
+            load_desc(matrix)
+        else
+            for strain,row of json
+                for gene in row
+                    matrix.set_desc(gene.gene, gene.desc + " length:#{gene.length}")
+    )
+
 # Load gene labels from XXXX.descriptions file that ProteinOrtho5 produces
 load_desc = (matrix) ->
     d3.text("#{get_stem()}.descriptions", (data) ->
@@ -758,7 +769,7 @@ init = () ->
         #console.log "Features : ",matrix.genes()
         #console.log "Strains : ",matrix.strains()
 
-        load_desc(matrix)
+        load_json(matrix)
         load_strains(strains)
 
         d3.select("#topinfo")
