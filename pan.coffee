@@ -79,6 +79,9 @@ class MDSHandler
         @dispatch.redraw(comp)
         @reorder()
 
+    redispatch: () ->
+        @dispatch.redraw(@last_comp)
+
     reorder: () ->
         if @last_comp? && @sort_enabled
             comp = @last_comp
@@ -491,8 +494,12 @@ class Pan
 
         @matrix.on('order_changed', () => @redraw())
 
+        @mdsDimension = 1
         @mdsBarGraph = new BarGraph(
                          elem: '#mds-bargraph'
+                         click: (d) =>
+                            @mdsDimension=+d.lbl
+                            @mds.redispatch()
                         )
         @scatter2 = new ScatterPlot(
                      elem: '#mds2'
@@ -507,7 +514,7 @@ class Pan
 
         @mds = new MDSHandler(@matrix, new ThinkingElement('#mds2', '#mds-thinking'))
         @mds.on('redraw', (comp) =>
-            @scatter2.draw(comp, @matrix.strains(), [0,1])
+            @scatter2.draw(comp, @matrix.strains(), [@mdsDimension-1, @mdsDimension])
             @mdsBarGraph.draw(comp[0..9].map((v,i) ->
                 range = d3.max(v) - d3.min(v)
                 {lbl: "#{i+1}", val: range}
