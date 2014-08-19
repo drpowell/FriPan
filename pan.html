@@ -27,71 +27,65 @@
 
 <body>
 
-  <div>
-    <span class='hdr'>FriPan</span>
-    <span class='by'>
-      David Powell &amp; Torsten Seemann 
-      <a href='http://vicbioinformatics.com/'>Victorian Bioinformatics Consortium (VBC)</a>
-    </span>
-    <div class='gravatar'>
-    <img src='http://www.gravatar.com/avatar/45c20adc35d534056a20322e2c70173e.png'/>
-    <img src='http://www.gravatar.com/avatar/99de0e8dee35338f4734dd7375aaaf9d.png'/>
-    </div>
+  <div class='hdr'>
+    <span class='title'>FriPan</span>
   </div>
 
-  <div id='topinfo'></div>
-
-  <div class="right">
-  <div class="option">
-    <div>
-      <label for="dendrogram-type">Dendrogram:</label>
-      <select id="dendrogram-type">
-        <option value="radial">Radial</option>
-        <option value="horz">Horizontal</option>
-      </select>
+  <div class='container'>
+    <div id='topinfo'></div>
+   
+    <div class="right">
+    <div class="option">
+      <div>
+        <label for="dendrogram-type">Dendrogram:</label>
+        <select id="dendrogram-type">
+          <option value="radial">Radial</option>
+          <option value="horz">Horizontal</option>
+        </select>
+      </div>
+      <div>
+        <label>Vertical scale</label>
+        <input id="vscale" type='text' value=1.0 size=5></input>
+      </div>
+      <div>
+        <label for='strain-sort'>Strain sort:</label>
+        <select id='strain-sort'>
+          <option value="mds">MDS dimension 1</option>
+          <option value="fixed">Fixed order</option>
+        </select>
+      </div>
+      <div>
+        <label for="strain-colour">Strain colour:</label>
+        <select id="strain-colour">
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div>
+        <label for='search'>Gene search:</label>
+        <input id='search' />
+      </div>
     </div>
-    <div>
-      <label>Vertical scale</label>
-      <input id="vscale" type='text' value=1.0 size=5></input>
+    <div id='colour-legend'></div>
     </div>
-    <div>
-      <label for='strain-sort'>Strain sort:</label>
-      <select id='strain-sort'>
-        <option value="mds">MDS dimension 1</option>
-        <option value="fixed">Fixed order</option>
-      </select>
+   
+    <div class='columns'>
+      <div>
+        <div id='mds-thinking'>THINKING...</div>
+        <div id='mds2'></div>
+      </div>
+      <div>
+        <div id='dendrogram-thinking'>THINKING...</div>
+        <div id='dendrogram'></div>
+      </div>
     </div>
-    <div>
-      <label for="strain-colour">Strain colour:</label>
-      <select id="strain-colour">
-        <option value="none">None</option>
-      </select>
-    </div>
-    <div>
-      <label for='search'>Gene search:</label>
-      <input id='search' />
+   
+    <div id='chart'>
+      <h3>Loading...</h3>
     </div>
   </div>
-  <div id='colour-legend'></div>
-  </div>
-
-  <div class='columns'>
-    <div>
-      <div id='mds-thinking'>THINKING...</div>
-      <div id='mds2'></div>
+   
+    <div id='tooltip'>
+      <div id='tooltip-text'></div>
     </div>
-    <div>
-      <div id='dendrogram-thinking'>THINKING...</div>
-      <div id='dendrogram'></div>
-    </div>
-  </div>
-
-  <div id='chart'>
-    <h3>Loading...</h3>
-  </div>
- 
-  <div id='tooltip'>
-    <div id='tooltip-text'></div>
-  </div>
 
 </body>

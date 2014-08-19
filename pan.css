@@ -1,8 +1,23 @@
 
+body {
+  margin: 0;
+}
+
+.container {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
 .hdr { 
   font-size: 32px; 
   font-weight: bold; 
-  margin-left: 20px; 
+  background-color: #333;
+  margin: 0;
+}
+
+.hdr .title {  
+  margin-left: 20px;
+  color: #ddd;
 }
 
 .by { 
