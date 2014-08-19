@@ -136,6 +136,24 @@ circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
   stroke: #fff;
 }
 
+#mds-bargraph {
+  margin: 10px 0 30px 0;
+}
+
+#mds-bargraph .bar-chart .bar { fill: steelblue; }
+
+#mds-bargraph .bar-chart .bar:hover { fill: brown; }
+
+#mds-bargraph .bar-chart .axis { font: 10px sans-serif; }
+
+#mds-bargraph .bar-chart .axis path, #mds-bargraph .bar-chart .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#mds-bargraph .bar-chart .x.axis path { display: none; }
+
 /*  ****************************************************/
 svg.dendrogram {
   border: 1px solid #ccc;

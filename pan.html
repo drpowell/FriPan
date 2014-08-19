@@ -33,49 +33,54 @@
   </div>
 
   <div class='container'>
+
+    <div class="right">
+    </div>
    
     <div class="right">
-    <div class="option">
-      <div>
-        <label for="dendrogram-type">Dendrogram:</label>
-        <select id="dendrogram-type">
-          <option value="radial">Radial</option>
-          <option value="horz">Horizontal</option>
-        </select>
+      <div id="mds-bargraph"></div>
+
+      <div class="option">
+        <div>
+          <label for="dendrogram-type">Dendrogram:</label>
+          <select id="dendrogram-type">
+            <option value="radial">Radial</option>
+            <option value="horz">Horizontal</option>
+          </select>
+        </div>
+        <div>
+          <label>Vertical scale</label>
+          <input id="vscale" type='text' value=1.0 size=5></input>
+        </div>
+        <div>
+          <label for='strain-sort'>Strain sort:</label>
+          <select id='strain-sort'>
+            <option value="mds">MDS dimension 1</option>
+            <option value="fixed">Fixed order</option>
+          </select>
+        </div>
+        <div>
+          <label for="strain-colour">Strain colour:</label>
+          <select id="strain-colour">
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div>
+          <label for='search'>Gene search:</label>
+          <input id='search' />
+        </div>
       </div>
-      <div>
-        <label>Vertical scale</label>
-        <input id="vscale" type='text' value=1.0 size=5></input>
-      </div>
-      <div>
-        <label for='strain-sort'>Strain sort:</label>
-        <select id='strain-sort'>
-          <option value="mds">MDS dimension 1</option>
-          <option value="fixed">Fixed order</option>
-        </select>
-      </div>
-      <div>
-        <label for="strain-colour">Strain colour:</label>
-        <select id="strain-colour">
-          <option value="none">None</option>
-        </select>
-      </div>
-      <div>
-        <label for='search'>Gene search:</label>
-        <input id='search' />
-      </div>
-    </div>
-    <div id='colour-legend'></div>
-    </div>
+      <div id='colour-legend'></div>
+    </div> <!-- .right -->
    
     <div class='columns'>
       <div>
-        <div id='mds-thinking'>THINKING...</div>
-        <div id='mds2'></div>
-      </div>
-      <div>
         <div id='dendrogram-thinking'>THINKING...</div>
         <div id='dendrogram'></div>
+      </div>
+      <div>
+        <div id='mds-thinking'>THINKING...</div>
+        <div id='mds2'></div>
       </div>
     </div>
    

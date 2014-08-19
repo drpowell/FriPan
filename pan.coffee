@@ -491,6 +491,9 @@ class Pan
 
         @matrix.on('order_changed', () => @redraw())
 
+        @mdsBarGraph = new BarGraph(
+                         elem: '#mds-bargraph'
+                        )
         @scatter2 = new ScatterPlot(
                      elem: '#mds2'
                      width: 500
@@ -505,6 +508,10 @@ class Pan
         @mds = new MDSHandler(@matrix, new ThinkingElement('#mds2', '#mds-thinking'))
         @mds.on('redraw', (comp) =>
             @scatter2.draw(comp, @matrix.strains(), [0,1])
+            @mdsBarGraph.draw(comp[0..9].map((v,i) ->
+                range = d3.max(v) - d3.min(v)
+                {lbl: "#{i+1}", val: range}
+            ))
         )
         @mds.update(null)
 

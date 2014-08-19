@@ -32,6 +32,12 @@ To view results just rename them `pan.proteinortho` and `pan.descriptions`. You 
 
 It is also possible to give arbitrary information on strains for sorting or colouring.  See the `pan.strains.example` file for an example.  This is expected to be a tab separated file with the first column named "ID" with the strain names matching those in pan.`proteinortho`.  Create such a tab separated file and put name it `pan.strains`.
 
+### Development
+
+While developing code, it is useful to enable coffee in "watch" mode and with source maps.  Run the following:
+
+    coffee -c -w -m *.coffee
+
 ### Source
 * Github: https://github.com/drpowell/FriPan
 * Website: http://www.vicbioinformatics.com/software.fripan.shtml
