@@ -41,8 +41,17 @@ class GeneMatrix
     genes: () ->
         @_genes
 
+    # is the given gene present in the given strain
     presence: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]?
+
+    # Count number of genes in the cluster
+    count_presence: (gene_id) ->
+        tot=0
+        @_values.forEach( (row) ->
+            tot+=1 if row[gene_id]?
+        )
+        tot
 
     strain_gene_name: (strain_id, gene_id) ->
         @_values[strain_id][gene_id]

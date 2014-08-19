@@ -208,6 +208,7 @@ class Pan
         gene_name_strain = @matrix.strain_gene_name(strain_id,col)
         desc_pri = @matrix.get_desc_non_hypot(col)
         desc = @matrix.get_desc(gene_name_strain)
+        num_present = @matrix.count_presence(col)
         txt = """<table>
                  <tr><th>Strain:<td>#{strain.name}
                  <tr><th>Gene (pri):<td> #{gene_name_pri}
@@ -215,6 +216,7 @@ class Pan
                  <tr><th>Present:<td>#{p}
                  <tr><th>Desc (pri):<td>#{desc_pri}
                  <tr><th>Desc:<td>#{desc}
+                 <tr><th>Strains with gene:<td>#{num_present} of #{@matrix.strains().length}
                  </table>
                 """
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
