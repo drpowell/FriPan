@@ -8,36 +8,34 @@ body {
   margin-right: 20px;
 }
 
-.hdr { 
-  font-size: 32px; 
-  font-weight: bold; 
+.hdr {
   background-color: #333;
   margin: 0;
+  margin-bottom: 5px;
+
 }
 
-.hdr .title {  
+.hdr .title {
+  font-size: 32px;
+  font-weight: bold;
   margin-left: 20px;
   color: #ddd;
 }
 
-.by { 
-  font-size: 20px; 
-  font-weight: bold; 
-  margin-left: 20px; 
-}
-
-.gravatar { 
-  position: absolute; 
-  top: 0; 
-  right: 0; 
-  display: none; 
+#topinfo {
+  font-size: 24px;
+  font-weight: normal;
+  display: inline;
+  float: right;
+  margin-right:20px;
+  margin-top: 7px;
 }
 
 .right {
   float: right;
 }
 
-.option { 
+.option {
   font-size: 9pt;
   border: 1px solid;
   padding: 5px;
@@ -79,22 +77,22 @@ svg {
 
 /* ------------------------------------------------------------ */
 /* Tool tip */
-#tooltip {   
+#tooltip {
   display: none;
-  position: absolute;           
-  text-align: left;           
+  position: absolute;
+  text-align: left;
   max-width: 500px;
-  padding: 1ex;             
-  font: 12px sans-serif;        
+  padding: 1ex;
+  font: 12px sans-serif;
   background: #FFFACD; /* lemonchiffon; */
   border: solid 1px black;
-  border-radius: 8px;           
-  pointer-events: none;         
+  border-radius: 8px;
+  pointer-events: none;
 }
 #tooltip td {
   word-wrap: break-word;
 }
-#tooltip table {   
+#tooltip table {
   table-layout: fixed;
   width: 500px;
 }
@@ -108,15 +106,6 @@ svg {
 
 /* ------------------------------------------------------------ */
 
-#topinfo {
-  display: block;
-  margin: 3ex;
-//  text-align: center;
-//  width: 100%;
-//  height: 3ex;
-//  background: pink;
-//  color: black;
-}
 
 #chart {
 //  background: lightgray;

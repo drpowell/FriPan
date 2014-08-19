@@ -718,8 +718,7 @@ class StrainInfo
 
 init = () ->
     document.title = "FriPan : #{get_stem()}"
-    $('.by').mouseover(() -> $('.gravatar').show())
-    $('.by').mouseout(() -> $('.gravatar').hide())
+    $(".hdr").append("<span class='title'>: #{get_stem()}</span>")
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
@@ -737,7 +736,7 @@ init = () ->
         load_strains(strains)
 
         d3.select("#topinfo")
-            .html("Loaded #{matrix.strains().length} strains and #{matrix.genes().length} ortholog clusters")
+          .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")
 
         pan = new Pan('#chart', matrix, strains)
 
