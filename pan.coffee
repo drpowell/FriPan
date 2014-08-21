@@ -406,6 +406,26 @@ class Pan
         row.transition()
            .attr('transform', (s) => "translate(0,#{s.pos * @bh})")
 
+    show_strain_info: (s) ->
+        if !s?
+            @tooltip.style("display", "none")
+            return
+        info = @strains.find_strain_by_name(s.name)
+        window.xx = info
+        str = ""
+        for k,v of info
+            if k not in ['id','name']
+                str += "<tr><th>#{k}<td>#{info[k]}"
+        txt = """<table>
+                 <tr><th>Strain:<td>#{s.name}
+                 #{str}
+                 </table>
+                """
+        @tooltip.style("display", "block") # un-hide it (display: none <=> block)
+                .select("#tooltip-text")
+                  .html(txt)
+        @_detail_position(@tooltip)
+
     # Draw the strain labels
     draw_labels: (elem) ->
         lbls = elem.selectAll('text.label')
@@ -416,8 +436,8 @@ class Pan
              .attr('text-anchor','end')
              .text((s) -> s.name)
              .on('click', (s) => @matrix.set_first(s.id))
-             .on("mouseover", (s) => @highlight(s))
-             .on("mouseout", (s) => @unhighlight())
+             .on("mouseover", (s) => @highlight(s); @show_strain_info(s))
+             .on("mouseout", (s) => @unhighlight(); @show_strain_info(null))
         lbls.transition()
             .attr('y', (s) => (s.pos+1)*@bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
