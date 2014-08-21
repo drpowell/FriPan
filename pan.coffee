@@ -142,6 +142,7 @@ class Pan
         #focus.select(".x.axis").call(xAxis)
         ex = brush.extent()
         diff = ex[1] - ex[0]
+        # FIXME - diff here is by pos (gene_by_pos), but other tools are slicing by id - BUG
         if diff==0
             # Reset to full zoom
             @reset_scale()

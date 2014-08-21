@@ -165,7 +165,7 @@ svg.dendrogram {
 
 .dendrogram path.brushed { stroke: red !important; }
 
-.dendrogram .leaf { text-size: 8px; }
+.dendrogram text.leaf { font-size: 8px; }
 
 /*  ****************************************************/
 .warning-popover {
