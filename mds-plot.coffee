@@ -235,7 +235,7 @@ class ScatterPlot
 class BarGraph
     constructor: (@opts) ->
         @opts.tot_width  ||= 200
-        @opts.tot_height ||= 200
+        @opts.tot_height ||= 150
         margin = {top: 20, right: 10, bottom: 30, left: 40}
         @width = @opts.tot_width - margin.left - margin.right
         @height = @opts.tot_height - margin.top - margin.bottom
@@ -291,7 +291,7 @@ class BarGraph
            .append("text")
              .attr('class', 'label')
              .attr("transform", "rotate(-90)")
-             .attr("x", -60)
+             .attr("x", -10)
              .attr("y", -33)
              .style("text-anchor", "end")
              .text("Magnitude")

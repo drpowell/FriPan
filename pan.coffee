@@ -606,7 +606,7 @@ class Pan
               .style('background-color', (v) -> scale(v))
 
     colour_by: (fld) ->
-        scale = d3.scale.category20()
+        scale = d3.scale.category10()
         strains = @strains.as_array()
         strain_colour = []
         for s in strains
