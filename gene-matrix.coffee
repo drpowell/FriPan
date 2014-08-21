@@ -1,13 +1,13 @@
 class GeneMatrix
-    # strains - array of strain objects.  Should have 'name'
-    # genes - array of gene objects.  Should have 'name'.  This array is the "pan-genome"
-    # values - 2d array, 1 row per strain. 1 col per gene.  value should be null
-    #          for not-present.  Otherwise may use a per-gene name
+    # _strains - array of strain objects.  Should have 'name'
+    # _genes - array of gene objects.  Each element is a "cluster".  This array is the "pan-genome"
+    # _values - 2d array, 1 row per strain. 1 col per gene.  value should be null
+    #          for not-present.  Otherwise may use a per-gene name.  Should be in the same order as "_genes"
+    #
+    # _desc - hash of gene descriptions.  Keyed on gene name
     constructor: (@_strains, @_genes, @_values) ->
         # Give both genes and strains ids.
         @_strains.forEach((s,i) -> s.id = s.pos = i)
-        @_genes.forEach((g,i) -> g.id = i)
-        @_build_by_pos()
         @_genes.forEach((g,i) -> g.id = g.pos = i )
         @_desc = {}
         # @dispatch is used to send events when the order of rows changes
@@ -27,11 +27,6 @@ class GeneMatrix
     on: (t,func) ->
         @dispatch.on(t, func)
 
-    # Sort the strains by position order into a local array @_pos
-    # @_pos indexed by position, returns strain_id
-    _build_by_pos: () ->
-        @_pos = @_strains.map((s) -> s.pos)
-        @_pos.sort((a,b) -> a-b)
     # Build a gene name to gene.id mapping
     _build_gene_name_idx: () ->
         gene_name_map = {}
@@ -51,7 +46,8 @@ class GeneMatrix
         @_strains
 
     # Return strain_id for the given strain_pos
-    strain_pos_to_id: (pos) -> @_pos[pos]
+    strain_pos_to_id: (pos) ->
+        @_strain_pos[pos]
 
     genes: () ->
         @_genes
@@ -103,7 +99,7 @@ class GeneMatrix
 
     search_gene: (str, max) ->
         res = []
-        for i in @_pos
+        for i in @_strain_pos
             for j in [0 ... @_values[i].length]
                 n =  @_values[i][j]
                 if n? && n.indexOf(str)>=0
@@ -113,7 +109,7 @@ class GeneMatrix
 
     # Find a name for the gene - searching by "pos" (ie. from the top)
     gene_name: (gene_id) ->
-        for idx in @_pos
+        for idx in @_strain_pos
             n = @strain_gene_name(idx,gene_id)
             return n if n?
         "not found"
@@ -125,7 +121,7 @@ class GeneMatrix
     # Find the first description that is not "hypothetical protein"
     get_desc_non_hypot: (gene_id) ->
         fst = ""
-        for idx in @_pos
+        for idx in @_strain_pos
             n = @strain_gene_name(idx,gene_id)
             continue if !n?
             desc = @get_desc(n)
@@ -145,16 +141,16 @@ class GeneMatrix
 
     # Set the given strain id to be first in the list
     set_first: (strain_id) ->
-        idx = @_pos.indexOf(strain_id)
-        @_pos.splice(idx, 1)         # Remove it from the list
-        @_pos.splice(0,0, strain_id) # And put it on the front
-        @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
+        idx = @_strain_pos.indexOf(strain_id)
+        @_strain_pos.splice(idx, 1)         # Remove it from the list
+        @_strain_pos.splice(0,0, strain_id) # And put it on the front
+        @_strain_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
         @dispatch.order_changed()
 
     # Set the complete order of strains
     set_strain_order: (order) ->
-        @_pos = order
-        @_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
+        @_strain_pos = order
+        @_strain_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
         @dispatch.order_changed()
 
 
