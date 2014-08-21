@@ -8,3 +8,4 @@ gene-matrix.js
 util.js
 tree.js
 *.map
+node_modules/
