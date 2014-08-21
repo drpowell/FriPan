@@ -8,9 +8,11 @@ class GeneMatrix
         @_strains.forEach((s,i) -> s.id = s.pos = i)
         @_genes.forEach((g,i) -> g.id = i)
         @_build_by_pos()
+        @_genes.forEach((g,i) -> g.id = g.pos = i )
         @_desc = {}
         # @dispatch is used to send events when the order of rows changes
         @dispatch = d3.dispatch("order_changed") if d3?
+        @_build_gene_name_idx()
 
     # Convert GeneMatrix to a hash (for transport to a web-worker)
     as_hash: () ->
@@ -30,6 +32,19 @@ class GeneMatrix
     _build_by_pos: () ->
         @_pos = @_strains.map((s) -> s.pos)
         @_pos.sort((a,b) -> a-b)
+    # Build a gene name to gene.id mapping
+    _build_gene_name_idx: () ->
+        gene_name_map = {}
+        @_values.forEach((row) ->
+            row.forEach((g, idx) ->
+                if g?
+                    names = g.split(',')
+                    names.forEach((n) ->
+                        gene_name_map[n] = idx
+                    )
+            )
+        )
+        @_gene_name_id = gene_name_map
 
     # Return array of strains ordered by id
     strains: () ->
@@ -40,6 +55,36 @@ class GeneMatrix
 
     genes: () ->
         @_genes
+
+    genes_by_pos: () ->
+        if !@_genes_by_pos?
+            @_genes_by_pos = @_genes.slice()
+            @_genes_by_pos.sort((g1,g2) -> g1.pos - g2.pos)
+        @_genes_by_pos
+
+    # Set the order of genes.  Takes an array of gene names
+    set_gene_order: (gene_names) ->
+        console.log "Ordering genes.  Genes specified:#{gene_names.length}"
+        # First reset all positions, then set the known ones, and fill in the rest
+        @_genes.forEach((g) -> g.pos=-1)
+        new_pos=0
+        gene_names.forEach((n) =>
+            id = @_gene_name_id[n]
+            if !id?
+                console.log "Unable to find gene '#{n}'"
+            else
+                # Set the gene position if it hasn't already been set
+                gene = @_genes[id]
+                if gene.pos<0
+                    gene.pos = new_pos
+                    new_pos += 1
+        )
+        @_genes.forEach((g) ->
+            if g.pos<0
+                g.pos = new_pos
+                new_pos += 1
+        )
+        @_genes_by_pos=null
 
     # is the given gene present in the given strain
     presence: (strain_id, gene_id) ->

@@ -20,7 +20,7 @@ for fname in sys.argv[1:]:
             if m:
                 if gene is not None:
                     strain.append(gene)
-                gene = {'gene': m.group(1), 'desc': m.group(2), 'length': 0}
+                gene = {'name': m.group(1), 'desc': m.group(2), 'length': 0}
             else:
                 # Part of the sequence, increment the length
                 if gene is not None:

@@ -197,18 +197,18 @@ class Pan
         row = Math.floor(y/@bh)
         col = Math.floor(x/@bw)
         strain_id = @matrix.strain_pos_to_id(row)
-        return if !strain_id?
+        gene = @matrix.genes_by_pos()[col]
+        return if !gene? || !strain_id?
 
         strain = @matrix.strains()[strain_id]
         @unhighlight()
         @highlight(strain)
-        gene = @matrix.genes()[col]
-        p = @matrix.presence(strain_id,col)
-        gene_name_pri = @matrix.gene_name(col)
-        gene_name_strain = @matrix.strain_gene_name(strain_id,col)
-        desc_pri = @matrix.get_desc_non_hypot(col)
+        p = @matrix.presence(strain_id,gene.id)
+        gene_name_pri = @matrix.gene_name(gene.id)
+        gene_name_strain = @matrix.strain_gene_name(strain_id,gene.id)
+        desc_pri = @matrix.get_desc_non_hypot(gene.id)
         desc = @matrix.get_desc(gene_name_strain)
-        num_present = @matrix.count_presence(col)
+        num_present = @matrix.count_presence(gene.id)
         txt = """<table>
                  <tr><th>Strain:<td>#{strain.name}
                  <tr><th>Gene (pri):<td> #{gene_name_pri}
@@ -217,6 +217,7 @@ class Pan
                  <tr><th>Desc (pri):<td>#{desc_pri}
                  <tr><th>Desc:<td>#{desc}
                  <tr><th>Strains with gene:<td>#{num_present} of #{@matrix.strains().length}
+                 <tr><th>Pos:<td>#{gene.pos}
                  </table>
                 """
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
@@ -361,15 +362,20 @@ class Pan
     collapse_off: (strain_id) ->
         res = []
         last_p=1
-        @matrix.genes().forEach((g) =>
+        @matrix.genes_by_pos().forEach((g) =>
             p = @matrix.presence(strain_id,g.id)
             if !p
                 if last_p
-                    res.push({x:g.id, len: 0})
+                    res.push({x:g.pos, len: 0})
                 res[res.length-1].len += 1
             last_p = p
         )
         res
+
+    # Used when the genes change order.  Otherwise we don't want to re-render all the gene boxes
+    clear_boxes: () ->
+        @mini.selectAll('g.gene-row').remove()
+        @focus.selectAll('g.gene-row').remove()
 
     # Draw the per-gene 'on/off' boxes
     draw_boxes: (elem) ->
@@ -418,15 +424,15 @@ class Pan
         @gene_gaps.selectAll('line.gene-gap').remove()
 
     draw_gaps: (ex) ->
-        in_range = @matrix.genes().filter((g) -> g.id >= ex[0] && g.id<=ex[1])
+        in_range = @matrix.genes_by_pos().filter((g) -> g.pos >= ex[0] && g.pos<=ex[1])
         col = @gene_gaps.selectAll('line.gene-gap')
-                        .data(in_range, ((g) -> g.id))
+                        .data(in_range, ((g) -> g.pos))
         col.exit().remove()
         col.enter()
             .append('line')
             .attr('class','gene-gap')
-            .attr('x1',(g,i) => g.id)
-            .attr('x2',(g,i) => g.id)
+            .attr('x1',(g,i) => g.pos)
+            .attr('x2',(g,i) => g.pos)
             .attr('y1',0)
             .attr('y2',@bh * @matrix.strains().length)
             .style('stroke','white')
@@ -563,6 +569,13 @@ class Pan
             @dendrogram.redraw()
         )
 
+        $('select#gene-order').on('change', (e) =>
+            order = $('option:selected',e.target).data('order')
+            @matrix.set_gene_order(order)
+            @clear_boxes()
+            @redraw()
+        )
+
         @sort_order = $('select#strain-sort option:selected').val()
         @reorder()
 
@@ -678,10 +691,18 @@ load_json = (matrix) ->
             console.log("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
             load_desc(matrix)
         else
-            for strain,row of json
+            strains = d3.keys(json).sort()
+            for strain in strains
+                row = json[strain]
+                add_gene_order(strain,row)
                 for gene in row
-                    matrix.set_desc(gene.gene, gene.desc + " length:#{gene.length}")
+                    matrix.set_desc(gene.name, gene.desc + " length:#{gene.length}")
     )
+
+add_gene_order = (strain, genes) ->
+    opt = "<option value=\"#{strain}\">#{strain}</option>"
+    elem = $(opt).appendTo('select#gene-order')
+    elem.data('order', genes.map((g) -> g.name))
 
 # Load gene labels from XXXX.descriptions file that ProteinOrtho5 produces
 load_desc = (matrix) ->
