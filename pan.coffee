@@ -376,6 +376,7 @@ class Pan
     clear_boxes: () ->
         @mini.selectAll('g.gene-row').remove()
         @focus.selectAll('g.gene-row').remove()
+        @_hide_gene_pointer()
 
     # Draw the per-gene 'on/off' boxes
     draw_boxes: (elem) ->
@@ -438,11 +439,16 @@ class Pan
             .style('stroke','white')
             .style('stroke-width','0.1')
 
+
+    _hide_gene_pointer: () ->
+        arrow = @context.selectAll("g.arrow").attr('display','none')
+        @focus.selectAll('line.pointer').remove()
+
     # Draw a pointing indicator to a specific gene on both minimap and main display
-    _show_gene: (id) ->
+    _show_gene_pointer: (gene) ->
         arrow = @context.selectAll("g.arrow")
                         .data([1])
-        arrow.attr('transform', "translate(#{id}+0.5)")
+        arrow.attr('transform', "translate(#{gene.pos}+0.5)")
              .attr('display', null)
 
         pointer = @focus.selectAll('line.pointer')
@@ -450,8 +456,8 @@ class Pan
         pointer.enter()
             .append('line')
             .attr('class','pointer')
-        pointer.attr('x1', id+0.5)
-               .attr('x2', id+0.5)
+        pointer.attr('x1', gene.pos+0.5)
+               .attr('x2', gene.pos+0.5)
                .attr('y1', 0)
                .attr('y2', @bh*@matrix.strains().length)
                .style('stroke','red')
@@ -650,12 +656,12 @@ class Pan
             resp(lst)
         focus: (event, ui) =>
             console.log "Showing",ui.item
-            @_show_gene(ui.item.value)
+            @_show_gene_pointer(ui.item.value)
             $("#search").val(ui.item.label)
             false
         select: (event, ui) =>
             console.log "Showing",ui.item
-            @_show_gene(ui.item.value)
+            @_show_gene_pointer(ui.item.value)
             false
         )
 

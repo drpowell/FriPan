@@ -103,7 +103,7 @@ class GeneMatrix
             for j in [0 ... @_values[i].length]
                 n =  @_values[i][j]
                 if n? && n.indexOf(str)>=0
-                    res.push({label:n, value:j})
+                    res.push({label:n, value:@_genes[j]})
                 return res if res.length>=max
         return res
 
