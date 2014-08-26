@@ -1,74 +1,4 @@
 
-# Calculate a MDS (classic) from a distnace matrix
-class MDS
-
-    # Calculate a "distance" based on presence/absence of genes
-    # Returns an array of array of distances
-    @distance: (mat, gene_range) ->
-        t1 = new Date
-        dist = []
-        for s1 in [0...mat.strains().length]
-            (dist[s1]||=[])[s1] = 0
-            for s2 in [0...s1]
-                d = 0
-                for g in [gene_range[0] .. gene_range[1]]
-                    d += Math.abs(mat.presence(s1,g) - mat.presence(s2,g))
-                (dist[s1] ||= [])[s2] = d
-                (dist[s2] ||= [])[s1] = d
-
-        # Print as R code!
-        #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
-        #mat.strains().forEach((s1,i) -> mat.strains().map((s2,j) -> console.log s1,s2,dist[i][j]))
-        #console.log mat.strains(),dist[0]
-        our_log "Distance took : #{new Date - t1}ms"
-
-        dist
-
-
-    @pca: (mat, gene_range) ->
-        t1= new Date
-        matrix = []
-        for s in [0...mat.strains().length]
-            matrix.push(row = [])
-            for g in [gene_range[0] .. gene_range[1]]
-                row.push(mat.presence(s,g))
-
-        # We expect 1 row per sample.  Each column is a different gene
-        # Subtract column-wise mean (need zero-mean for PCA).
-        X = numeric.transpose(numeric.transpose(matrix).map((r) -> mean = 1.0*numeric.sum(r)/r.length; numeric.sub(r,mean)))
-        #console.log("matrix",matrix,"X",X)
-
-        sigma = numeric.dot(X,numeric.transpose(X))
-        svd = numeric.svd(sigma)
-        r = numeric.dot(svd.V, numeric.diag(svd.S))   # No sqrt - means we are using manhattan distance(?)
-        #r = numeric.dot(svd.V, numeric.sqrt(numeric.diag(svd.S)))
-        our_log "SVD took : #{new Date - t1}ms"
-        r
-
-
-    @cmdscale: (dist) ->
-        dist = numeric.pow(dist, 2)        # , done by cmdscale!
-        # Function to mean center the rows
-        centre = (mat) -> mat.map((r) -> m=numeric.sum(r)/r.length ; numeric.sub(r,m))
-
-        # row and col center matrix
-        c = centre(numeric.transpose(centre(dist)))
-        c = numeric.neg( numeric.div(c,2) )              # Not sure why, done by cmdscale
-        t1 = new Date
-        eig = numeric.eig(c)
-        our_log "eig took : #{new Date - t1}ms"
-        order = [0...c.length]
-        #order.sort((a,b) -> eig.lambda.x[b] - eig.lambda.x[a])  # FIXME - we're not selecting the largest eigenvalues!
-        ev = order.map((i) -> eig.lambda.x[i])
-        evec = order.map((i) -> eig.E.x[i])
-        #console.log ev
-
-        dim = (idx) ->
-            numeric.mul(numeric.transpose(evec)[idx], Math.sqrt(ev[idx]))
-
-        {xs: dim(0), ys: dim(1) }
-
-
 # Very simple scatter plot
 class ScatterPlot
     constructor: (@opts) ->
@@ -161,7 +91,7 @@ class ScatterPlot
             .call(@xAxis)
           .append("text")
             .attr("class", "label")
-            .attr("x", 5+@width)
+            .attr("x", 8+@width)
             .attr("y", 10)
             .style("text-anchor", "start")
             .text("Dim #{dim1+1}");
@@ -235,8 +165,8 @@ class ScatterPlot
 class BarGraph
     constructor: (@opts) ->
         @opts.tot_width  ||= 200
-        @opts.tot_height ||= 150
-        margin = {top: 20, right: 10, bottom: 30, left: 40}
+        @opts.tot_height ||= 160
+        margin = {top: 20, right: 5, bottom: 30, left: 45}
         @width = @opts.tot_width - margin.left - margin.right
         @height = @opts.tot_height - margin.top - margin.bottom
 
@@ -255,6 +185,8 @@ class BarGraph
                    .scale(@y)
                    .orient("left")
                    .tickSize(8,1)
+                   .ticks(5)
+                   .tickFormat(d3.format("%"))
 
         @svg = d3.select(@opts.elem).append("svg")
                  .attr('class','bar-chart')
@@ -269,10 +201,10 @@ class BarGraph
 
         @svg.append("text")
              .attr('class', 'title')
-             .attr("x", @width/2)
+             .attr("x", @width/2 - 14)
              .attr("y", -10)
              .style("text-anchor", "middle")
-             .text("Magnitude of each MDS dimension")
+             .text("Variance percentage by MDS dimension")
 
         @svg.append("g")
              .attr("class", "x axis")
@@ -294,7 +226,7 @@ class BarGraph
              .attr("x", -10)
              .attr("y", -33)
              .style("text-anchor", "end")
-             .text("Magnitude")
+             .text("Variance percentage")
 
         @svg.selectAll(".bar")
             .data(data)
@@ -306,6 +238,5 @@ class BarGraph
               .attr("height", (d) => @height - @y(d.val))
               .on('click', (d) => if @opts.click? then @opts.click(d))
 
-@MDS = MDS
 @ScatterPlot = ScatterPlot
 @BarGraph = BarGraph

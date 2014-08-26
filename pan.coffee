@@ -89,7 +89,8 @@ class MDSHandler
             window.clearTimeout(@background_runner)
             @background_runner = window.setTimeout(() =>
                 ids = @matrix.strains().map((s) -> s.id)
-                ids.sort((a,b) -> comp[0][a] - comp[0][b])
+                pts = numeric.transpose(comp.points)
+                ids.sort((a,b) -> pts[0][a] - pts[0][b])
                 @matrix.set_strain_order(ids)
             ,1000)
 
@@ -549,10 +550,13 @@ class Pan
 
         @mds = new MDSHandler(@matrix, new ThinkingElement('#mds2', '#mds-thinking'))
         @mds.on('redraw', (comp) =>
-            @scatter2.draw(comp, @matrix.strains(), [@mdsDimension-1, @mdsDimension])
-            @mdsBarGraph.draw(comp[0..9].map((v,i) ->
-                range = d3.max(v) - d3.min(v)
-                {lbl: "#{i+1}", val: range}
+            points = numeric.transpose(comp.points)
+            @scatter2.draw(points, @matrix.strains(), [@mdsDimension-1, @mdsDimension])
+
+            # Convert eigenvalues to percentages
+            eigen_total = d3.sum(comp.eigenvalues)
+            @mdsBarGraph.draw(comp.eigenvalues[0..9].map((v,i) ->
+                {lbl: "#{i+1}", val: v/eigen_total}
             ))
         )
         @mds.update(null)

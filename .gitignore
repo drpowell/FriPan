@@ -7,5 +7,6 @@ mds-worker.js
 gene-matrix.js
 util.js
 tree.js
+mds.js
 *.map
 node_modules/

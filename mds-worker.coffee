@@ -1,7 +1,7 @@
 
 importScripts('util.js')
 importScripts('lib/numeric-1.2.6.js')
-importScripts('mds-plot.js')
+importScripts('mds.js')
 importScripts('gene-matrix.js')
 
 @onmessage = (ev) ->
@@ -13,13 +13,12 @@ importScripts('gene-matrix.js')
         if msg.mds?
             range = msg.mds
             #our_log "WORKER: #{range}"
-            comp = MDS.pca(@matrix, range)
-            comp = numeric.transpose(comp)
+            comp = MDS.pca_gene(@matrix, range)
             postMessage(comp)
         else if msg.dist?
             range = msg.dist
             #our_log "WORKER: #{range}"
-            dist_arr = MDS.distance(@matrix, range)
+            dist_arr = Distance.distance(@matrix, range)
             postMessage(dist_arr)
         else
             our_log "WORKER:  Unknown method:",msg
