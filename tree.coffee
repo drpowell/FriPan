@@ -90,8 +90,9 @@ class Dendrogram
 
         @svg = d3.select(@opts.elem).append("svg")
             .attr("class", "dendrogram")
-            .attr("width", @opts.width)
-            .attr("height", @opts.height)
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("viewBox", "0 0 #{@opts.width} #{@opts.height} ")
             .call(zoom)
 
         # Create a full size rect to capture zoom events not otherwise on an element

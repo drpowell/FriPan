@@ -506,11 +506,11 @@ class Pan
     # Highlight the strain in the MDS plot, and in the table
     highlight: (strain) ->
         d3.selectAll(".strain-#{strain.id}").classed({'highlight':true})
-        @scatter2.highlight("strain-#{strain.id}")
+        @scatter.highlight("strain-#{strain.id}")
 
     unhighlight: () ->
         d3.selectAll(".highlight").classed({'highlight':false})
-        @scatter2.unhighlight()
+        @scatter.unhighlight()
 
     mds_brushed: (strains) ->
         d3.selectAll(".brushed").classed({'brushed':false})
@@ -537,10 +537,10 @@ class Pan
                             @mdsDimension=+d.lbl
                             @mds.redispatch()
                         )
-        @scatter2 = new ScatterPlot(
-                     elem: '#mds2'
+        @scatter = new ScatterPlot(
+                     elem: '#mds'
                      width: 500
-                     height: 400
+                     height: 399
                      left: 50
                      click: (s) => @matrix.set_first(s.id)
                      mouseover: (s) => @highlight(s)
@@ -548,10 +548,10 @@ class Pan
                      brush: (s) => @mds_brushed(s)
                     )
 
-        @mds = new MDSHandler(@matrix, new ThinkingElement('#mds2', '#mds-thinking'))
+        @mds = new MDSHandler(@matrix, new ThinkingElement('#mds', '#mds-thinking'))
         @mds.on('redraw', (comp) =>
             points = numeric.transpose(comp.points)
-            @scatter2.draw(points, @matrix.strains(), [@mdsDimension-1, @mdsDimension])
+            @scatter.draw(points, @matrix.strains(), [@mdsDimension-1, @mdsDimension])
 
             # Convert eigenvalues to percentages
             eigen_total = d3.sum(comp.eigenvalues)

@@ -31,22 +31,23 @@ class ScatterPlot
                    .scale(@y)
                    .orient("left");
 
+        svg_w = @width + margin.left + margin.right
+        svg_h = @height + margin.top + margin.bottom
         div = d3.select(@opts.elem).append("div")
-                .style(
-                    width: (@width + margin.left + margin.right)+"px"
-                    height: (@height + margin.top + margin.bottom)+"px")
                 .attr("class","mds-scatter")
         @svg = div.append("svg")
-                 .attr("width", @width + margin.left + margin.right)
-                 .attr("height", @height + margin.top + margin.bottom)
-                 .attr("class","main")
+                  .attr("width", "100%")
+                  .attr("height", "100%")
+                  .attr("viewBox", "0 0 #{svg_w} #{svg_h}")
+                  .attr("class","main")
                 .append("g")
                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
         # Create an SVG "overlay" layer.  Only drawn on for highlighting to show stuff on top
         @svg_overlay = div.append('svg')
-                 .attr("width", @width + margin.left + margin.right)
-                 .attr("height", @height + margin.top + margin.bottom)
+                 .attr("width", "100%")
+                 .attr("height", "100%")
+                 .attr("viewBox", "0 0 #{svg_w} #{svg_h}")
                  .attr("class","overlay")
                 .append("g")
                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")

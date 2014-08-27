@@ -35,6 +35,16 @@ body {
   float: right;
 }
 
+.columns {
+  margin-right: 240px;
+  height: 390px;
+}
+
+.columns .column {
+  width: 48%;
+  height: 100%;
+}
+
 .option {
   font-size: 9pt;
   border: 1px solid;
@@ -119,10 +129,12 @@ svg {
 .highlight { fill: red !important; font-weight: bold; }
 circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
 
-#mds, #mds2 { display: inline-block; }
+#dendrogram, #mds { display: inline-block; width:100%; height:100%; }
+
 #mds-thinking, #dendrogram-thinking { display: none; position: absolute; font-size: 50px; }
 
-.mds-scatter { border: 1px solid #ccc; }
+#mds { border: 1px solid #ccc; }
+.mds-scatter { position: relative; width:100%; height:100%; }
 .mds-scatter svg { position: absolute; }
 .mds-scatter svg.overlay { pointer-events: none; }
 
