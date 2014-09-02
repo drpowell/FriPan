@@ -260,7 +260,6 @@ class Pan
 
         @x2 = d3.scale.linear().range([0, @width])
 
-        #x2.domain([0,2846])
         @xAxis2 = d3.svg.axis().scale(@x2).orient("bottom")
 
         brush = d3.svg.brush()
@@ -800,6 +799,10 @@ class StrainInfo
                 for c in @columns
                     s[c] = row[c]
 
+setup_download = (sel) ->
+    d3.selectAll(".svg-download")
+          .on("mousedown", (e) -> download_svg(d3.event.target))
+
 init = () ->
     document.title = "FriPan : #{get_stem()}"
     $(".hdr").append("<span class='title'>: #{get_stem()}</span>")
@@ -825,6 +828,8 @@ init = () ->
         pan = new Pan('#chart', matrix, strains)
 
         $( window ).resize(() -> pan.resize())
+
+        setup_download(".svg_download")
     )
 
 $(document).ready(() -> add_browser_warning() ; init() )

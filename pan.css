@@ -84,6 +84,12 @@ svg {
 .minimap {
 }
 
+.svg-download {
+  float: right;
+  color: #999;
+  font-size: 9px;
+}
+
 /* ------------------------------------------------------------ */
 /* Tool tip */
 #tooltip {
