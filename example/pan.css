@@ -1,0 +1,209 @@
+
+body {
+  margin: 0;
+}
+
+.container {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.hdr {
+  background-color: #333;
+  margin: 0;
+  margin-bottom: 5px;
+
+}
+
+.hdr .title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-left: 20px;
+  color: #ddd;
+}
+
+#topinfo {
+  font-size: 24px;
+  font-weight: normal;
+  display: inline;
+  float: right;
+  margin-right:20px;
+  margin-top: 7px;
+}
+
+.right {
+  float: right;
+}
+
+.columns {
+  margin-right: 240px;
+  height: 390px;
+}
+
+.columns .column {
+  width: 48%;
+  height: 100%;
+}
+
+.option {
+  font-size: 9pt;
+  border: 1px solid;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #eee;
+}
+.option label { display: inline-block; width: 70px; }
+
+.columns > div {
+  display: inline-block;
+}
+
+
+#colour-legend .title { font-weight: bold; }
+#colour-legend .box {float: left; height: 10px; width: 10px; margin: 3px;}
+
+.ui-menu-item { font-size: 9pt; }
+
+svg {
+  font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .3;
+  fill: red;
+  shape-rendering: crispEdges;
+}
+
+.minimap {
+}
+
+.svg-download {
+  float: right;
+  color: #999;
+  font-size: 9px;
+}
+
+/* ------------------------------------------------------------ */
+/* Tool tip */
+#tooltip {
+  display: none;
+  position: absolute;
+  text-align: left;
+  max-width: 500px;
+  padding: 1ex;
+  font: 12px sans-serif;
+  background: #FFFACD; /* lemonchiffon; */
+  border: solid 1px black;
+  border-radius: 8px;
+  pointer-events: none;
+}
+#tooltip td {
+  word-wrap: break-word;
+}
+#tooltip table {
+  table-layout: fixed;
+  width: 500px;
+}
+#tooltip tr:nth-child(even) {
+  background-color: #dfdaad;
+}
+#tooltip th {
+  width: 10em;
+  text-align: right
+}
+
+/* ------------------------------------------------------------ */
+
+
+#chart {
+//  background: lightgray;
+}
+
+.gene-row rect.on  { fill: green; }
+.gene-row rect.off { fill: lightgray; }
+
+.gene-row.highlight rect.on  { fill: red !important; }
+.gene-row.brushed rect.on  { fill: red !important; }
+
+.highlight { fill: red !important; font-weight: bold; }
+circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
+
+#dendrogram, #mds { display: inline-block; width:100%; height:100%; }
+
+#mds-thinking, #dendrogram-thinking { display: none; position: absolute; font-size: 50px; }
+
+#mds { border: 1px solid #ccc; }
+.mds-scatter { position: relative; width:100%; height:100%; }
+.mds-scatter svg { position: absolute; }
+.mds-scatter svg.overlay { pointer-events: none; }
+
+.mds-scatter rect { fill: none; }
+.mds-scatter .highlight rect { fill: #ddd; stroke: black; }
+
+.mds-scatter .extent {
+  fill: #000;
+  fill-opacity: .2;
+  stroke: #fff;
+}
+
+#mds-bargraph {
+  margin: 10px 0 30px 0;
+}
+
+#mds-bargraph .bar-chart .bar { fill: steelblue; }
+
+#mds-bargraph .bar-chart .bar:hover { fill: brown; }
+
+#mds-bargraph .bar-chart .axis { font: 10px sans-serif; }
+
+#mds-bargraph .bar-chart .axis path, #mds-bargraph .bar-chart .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#mds-bargraph .bar-chart .x.axis path { display: none; }
+
+/*  ****************************************************/
+svg.dendrogram {
+  border: 1px solid #ccc;
+}
+
+.dendrogram path {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+.dendrogram path.brushed { stroke: red !important; }
+
+.dendrogram text.leaf { font-size: 8px; }
+
+/*  ****************************************************/
+.warning-popover {
+    position: relative;
+    top: 70px;
+    z-index: 1100;
+}
+
+.warning-popover .browser-warning {
+    position: absolute;
+    width: 700px;
+    left: 50%;
+    margin-left: -350px;
+}
+
+.browser-warning {
+    background-color: #eaa;
+    border: thin black solid;
+    border-radius: 10px;
+    padding: 5px 20px;
+}
+
+/*  ****************************************************/

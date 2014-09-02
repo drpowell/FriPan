@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <link rel="stylesheet" type="text/css" href="pan.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="lib/jquery-ui.js"></script>
+
+  <!-- D3 -->
+  <script type="text/javascript" src="lib/d3.v3.min.js"></script>
+
+  <!-- numeric js -->
+  <script type="text/javascript" src="lib/numeric-1.2.6.js"></script>
+
+  <script type="text/javascript" src="util.js"></script>
+  <script type="text/javascript" src="pan.js"></script>
+  <script type="text/javascript" src="tree.js"></script>
+  <script type="text/javascript" src="mds-plot.js"></script>
+  <script type="text/javascript" src="gene-matrix.js"></script>
+
+</head>
+
+<body>
+
+  <div class='hdr'>
+    <span class='title'>FriPan</span>
+    <div class='title' id='topinfo'></div>
+  </div>
+
+  <div class='container'>
+
+    <div class="right">
+      <a class='svg-download' href='#' data-for='#mds-bargraph svg'>Download</a>
+      <div id="mds-bargraph"></div>
+
+      <div class="option">
+        <div>
+          <label for="dendrogram-type">Dendrogram:</label>
+          <select id="dendrogram-type">
+            <option value="radial">Radial</option>
+            <option value="horz">Horizontal</option>
+          </select>
+        </div>
+        <div>
+          <label>Vertical scale</label>
+          <input id="vscale" type='text' value=1.0 size=5></input>
+        </div>
+        <div>
+          <label for='strain-sort'>Strain sort:</label>
+          <select id='strain-sort'>
+            <option value="mds">MDS dimension 1</option>
+            <option value="fixed">Fixed order</option>
+          </select>
+        </div>
+        <div>
+          <label for="strain-colour">Strain colour:</label>
+          <select id="strain-colour">
+            <option value="none">None</option>
+          </select>
+        </div>
+        <div>
+          <label for="gene-order">Gene order:</label>
+          <select id="gene-order">
+            <option value="none">Cluster order</option>
+          </select>
+        </div>
+        <div>
+          <label for='search'>Gene search:</label>
+          <input id='search' />
+        </div>
+      </div>
+      <div id='colour-legend'></div>
+    </div> <!-- .right -->
+   
+    <div class='columns'>
+      <div class='column'>
+        <a class='svg-download' href='#' data-for='#dendrogram svg'>Download</a>
+        <div id='dendrogram-thinking'>THINKING...</div>
+        <div id='dendrogram'></div>
+      </div>
+      <div class='column'>
+        <a class='svg-download' href='#' data-for='#mds svg.main'>Download</a>
+        <div id='mds-thinking'>THINKING...</div>
+        <div id='mds'></div>
+      </div>
+    </div>
+   
+    <div id='chart'>
+      <h3>Loading...</h3>
+    </div>
+    <a class='svg-download' href='#' data-for='#chart svg'>Download</a>
+  </div>
+   
+    <div id='tooltip'>
+      <div id='tooltip-text'></div>
+    </div>
+
+</body>

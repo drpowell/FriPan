@@ -1,0 +1,104 @@
+ID	Protease	Country	Host Species	Phenotype
+AN363.faa	Stable	Sweden	Sheep	Virulent
+AN484.faa	Unstable	Sweden	Sheep	Benign
+BKT018497.faa	Stable	Sweden	Sheep	Virulent
+BKT031675.faa	Unstable	Sweden	Cattle	Benign
+BKT048543.faa	Unstable	Sweden	Sheep	Benign
+BKT051780.faa	Unstable	Sweden	Sheep	Benign
+BKT052990.faa		Sweden	Sheep	Unknown
+BKT055907.faa	Unstable	Sweden	Sheep	Virulent
+BKT058516.faa	Unstable	Sweden	Sheep	Virulent
+BKT058890.faa	Unstable	Sweden	Sheep	Unknown
+BKT062646.faa	Stable	Sweden	Sheep	Virulent
+BKT063297.faa	Stable	Sweden	Sheep	Virulent
+BKT066722.faa	Unstable	Sweden	Sheep	Virulent
+BKT066771.faa	Unstable	Sweden	Goat	Benign
+BKT068051.faa	Unstable	Sweden	Sheep	Benign
+BKT072696.faa	Unstable	Sweden	Sheep	Virulent
+BKT073391.faa	Unstable	Sweden	Cattle	Benign
+CS287.faa		Australia	Sheep	Unknown
+CS310.faa		Australia	Sheep	Unknown
+CS311.faa		Australia	Sheep	Unknown
+JIR1204.faa		Australia	Sheep	Unknown
+JIR1214.faa	Stable	Australia	Sheep	Virulent
+JIR1444.faa		Australia	Sheep	Virulent
+JIR3211.faa		Australia	Sheep	Virulent
+JIR3290.faa	Unstable	Australia	Sheep	Unknown
+JIR3310.faa	Stable	Australia	Sheep	Unknown
+JIR3312.faa	Unstable	Australia	Sheep	Unknown
+JIR3356.faa		Australia	Sheep	Virulent
+JIR3468.faa		Australia	Sheep	Unknown
+JIR3484.faa		Australia	Sheep	Unknown
+JIR3528.faa		Australia	Sheep	Benign
+JIR3620.faa		Australia	Sheep	Unknown
+JIR3780.faa	Unstable	Norway	Sheep	Benign
+JIR3781.faa	Stable	Norway	Sheep	Virulent
+JIR3782.faa	Unstable	Norway	Cattle	Benign
+JIR3783.faa	Stable	Norway	Sheep	Virulent
+JIR3784.faa	Unstable	Norway	Cattle	Benign
+JIR3785.faa	Unstable	Norway	Cattle	Benign
+JIR3786.faa	Stable	Norway	Sheep	Virulent
+JIR3787.faa	Unstable	Norway	Sheep	Benign
+JIR3788.faa	Stable	Norway	Sheep	Virulent
+JIR3789.faa	Stable	Norway	Sheep	Virulent
+JIR3790.faa	Stable	Norway	Sheep	Virulent
+JIR3791.faa	Stable	Norway	Sheep	Virulent
+JIR3792.faa	Stable	Norway	Sheep	Virulent
+JIR3793.faa	Unstable	Norway	Cattle	Benign
+JIR3794.faa	Stable	Norway	Sheep	Virulent
+JIR3795.faa	Stable	Norway	Sheep	Virulent
+JIR3796.faa	Unstable	Norway	Sheep	Benign
+JIR3797.faa	Unstable	Norway	Goat	Benign
+JIR3798.faa	Unstable	Norway	Sheep	Benign
+JIR3799.faa	Unstable	Norway	Sheep	Benign
+JIR3800.faa	Stable	Norway	Sheep	Virulent
+JIR3801.faa	Stable	Norway	Sheep	Virulent
+JIR3802.faa	Unstable	Norway	Sheep	Benign
+JIR3803.faa	Unstable	Norway	Sheep	Benign
+JIR3804.faa	Unstable	Norway	Sheep	Benign
+JIR3805.faa	Unstable	Norway	Sheep	Benign
+JIR3806.faa	Stable	Norway	Sheep	Virulent
+JIR3807.faa	Unstable	Norway	Sheep	Benign
+JIR3808.faa	Stable	Norway	Cattle	Virulent
+JIR3809.faa	Stable	Nepal	Sheep	Virulent
+JIR3810.faa	Stable	Bhutan	Sheep	Unknown
+JIR3811.faa	Stable	Australia	Sheep	Virulent
+JIR3812.faa	Stable	Australia	Sheep	Virulent
+JIR3813.faa	Stable	Australia	Sheep	Virulent
+JIR3814.faa	Stable	Australia	Sheep	Virulent
+JIR3815.faa	Stable	Australia	Sheep	Virulent
+JIR3816.faa	Stable	Australia	Sheep	Virulent
+JIR3817.faa		Australia	Sheep	Virulent
+JIR3818.faa	Stable	Australia	Sheep	Virulent
+JIR3819.faa	Stable	Australia	Sheep	Virulent
+JIR3820.faa		Australia	Sheep	Virulent
+JIR3821.faa	Unstable	Denmark	Sheep	Virulent
+JIR3822.faa	Stable	Denmark	Sheep	Virulent
+JIR3823.faa	Stable	Denmark	Sheep	Virulent
+JIR3824.faa	Stable	Denmark	Sheep	Virulent
+JIR3825.faa	Stable	Denmark	Sheep	Virulent
+JIR3826.faa	Stable	Denmark	Sheep	Virulent
+JIR3827.faa	Stable	Denmark	Sheep	Virulent
+JIR3828.faa	Stable	Denmark	Sheep	Virulent
+JIR3829.faa	Stable	Australia	Sheep	Virulent
+JIR3830.faa	Stable	Australia	Sheep	Virulent
+JIR3831.faa	Stable	Australia	Sheep	Virulent
+JIR3832.faa	Stable	Australia	Sheep	Virulent
+JIR3833.faa	Stable	Australia	Sheep	Virulent
+JIR3834.faa		India	Sheep	Virulent
+JIR3835.faa	Stable	Norway	Sheep	Virulent
+JIR3836.faa	Stable	Norway	Sheep	Virulent
+JIR3837.faa	Stable	Norway	Sheep	Virulent
+JIR3838.faa	Stable	Norway	Sheep	Virulent
+JIR3839.faa	Unstable	Norway	Sheep	Benign
+JIR3843.faa		Australia	Sheep	Unknown
+JIR3844.faa		Australia	Sheep	Unknown
+JIR3845.faa		Australia	Sheep	Unknown
+JIR3846.faa		Australia	Sheep	Unknown
+JIR3847.faa		Australia	Sheep	Unknown
+JIR3849.faa		Australia	Sheep	Unknown
+JIR3851.faa		Australia	Sheep	Unknown
+JIR3983.faa	Unstable	Norway	Sheep	Benign
+JIR3984.faa	Stable	Norway	Sheep	Virulent
+JIR3985.faa		UK	Sheep	Virulent
+JIR3988.faa	Stable	Australia	Sheep	Virulent
