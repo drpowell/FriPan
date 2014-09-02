@@ -63,6 +63,11 @@ class SVG
                 ['font-size','font-family'].forEach((a) ->
                     dest.style(a, src.style(a))
                 )
+                # convert dx/dy from 'em' to 'px'.
+                ['dx','dy'].forEach((a) ->
+                    if (m = /(.*)em/.exec(dest.attr(a)))
+                        dest.attr(a, m[1] * 10)       # Assume 10px font-size.  HACK
+                )
             else  if src.node().tagName in ['rect','line','path']
                 ['fill','stroke','fill-opacity'].forEach((a) ->
                     dest.style(a, src.style(a))
