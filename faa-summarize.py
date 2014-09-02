@@ -27,4 +27,4 @@ for fname in sys.argv[1:]:
                     gene['length'] += len(l.rstrip('*\n'))
     result[fname] = strain
 
-print json.dumps(result)
+print json.dumps({'gene_order':result})

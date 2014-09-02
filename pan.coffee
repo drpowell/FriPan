@@ -125,6 +125,7 @@ class DendrogramWrapper
         @redraw()
 
     redraw: () ->
+        return if !@tree?
         strain_info = @matrix.strains().map((s,i) =>
                           text:s.name
                           colour: @colours[i] || 'black'
@@ -715,18 +716,21 @@ parse_proteinortho = (tsv) ->
 get_stem = () ->
     get_url_params() || 'pan'
 
+process_gene_order = (matrix, json) ->
+    strains = d3.keys(json).sort()
+    for strain in strains
+        row = json[strain]
+        add_gene_order(strain,row)
+        for gene in row
+            matrix.set_desc(gene.name, gene.desc + " length:#{gene.length}")
+
 load_json = (matrix) ->
     d3.json("#{get_stem()}.json", (err, json) ->
         if (err)
             console.log("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
             load_desc(matrix)
         else
-            strains = d3.keys(json).sort()
-            for strain in strains
-                row = json[strain]
-                add_gene_order(strain,row)
-                for gene in row
-                    matrix.set_desc(gene.name, gene.desc + " length:#{gene.length}")
+            process_gene_order(matrix,json.gene_order) if json.gene_order?
     )
 
 add_gene_order = (strain, genes) ->
