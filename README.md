@@ -40,4 +40,4 @@ While developing code, it is useful to enable coffee in "watch" mode and with so
 
 ### Source
 * Github: https://github.com/drpowell/FriPan
-* Website: http://www.vicbioinformatics.com/software.fripan.shtml
+* Website: http://drpowell.github.io/FriPan/
