@@ -584,10 +584,15 @@ class Pan
                 @set_scale()
         )
 
-        $('select#strain-colour').on('change', (e) =>
-            v = $(e.target).val()
-            @colour_by(v)
-        )
+        if (colorbrewer?)
+            brewer_options = "<option disabled>──────────</option>"
+            d3.keys(colorbrewer).forEach((c) ->
+                brewer_options += "<option value='brewer-#{c}'>#{c}</option>"
+            )
+            $('select#strain-colour-scheme').append(brewer_options)
+
+        $('select#strain-colour').on('change', (e) => @re_colour())
+        $('select#strain-colour-scheme').on('change', (e) => @re_colour())
 
         $('select#strain-sort').on('change', (e) =>
             @sort_order = $(e.target).val()
@@ -630,9 +635,50 @@ class Pan
             .attr('class','box')
               .style('background-color', (v) -> scale(v))
 
-    colour_by: (fld) ->
-        scale = d3.scale.category10()
+    re_colour: () ->
+        col_fld = $('select#strain-colour').val()
+        col_scheme = $('select#strain-colour-scheme').val()
+        @colour_by(col_fld, col_scheme)
+
+    colour_by: (fld, scheme) ->
         strains = @strains.as_array()
+        domain = if (fld != 'none')
+                     d3.set(strains.map((s) -> s[fld])).values()
+                 else
+                     []
+
+        # Choose, and prime, the correct colour scale
+        if scheme=='cat10' 
+            scale = d3.scale.category10()
+            scale.domain(domain)
+        else if scheme=='cat20a' 
+            scale = d3.scale.category20()
+            scale.domain(domain)
+        else if scheme=='cat20b' 
+            scale = d3.scale.category20b()
+            scale.domain(domain)
+        else if scheme=='cat20c' 
+            scale = d3.scale.category20c()
+            scale.domain(domain)
+        else if scheme=='raw'
+            scale = d3.scale.ordinal()
+            scale.domain(domain)
+            scale.range(domain)
+        else if scheme.indexOf('brewer-')==0
+            scale = d3.scale.ordinal()
+            scale.domain(domain)
+            # Try and find the best number in the palette based on the size of the domain
+            b = colorbrewer[scheme.slice(7)]
+            sizes = d3.keys(b).sort().reverse()
+            best = sizes[0]  # Default to the largest
+            sizes.forEach((s) -> best=s if s>=domain.length)
+            #console.log "domain size=#{domain.length}  sizes=#{sizes}.  Best=#{best}"
+            scale.range(b[best])
+            if domain.length>best
+                log_error("Not enough colours in #{scheme}, max=#{best}.  Need #{domain.length}")
+        else
+            log_error("Bad colour scheme")
+
         strain_colour = []
         for s in strains
             col = if fld=='none' then '' else scale(s[fld])

@@ -54,6 +54,9 @@ body {
 }
 .option label { display: inline-block; width: 70px; }
 
+.option #strain-colour { max-width: 120px; }
+.option #strain-colour-scheme { max-width: 60px; }
+
 .columns > div {
   display: inline-block;
 }
