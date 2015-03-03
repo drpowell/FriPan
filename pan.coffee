@@ -643,7 +643,7 @@ class Pan
     colour_by: (fld, scheme) ->
         strains = @strains.as_array()
         domain = if (fld != 'none')
-                     d3.set(strains.map((s) -> s[fld])).values()
+                     d3.set(strains.map((s) -> s[fld])).values().sort()
                  else
                      []
 
