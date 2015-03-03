@@ -14,6 +14,9 @@ class GeneMatrix
         @dispatch = d3.dispatch("order_changed") if d3?
         @_build_gene_name_idx()
 
+        # Create a default strain ordering
+        @set_strain_order( @_strains.map((s) -> s.id) )
+
     # Convert GeneMatrix to a hash (for transport to a web-worker)
     as_hash: () ->
         {strains: @_strains, genes: @_genes, values: @_values, desc: @_desc}
@@ -134,6 +137,7 @@ class GeneMatrix
         names = (gene_name || '').split(',')
         res = ""
         names.forEach((n) =>
+            n=n.trim()
             res += " # " if res.length>0
             res += @_desc[n] if @_desc[n]
         )
@@ -145,13 +149,13 @@ class GeneMatrix
         @_strain_pos.splice(idx, 1)         # Remove it from the list
         @_strain_pos.splice(0,0, strain_id) # And put it on the front
         @_strain_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
-        @dispatch.order_changed()
+        @dispatch.order_changed() if @dispatch
 
     # Set the complete order of strains
     set_strain_order: (order) ->
         @_strain_pos = order
         @_strain_pos.forEach((s_id, idx) => @_strains[s_id].pos = idx) # Now re-pos the strains
-        @dispatch.order_changed()
+        @dispatch.order_changed() if @dispatch
 
 
 @GeneMatrix=GeneMatrix
