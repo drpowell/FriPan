@@ -102,13 +102,22 @@ class GeneMatrix
 
     search_gene: (str, max) ->
         res = []
+        res_desc = []
+        res_pos = {}
+        res_pos_desc = {}
         for i in @_strain_pos
             for j in [0 ... @_values[i].length]
                 n =  @_values[i][j]
-                if n? && n.indexOf(str)>=0
-                    res.push({label:n, value:@_genes[j]})
+                if n?
+                    if n.indexOf(str)>=0 && (j not of res_pos)
+                        res.push({label:n, value:@_genes[j], pos: j})
+                        res_pos[j]=true
+                    desc = @get_desc(n)
+                    if desc? && desc.indexOf(str)>=0 && (j not of res_pos_desc)
+                        res_desc.push({label:desc, value:@_genes[j], pos: j})
+                        res_pos_desc[j]=true
                 return res if res.length>=max
-        return res
+        return res.concat(res_desc)[0..max]
 
     # Find a name for the gene - searching by "pos" (ie. from the top)
     gene_name: (gene_id) ->

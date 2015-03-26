@@ -726,12 +726,12 @@ class Pan
             lst = @matrix.search_gene(req.term,20)
             resp(lst)
         focus: (event, ui) =>
-            console.log "Showing",ui.item
+            #console.log "Showing",ui.item
             @_show_gene_pointer(ui.item.value)
             $("#search").val(ui.item.label)
             false
         select: (event, ui) =>
-            console.log "Showing",ui.item
+            #console.log "Showing",ui.item
             @_show_gene_pointer(ui.item.value)
             false
         )
