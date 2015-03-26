@@ -648,16 +648,16 @@ class Pan
                      []
 
         # Choose, and prime, the correct colour scale
-        if scheme=='cat10' 
+        if scheme=='cat10'
             scale = d3.scale.category10()
             scale.domain(domain)
-        else if scheme=='cat20a' 
+        else if scheme=='cat20a'
             scale = d3.scale.category20()
             scale.domain(domain)
-        else if scheme=='cat20b' 
+        else if scheme=='cat20b'
             scale = d3.scale.category20b()
             scale.domain(domain)
-        else if scheme=='cat20c' 
+        else if scheme=='cat20c'
             scale = d3.scale.category20c()
             scale.domain(domain)
         else if scheme=='raw'
