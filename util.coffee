@@ -16,6 +16,15 @@ log_msg = (msg,rest) ->
     r = [msg].concat(args)
     window.our_log.apply(window, r)
 
+    return if msg=='DEBUG'
+
+    $('.log-list').append("<pre class='#{msg.toLowerCase()}'>#{msg}: #{args}")
+    if msg=='ERROR'
+        $('.log-link').removeClass('btn-link')
+        $('.log-link').addClass('btn-danger')
+    if msg=='ERROR' || msg=='WARN'
+        $('.log-link').css('opacity','1')
+
 html_warning = """
     <div class='browser-warning'>
       <button type="button" class="close" onclick="$('.browser-warning').hide();">x</button>
@@ -23,6 +32,13 @@ html_warning = """
       <p>Please use <a href='http://www.mozilla.org/en-US/firefox/new/'>Firefox</a> or <a href='http://www.google.com/chrome/'>Chrome</a></p>
     </div>
     """
+
+@setup_nav_bar = () ->
+    #about = $(require("../templates/about.hbs")(version: degust_version))
+    #$('#about-modal').replaceWith(about)
+    $("a.log-link").click(() -> $('.log-list').toggle())
+
+    #window.debug ?= get_url_vars()["debug"]
 
 # Display a popup warning, or fill in a warning box if using IE
 @add_browser_warning = () ->
