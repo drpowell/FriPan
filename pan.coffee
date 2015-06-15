@@ -17,7 +17,6 @@ class LatestWorker
             if !@deep_cmp(cur_data, @_last_data)
                 @_computing = 1
                 @_last_data = cur_data
-                #console.log "Sending worker:", cur_data
                 @dispatch.started()
                 @worker.postMessage(msg: cur_data)
 
@@ -71,7 +70,6 @@ class MDSHandler
         range = [0, ngenes-1] if !range?
         range = [Math.floor(range[0]), Math.min(Math.ceil(range[1]), ngenes-1)]
         @_current_range = range
-        #console.log "drawing",range
         @latest_worker.update()
 
     redraw: (comp) ->
@@ -726,12 +724,10 @@ class Pan
             lst = @matrix.search_gene(req.term,20)
             resp(lst)
         focus: (event, ui) =>
-            #console.log "Showing",ui.item
             @_show_gene_pointer(ui.item.value)
             $("#search").val(ui.item.label)
             false
         select: (event, ui) =>
-            #console.log "Showing",ui.item
             @_show_gene_pointer(ui.item.value)
             false
         )
@@ -751,7 +747,6 @@ parse_proteinortho = (tsv) ->
         if i==1
             strains = d3.keys(row)[3..] # skip first 3 junk columns
                         .map((s) -> {name: s})
-            #console.log "STRAINS: #{strains}"
         genes.push( {name:"cluster#{i}", desc:""} )
         values.push( strains.map( (s) -> if row[s.name]=='*' then null else row[s.name]) )
 
@@ -773,7 +768,7 @@ process_gene_order = (matrix, json) ->
 load_json = (matrix) ->
     d3.json("#{get_stem()}.json", (err, json) ->
         if (err)
-            console.log("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
+            log_warn("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
             load_desc(matrix)
         else
             process_gene_order(matrix,json.gene_order) if json.gene_order?
@@ -796,7 +791,7 @@ load_desc = (matrix) ->
             if match
                 matrix.set_desc(match[1], match[2])
             else
-                console.log "BAD LINE: #{l}"
+                log_error "BAD LINE: #{l}"
         )
     )
 
@@ -840,11 +835,11 @@ class StrainInfo
             for c in @columns
                 s[c] = '_not-set_'
 
-        console.log "Read info on #{@matrix.length}.  Columns=#{@columns}"
+        log_info "Read info on #{@matrix.length}.  Columns=#{@columns}"
         for row in @matrix
             s = @find_strain_by_name(row['ID'])
             if !s?
-                console.log "Unable to find strain for #{row['ID']}"
+                log_error "Unable to find strain for #{row['ID']}"
             else
                 for c in @columns
                     s[c] = row[c]
@@ -855,7 +850,8 @@ setup_download = (sel) ->
 
 init = () ->
     document.title = "FriPan : #{get_stem()}"
-    $(".hdr").append("<span class='title'>: #{get_stem()}</span>")
+    $(".hdr .title").append("<span class='title'>: #{get_stem()}</span>")
+    setup_nav_bar()
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
