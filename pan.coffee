@@ -708,7 +708,7 @@ class Pan
             if fld=='fixed'
                 strains.sort((a,b) -> a.id - b.id)
             else
-                strains.sort((a,b) -> a[fld].localeCompare(b[fld]))
+                strains.sort((a,b) -> a[fld].localeCompare(b[fld], [], {numeric: true}))
 
             ids = strains.map((s) -> s.id)
             @matrix.set_strain_order(ids)
