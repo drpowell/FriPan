@@ -11,7 +11,7 @@ Ensure you have CoffeeScript >= 1.4 installed:
 
 Install the code and run the demo code:
 
-    git clone https://github.com/Victorian-Bioinformatics-Consortium/FriPan
+    git clone https://github.com/drpowell/FriPan
     cd FriPan
     make demo
     ./server.sh
