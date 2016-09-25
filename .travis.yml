@@ -1,5 +1,5 @@
 before_install:
-  - npm install coffee-script
+  - npm install browserify webworkify coffeeify
 
 before_script:
 
