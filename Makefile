@@ -16,7 +16,11 @@ help:
 	
 compile:
 	@echo "### Compiling .coffee to .js ###"
-	coffee -c .
+	browserify -t coffeeify src/main.coffee -o build.js
+
+debug:
+	@echo "### Compiling .coffee to .js ###"
+	watchify -v --debug -t coffeeify src/main.coffee -o build.js
 	
 demo: compile
 	@echo "### Copying .example files ###"

@@ -333,6 +333,6 @@ class Dendrogram
             @opts.callback[typ](args)
 
 
-window.Dendrogram = Dendrogram
 
-window.TreeBuilder = TreeBuilder
+module.exports.Dendrogram = Dendrogram
+module.exports.TreeBuilder = TreeBuilder

@@ -1,3 +1,8 @@
+work = require('webworkify');
+Util = require('./util.coffee')
+GeneMatrix = require('./gene-matrix.coffee')
+Tree = require('./tree.coffee')
+Plot = require('./mds-plot.coffee')
 
 # A worker that will only compute new values if the web worker is not busy
 # and the parameters have changed
@@ -50,7 +55,7 @@ class MDSHandler
     constructor: (@matrix, @think_elem) ->
         @dispatch = d3.dispatch("redraw")
         @_current_range = null
-        worker = new Worker('mds-worker.js')
+        worker = work(require('./mds-worker.coffee'))
         worker.postMessage(init: @matrix.as_hash())
         @latest_worker = new LatestWorker(worker, () => {mds: @_current_range})
         @latest_worker.on('updated', (comp) => @redraw(comp))
@@ -95,7 +100,7 @@ class MDSHandler
 class DendrogramWrapper
     constructor: (@widget, @matrix, @think_elem) ->
         @_current_range = null
-        worker = new Worker('mds-worker.js')
+        worker = work(require('./mds-worker.coffee'))
         worker.postMessage(init: @matrix.as_hash())
         @latest_worker = new LatestWorker(worker, () => {dist: @_current_range})
         @latest_worker.on('updated', (d) => @_calc_done(d))
@@ -119,7 +124,7 @@ class DendrogramWrapper
         @latest_worker.update()
 
     _calc_done: (dist_arr) ->
-        @tree = new TreeBuilder(dist_arr)
+        @tree = new Tree.TreeBuilder(dist_arr)
         @redraw()
 
     redraw: () ->
@@ -529,13 +534,13 @@ class Pan
         @matrix.on('order_changed', () => @redraw())
 
         @mdsDimension = 1
-        @mdsBarGraph = new BarGraph(
+        @mdsBarGraph = new Plot.BarGraph(
                          elem: '#mds-bargraph'
                          click: (d) =>
                             @mdsDimension=+d.lbl
                             @mds.redispatch()
                         )
-        @scatter = new ScatterPlot(
+        @scatter = new Plot.ScatterPlot(
                      elem: '#mds'
                      width: 500
                      height: 399
@@ -559,7 +564,7 @@ class Pan
         )
         @mds.update(null)
 
-        dendrogramWidget = new Dendrogram(
+        dendrogramWidget = new Tree.Dendrogram(
                         elem: '#dendrogram'
                         width: 600
                         height: 400
@@ -673,9 +678,9 @@ class Pan
             #console.log "domain size=#{domain.length}  sizes=#{sizes}.  Best=#{best}"
             scale.range(b[best])
             if domain.length>best
-                log_error("Not enough colours in #{scheme}, max=#{best}.  Need #{domain.length}")
+                Util.log_error("Not enough colours in #{scheme}, max=#{best}.  Need #{domain.length}")
         else
-            log_error("Bad colour scheme")
+            Util.log_error("Bad colour scheme")
 
         strain_colour = []
         for s in strains
@@ -755,7 +760,7 @@ parse_proteinortho = (tsv) ->
 # ------------------------------------------------------------
 #
 get_stem = () ->
-    get_url_params() || 'pan'
+    Util.get_url_params() || 'pan'
 
 process_gene_order = (matrix, json) ->
     strains = d3.keys(json).sort()
@@ -768,7 +773,7 @@ process_gene_order = (matrix, json) ->
 load_json = (matrix) ->
     d3.json("#{get_stem()}.json", (err, json) ->
         if (err)
-            log_warn("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
+            Util.log_warn("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
             load_desc(matrix)
         else
             process_gene_order(matrix,json.gene_order) if json.gene_order?
@@ -791,7 +796,7 @@ load_desc = (matrix) ->
             if match
                 matrix.set_desc(match[1], match[2])
             else
-                log_error "BAD LINE: #{l}"
+                Util.log_error "BAD LINE: #{l}"
         )
     )
 
@@ -826,7 +831,7 @@ class StrainInfo
     set_info: (@matrix) ->
         @columns = d3.keys(@matrix[0])
         if 'ID' != @columns.shift()
-            log_error("No ID column in #{get_stem()}.strains")
+            Util.log_error("No ID column in #{get_stem()}.strains")
             @columns = []
             return
 
@@ -835,23 +840,23 @@ class StrainInfo
             for c in @columns
                 s[c] = '_not-set_'
 
-        log_info "Read info on #{@matrix.length}.  Columns=#{@columns}"
+        Util.log_info "Read info on #{@matrix.length}.  Columns=#{@columns}"
         for row in @matrix
             s = @find_strain_by_name(row['ID'])
             if !s?
-                log_error "Unable to find strain for #{row['ID']}"
+                Util.log_error "Unable to find strain for #{row['ID']}"
             else
                 for c in @columns
                     s[c] = row[c]
 
 setup_download = (sel) ->
     d3.selectAll(".svg-download")
-          .on("mousedown", (e) -> download_svg(d3.event.target))
+          .on("mousedown", (e) -> Util.download_svg(d3.event.target))
 
 init = () ->
     document.title = "FriPan : #{get_stem()}"
     $(".hdr .title").append("<span class='title'>: #{get_stem()}</span>")
-    setup_nav_bar()
+    Util.setup_nav_bar()
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
@@ -878,4 +883,4 @@ init = () ->
         setup_download(".svg_download")
     )
 
-$(document).ready(() -> add_browser_warning() ; init() )
+$(document).ready(() -> Util.add_browser_warning() ; init() )

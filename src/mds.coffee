@@ -1,3 +1,6 @@
+numeric = require('./lib/numeric-1.2.6.js')
+Util = require('./util.coffee')
+
 class MDS
     # The "data" are rows, the "dimensions" are columns
     # Matrix has 1 row per "strain", 1 column per "cluster".  Each entry is a boolean
@@ -79,10 +82,9 @@ class Distance
         #console.log "matrix(c("+dist.map((r) -> ""+r)+"), byrow=T, nrow=#{dist.length}"
         #mat.strains().forEach((s1,i) -> mat.strains().map((s2,j) -> console.log s1,s2,dist[i][j]))
         #console.log mat.strains(),dist[0]
-        our_log "Distance took : #{new Date - t1}ms"
+        Util.our_log "Distance took : #{new Date - t1}ms"
 
         dist
 
-
-@MDS = MDS
-@Distance = Distance
+module.exports.MDS = MDS
+module.exports.Distance = Distance

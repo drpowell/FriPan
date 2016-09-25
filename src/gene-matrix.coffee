@@ -167,4 +167,4 @@ class GeneMatrix
         @dispatch.order_changed() if @dispatch
 
 
-@GeneMatrix=GeneMatrix
+module.exports = GeneMatrix

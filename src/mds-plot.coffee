@@ -239,5 +239,5 @@ class BarGraph
               .attr("height", (d) => @height - @y(d.val))
               .on('click', (d) => if @opts.click? then @opts.click(d))
 
-@ScatterPlot = ScatterPlot
-@BarGraph = BarGraph
+module.exports.ScatterPlot = ScatterPlot
+module.exports.BarGraph = BarGraph

@@ -1,13 +1,15 @@
-@our_log = (o) ->
+root = module.exports
+
+root.our_log = (o) ->
     if console? && console.log?
         console.log.apply(console, if !!arguments.length then arguments else [this])
     else if opera? && opera.postError?
         opera.postError(o || this)
 
-@log_info = (o) -> log_msg("INFO", arguments)
-@log_warn = (o) -> log_msg("WARN", arguments)
-@log_error = (o) -> log_msg("ERROR", arguments)
-@log_debug = (o) ->
+root.log_info = (o) -> log_msg("INFO", arguments)
+root.log_warn = (o) -> log_msg("WARN", arguments)
+root.log_error = (o) -> log_msg("ERROR", arguments)
+root.log_debug = (o) ->
     log_msg("DEBUG", arguments) if window.debug?
 
 # Our internal log allowing a log type
@@ -33,7 +35,7 @@ html_warning = """
     </div>
     """
 
-@setup_nav_bar = () ->
+root.setup_nav_bar = () ->
     #about = $(require("../templates/about.hbs")(version: degust_version))
     #$('#about-modal').replaceWith(about)
     $("a.log-link").click(() -> $('.log-list').toggle())
@@ -41,7 +43,7 @@ html_warning = """
     #window.debug ?= get_url_vars()["debug"]
 
 # Display a popup warning, or fill in a warning box if using IE
-@add_browser_warning = () ->
+root.add_browser_warning = () ->
     if window.navigator.userAgent.indexOf("MSIE ")>=0
         outer = $('.browser-warning-outer')
         if outer.length==0
@@ -50,10 +52,9 @@ html_warning = """
             outer = $('.browser-warning-outer')
         outer.append(html_warning)
 
-@get_url_params = () ->
+root.get_url_params = () ->
     hash = window.location.search
     hash.substring(1)               # remove '?'
-
 
 # ------------------------------------------------------------
 # SVG Downloading
@@ -107,5 +108,5 @@ class SVG
           .attr("href-lang", "image/svg+xml")
           .attr("href", "data:image/svg+xml;base64,\n" + btoa(html))
 
-@download_svg = SVG.download_svg
+root.download_svg = SVG.download_svg
 # ------------------------------------------------------------
