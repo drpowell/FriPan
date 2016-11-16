@@ -5,16 +5,15 @@ FriPan is a web-based tool for exploring the pan-genome of multiple bacterial ge
 
 ## Installation
 
-Ensure you have CoffeeScript >= 1.4 & browserify installed:
+Ensure you have browserify installed:
 
-    npm install -g coffee-script
     npm install -g browserify
 
 Install the code and build
 
     git clone https://github.com/drpowell/FriPan
     cd FriPan
-    npm install webworkify
+    npm install webworkify coffeeify
     make compile
 
 Run the demo code:
