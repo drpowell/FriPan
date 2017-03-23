@@ -151,7 +151,8 @@ class ScatterPlot
 
     highlight: (cls) ->
         elem = @svg.select(".dot.#{cls}")
-        @svg_overlay[0][0].appendChild(elem[0][0].cloneNode(true))
+        if elem.node()
+            @svg_overlay.node().appendChild(elem.node().cloneNode(true))
 
     unhighlight: () ->
         @svg_overlay.html('')
