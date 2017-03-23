@@ -152,6 +152,10 @@ class GeneMatrix
         )
         res
 
+    # Return the gene names for the strain by idx
+    get_genes_for_strain_pos: (pos) ->
+        @_values[@_strain_pos[pos]].slice(0)
+
     # Set the given strain id to be first in the list
     set_first: (strain_id) ->
         idx = @_strain_pos.indexOf(strain_id)

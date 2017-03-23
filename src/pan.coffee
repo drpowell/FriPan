@@ -409,7 +409,7 @@ class Pan
                     .attr('x', (p) -> p.x)
                     .attr('width', (p) => @bw*p.len)
 
-        row.transition()
+        row #.transition()
            .attr('transform', (s) => "translate(0,#{s.pos * @bh})")
 
     show_strain_info: (s) ->
@@ -533,7 +533,16 @@ class Pan
         @create_elems()
         @draw_chart()
 
-        @matrix.on('order_changed', () => @redraw())
+        @matrix.on('order_changed', () =>
+            sel = $('select#gene-order option:selected').val()
+            # Order of the strains has changed.
+            # If we are ordering genes by the first strain, reorder genes too
+            # otherwise just redraw
+            if (sel == '1st')
+                @reorder_genes(sel)
+            else
+                @redraw()
+        )
 
         @mdsDimension = 1
         @mdsBarGraph = new Plot.BarGraph(
@@ -611,14 +620,26 @@ class Pan
         )
 
         $('select#gene-order').on('change', (e) =>
-            order = $('option:selected',e.target).data('order')
-            @matrix.set_gene_order(order)
-            @clear_boxes()
-            @redraw()
+            sel = $('option:selected',e.target).val()
+            @reorder_genes(sel)
         )
 
         @sort_order = $('select#strain-sort option:selected').val()
         @reorder()
+
+    reorder_genes: (sel) ->
+        if sel == 'none'
+            order = @matrix.genes()
+        else if sel == '1st'
+            order = @matrix.get_genes_for_strain_pos(0) # Take the first row
+                           .filter((n) -> !!n)          # Remove null names
+                           .map((n) -> n.split(',')[0]) # First name for paralogs
+                           .sort()
+        else
+            order = $('option:selected',e.target).data('order')
+        @matrix.set_gene_order(order)
+        @clear_boxes()
+        @redraw()
 
     make_colour_legend: (scale, fld) ->
         vals = scale.domain().sort()
