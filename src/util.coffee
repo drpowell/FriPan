@@ -16,7 +16,7 @@ root.log_debug = (o) ->
 log_msg = (msg,rest) ->
     args = Array.prototype.slice.call(rest)
     r = [msg].concat(args)
-    window.our_log.apply(window, r)
+    root.our_log.apply(window, r)
 
     return if msg=='DEBUG'
 
