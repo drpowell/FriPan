@@ -642,7 +642,7 @@ class Pan
         @redraw()
 
     make_colour_legend: (scale, fld) ->
-        vals = scale.domain().sort()
+        vals = scale.domain().sort((a,b) -> a.localeCompare(b, [], {numeric: true}))
         elem = d3.select('#colour-legend')
         elem.html('')
         return if vals.length==0
