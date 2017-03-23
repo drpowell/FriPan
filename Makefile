@@ -30,9 +30,6 @@ demo: compile
 install: demo
 	@echo "### Installing to $(INSTALLDIR) ###"
 	$(MKDIR) -p $(INSTALLDIR)
-	$(CP) -r lib/ *.js pan.* $(INSTALLDIR)
+	$(CP) -r build.js pan.* $(INSTALLDIR)
 	@echo "### URL ###"
 	@echo "http://$(HOSTNAME)/~$(USER)/fripan/pan.html"
-	
-	
-	
