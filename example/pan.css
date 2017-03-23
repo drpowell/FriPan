@@ -9,17 +9,24 @@ body {
 }
 
 .hdr {
-  background-color: #333;
+  background-color: #ddd;
   margin: 0;
   margin-bottom: 5px;
 
+}
+
+.hdr svg {
+    width: 90px;
+    height: 100%;
+    float: left;
 }
 
 .hdr .title {
   font-size: 32px;
   font-weight: bold;
   margin-left: 20px;
-  color: #ddd;
+  color: #333;
+  display: inline-block;
 }
 
 #topinfo {
@@ -122,6 +129,7 @@ svg {
   text-align: right
 }
 
+#dialog-message { display: none; }
 /* ------------------------------------------------------------ */
 
 
@@ -230,13 +238,14 @@ svg.dendrogram {
 .log-list .warn { color: yellow; }
 .log-list .info { color: blue; }
 
-.log-link { 
-    opacity: 0.4; 
+.log-link, .about-link {
+    opacity: 0.4;
     font-size: 18px;
     display: inline;
     float: right;
-    color: #eee;
+    color: #333;
     margin-top: 9px;
+    padding-right: 10px;
 }
 
 /*  ****************************************************/
