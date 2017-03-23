@@ -26,6 +26,7 @@ demo: compile
 	@echo "### Copying .example files ###"
 	$(CP) pan.descriptions.example pan.descriptions
 	$(CP) pan.proteinortho.example pan.proteinortho
+	$(CP) pan.strains.example pan.strains
 
 install: demo
 	@echo "### Installing to $(INSTALLDIR) ###"
