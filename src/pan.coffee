@@ -750,7 +750,8 @@ parse_proteinortho = (tsv) ->
     for row in tsv
         i += 1
         if i==1
-            strains = d3.keys(row)[3..] # skip first 3 junk columns
+            strains = d3.keys(row)
+                        .filter((s) -> ['# Species','Genes', 'Alg.-Conn.'].indexOf(s)<0)  # skip 3 junk columns
                         .map((s) -> {name: s})
         genes.push( {name:"cluster#{i}", desc:""} )
         values.push( strains.map( (s) -> if row[s.name]=='*' then null else row[s.name]) )
