@@ -1,3 +1,12 @@
+.logo {
+    float: left;
+    width: 350px;
+    height: 100%;
+    margin-left: 100px;
+    border: none;
+    box-shadow: none;
+}
+
 .screenshot {
   float: right;
   width: 350px;
@@ -6,22 +15,34 @@
   box-shadow: none;
 }
 
+#header_wrap {
+    background: #ddd;
+}
+
+#main_title {
+    color: #333;
+    font-weight: 700;
+    font-size: 42px;
+}
+
+#main_tagline {
+    color: #333;
+    font-weight: 300;
+    font-size: 24px;
+}
+
 a.link-big { font-size: 32px; }
 
 #html-example { font-size: 12px; }
 
 .fork-me {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
+    position: absolute;
+    top: 0;
+    left: 0;
     border: 0;
     width: inherit;
     border: none;
     padding: 0;
     margin: 0;
     box-shadow: none;
-}
-
-img.logo {
-  width: auto;
 }
