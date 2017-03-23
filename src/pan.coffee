@@ -88,6 +88,8 @@ class MDSHandler
     reorder: () ->
         if @last_comp? && @sort_enabled
             comp = @last_comp
+            if @sort_enabled=='once'
+                @sort_enabled = false
             # Callback to reorder rows.  Do it occasionally, otherwise very disconcerting
             window.clearTimeout(@background_runner)
             @background_runner = window.setTimeout(() =>
@@ -701,8 +703,10 @@ class Pan
         @dendrogram.redraw()
 
     reorder: () ->
-        if @sort_order=='mds'
+        if @sort_order=='mds-dyn'
             @mds.enable_sort(true)
+        else if @sort_order=='mds'
+            @mds.enable_sort('once')
         else
             @mds.enable_sort(false)
             fld = @sort_order

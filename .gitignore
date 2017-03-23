@@ -10,3 +10,4 @@ tree.js
 mds.js
 *.map
 node_modules/
+build.js
