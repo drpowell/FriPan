@@ -3,6 +3,7 @@ Util = require('./util.coffee')
 GeneMatrix = require('./gene-matrix.coffee')
 Tree = require('./tree.coffee')
 Plot = require('./mds-plot.coffee')
+LogoSVG = require('./FriPan-logo.svg.js')
 
 # A worker that will only compute new values if the web worker is not busy
 # and the parameters have changed
@@ -880,10 +881,25 @@ setup_download = (sel) ->
     d3.selectAll(".svg-download")
           .on("mousedown", (e) -> Util.download_svg(d3.event.target))
 
+setup_about = () ->
+    $("a.about-link").click(() ->
+        $( "#dialog-message" ).dialog(
+            modal: true
+            width: 500
+            buttons:
+                Ok: () -> $( this ).dialog( "close" )
+        )
+    )
+    $( "#dialog-message" ).prepend(LogoSVG)
+
+
+
 init = () ->
     document.title = "FriPan : #{get_stem()}"
+    $(".hdr").prepend(LogoSVG)
     $(".hdr .title").append("<span class='title'>: #{get_stem()}</span>")
     Util.setup_nav_bar()
+    setup_about()
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
