@@ -4,6 +4,9 @@ GeneMatrix = require('./gene-matrix.coffee')
 Tree = require('./tree.coffee')
 Plot = require('./mds-plot.coffee')
 
+
+dendrogram2 = null
+
 # A worker that will only compute new values if the web worker is not busy
 # and the parameters have changed
 class LatestWorker
@@ -137,6 +140,7 @@ class DendrogramWrapper
                         )
 
         @widget.draw(@typ, @tree, strain_info)
+        dendrogram2.draw('horz', @tree)
         #console.log "Dendrogram: distance=#{t2-t1}ms tree=#{t3-t2}ms draw=#{t4-t3}ms"
 
 
@@ -445,6 +449,25 @@ class Pan
         lbls.transition()
             .attr('y', (s) => (s.pos+1)*@bh-1)   # i+1 as TEXT is from baseline not top
         # TODO: set font size to be same as row height?
+
+    draw_label_tree: (elem) ->
+        node2line = (n) -> [{x:n.children[0].dist, y:n.children[0].y},
+                            {x:n.dist, y:n.children[0].y},
+                            {x:n.dist, y:n.children[1].y},
+                            {x:n.children[1].dist, y:n.children[1].y}]
+
+        mk_line = d3.svg.line()
+                  .x((d) -> x(d.x))
+                  .y((d) -> y(d.y))
+                  #.interpolate("basis")
+
+        elem.selectAll('path.link')
+            .data(nodes)
+            .enter()
+            .append('path')
+              .attr('class', (d) -> 'link '+d.name)
+              .attr("stroke", (d) -> d.colour)
+              .attr('d', (d) -> mk_line(node2line(d)))
 
     hide_gaps: () ->
         @gene_gaps.selectAll('line.gene-gap').remove()

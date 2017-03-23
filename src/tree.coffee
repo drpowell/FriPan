@@ -72,14 +72,15 @@ class TreeBuilder
 
 class Dendrogram
     constructor: (@opts) ->
-        @opts.width ||= 500
-        @opts.height ||= 500
-        @opts.label_width ||= 180
-        @opts.h_pad ||= 20
-        @opts.w_pad ||= 10
-        @opts.axis_height = 10
-        @opts.label_pad ||= 5
-        @opts.radius ||= 150
+        @opts.width ?= 500
+        @opts.height ?= 500
+        @opts.label_width ?= 180
+        @opts.h_pad ?= 20
+        @opts.w_pad ?= 10
+        @opts.axis_height ?= 10
+        @opts.label_pad ?= 5
+        @opts.radius ?= 150
+        @opts.enable_zoom ?= true
         @opts.callback = {}
         ['mouseover','mouseout'].forEach((s) =>
             @opts.callback[s] = @opts[s])
@@ -93,7 +94,9 @@ class Dendrogram
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("viewBox", "0 0 #{@opts.width} #{@opts.height} ")
-            .call(zoom)
+
+        if (@opts.enable_zoom)
+            @svg.call(zoom)
 
         # Create a full size rect to capture zoom events not otherwise on an element
         @svg.append("rect")
@@ -153,7 +156,7 @@ class Dendrogram
     #             value is an object like:  {text: "leaf label", colour: "leaf colour"}
     #             This object will also be passed back on 'mouseover' events
     draw: (typ, builder, node_info={}) ->
-        typ ||= 'horz'
+        typ ?= 'horz'
         if typ=='horz'
             @draw_horz(builder, node_info)
         else if typ=='radial'

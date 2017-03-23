@@ -230,8 +230,8 @@ svg.dendrogram {
 .log-list .warn { color: yellow; }
 .log-list .info { color: blue; }
 
-.log-link { 
-    opacity: 0.4; 
+.log-link {
+    opacity: 0.4;
     font-size: 18px;
     display: inline;
     float: right;
