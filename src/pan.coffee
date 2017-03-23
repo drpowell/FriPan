@@ -496,6 +496,7 @@ class Pan
 
         @draw_boxes(@focus)
         @draw_labels(@labels)
+        @re_colour()
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
@@ -531,7 +532,6 @@ class Pan
 
         @vscale = 1.0
         @create_elems()
-        @draw_chart()
 
         @matrix.on('order_changed', () =>
             sel = $('select#gene-order option:selected').val()
@@ -625,6 +625,7 @@ class Pan
         )
 
         @sort_order = $('select#strain-sort option:selected').val()
+        @draw_chart()
         @reorder()
 
     reorder_genes: (sel) ->
