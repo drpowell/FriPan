@@ -631,7 +631,7 @@ class Pan
 
     reorder_genes: (sel) ->
         if sel == 'none'
-            order = @matrix.genes()
+            order = []  # default order is from input file
         else if sel == '1st'
             order = @matrix.get_genes_for_strain_pos(0) # Take the first row
                            .filter((n) -> !!n)          # Remove null names
