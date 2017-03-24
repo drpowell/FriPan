@@ -113,7 +113,8 @@ While developing code, it is useful to enable coffee in "watch" mode and with so
 make debug
 ```
 
-##Issues
+## Issues
+
 Report feedback, suggestions and bugs on the [Issues page](https://github.com/drpowell/FriPan/issues)
 
 ## Source
@@ -121,7 +122,7 @@ Report feedback, suggestions and bugs on the [Issues page](https://github.com/dr
 * Github: https://github.com/drpowell/FriPan
 * Website: http://drpowell.github.io/FriPan/
 
-##Authors
+## Authors
 
 * [David Powell](https://twitter.com/d_r_powell)
 * [Torsten Seemann](https://twitter.com/torstenseemann)
