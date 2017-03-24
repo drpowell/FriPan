@@ -4,7 +4,7 @@ Interactive visualization of bacterial pan-genomes
 
 ## Introduction
 
-<img align="right" width="10%" src="fripan.png">
+<img align="right" width="20%" src="fripan.png">
 FriPan is a web-based tool for exploring the pan-genome of multiple
 bacterial genomes.  FriPan does not perform the ortholog clustering itself,
 but it can import data from ProteinOrtho5 output files.  Each isolate/strain
