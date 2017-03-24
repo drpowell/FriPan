@@ -54,11 +54,11 @@ An example set of input files with the stem `test` is provided:
 
 ### XXX.proteinortho
 
-This is the gene presence/absence matrix in TSV format.
-Each row is a gene ortholog cluster, and each column in a strain.  
-Each cell in the matrix is gene ID, or `*` if none.
-Paralogs are CSV within the cell. The first 3 columns are unused,
-but you must use **the exact** names as below.
+This is the gene presence/absence matrix in TSV format. Each row
+is a gene ortholog cluster, and each column in a strain. Each
+cell in the matrix is gene ID, or `*` if none. Paralogs are CSV within
+the cell. The first 3 columns are unused, but you must
+use **the exact** names as below.
 
 ```
 # Species   Genes   Alg.-Conn.   USA300    TW20      JKD6159
