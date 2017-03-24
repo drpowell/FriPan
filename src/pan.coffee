@@ -786,6 +786,30 @@ parse_proteinortho = (tsv) ->
     new GeneMatrix( strains, genes, d3.transpose(values) )
 
 # ------------------------------------------------------------
+# Load a Roary output file
+parse_roary = (csv) ->
+    info_cols = ["Gene","Non-unique Gene name","Annotation","No. isolates","No. sequences",
+                 "Avg sequences per isolate","Genome Fragment","Order within Fragment","Accessory Fragment",
+                 "Accessory Order with Fragment","QC","Min group size nuc","Max group size nuc","Avg group size nuc"
+                ]
+    strains = []
+    values = []
+    genes = []
+    i=0
+    for row in csv
+        i += 1
+        if i==1
+            strains = d3.keys(row)
+                        .filter((s) -> info_cols.indexOf(s)<0)  # skip 3 junk columns
+                        .map((s) -> {name: s})
+        gene = {name:"cluster#{i}", desc:""}
+        info_cols.forEach((i) -> gene[i] = row[i])
+        genes.push(gene)
+        values.push( strains.map( (s) -> if row[s.name]=='' then null else row[s.name]) )
+
+    new GeneMatrix( strains, genes, d3.transpose(values) )
+
+# ------------------------------------------------------------
 #
 get_stem = () ->
     Util.get_url_params() || 'test'
@@ -906,6 +930,23 @@ setup_about = () ->
     )
     $( "#dialog-message" ).prepend(LogoSVG)
 
+load_rest = (matrix) ->
+    strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
+    #console.log "Features : ",matrix.genes()
+    #console.log "Strains : ",matrix.strains()
+
+    load_json(matrix)
+    load_strains(strains)
+
+    d3.select("#topinfo")
+      .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")
+
+    pan = new Pan('#chart', matrix, strains)
+
+    $( window ).resize(() -> pan.resize())
+
+    setup_download(".svg_download")
+
 
 init = () ->
     document.title = "FriPan : #{get_stem()}"
@@ -917,27 +958,22 @@ init = () ->
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
-        if !data?
-            $('#chart').text("Unable to load : #{url}")
-            return
-        $('#chart').html('')
-        matrix = parse_proteinortho(data)
-
-        strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
-        #console.log "Features : ",matrix.genes()
-        #console.log "Strains : ",matrix.strains()
-
-        load_json(matrix)
-        load_strains(strains)
-
-        d3.select("#topinfo")
-          .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")
-
-        pan = new Pan('#chart', matrix, strains)
-
-        $( window ).resize(() -> pan.resize())
-
-        setup_download(".svg_download")
+        if data?
+            $('#chart').html('')
+            matrix = parse_proteinortho(data)
+            load_rest(matrix)
+        else
+            url = "#{get_stem()}.roary"
+            Util.log_info "No proteinortho, trying : #{url}"
+            d3.csv(url, (data) ->
+                if data?
+                    $('#chart').html('')
+                    matrix = parse_roary(data)
+                    load_rest(matrix)
+                else
+                    Util.log_error "No data file found"
+                    $('#chart').text("Unable to load : #{url}")
+            )
     )
 
 $(document).ready(() -> Util.add_browser_warning() ; init() )
