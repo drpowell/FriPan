@@ -217,6 +217,38 @@ svg.dendrogram {
     padding: 5px 20px;
 }
 
+/* Index message panel ****************************************************/
+
+.index-list ul {
+    padding-left: 5px;
+}
+
+.index-list li:hover {
+    background-color: #eee;
+}
+
+.index-list li {
+    list-style: none;
+    display: block;
+    margin-top: 2px;
+}
+
+.index-list {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 60px;
+
+    border: thin solid black;
+    background: #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    z-index: 99;
+    max-height: 600px;
+    overflow: scroll;
+    font-size: 20px
+}
+
 /* Log message panel ****************************************************/
 
 .log-list {
@@ -238,7 +270,7 @@ svg.dendrogram {
 .log-list .warn { color: yellow; }
 .log-list .info { color: blue; }
 
-.log-link, .about-link {
+.log-link, .about-link, .index-link {
     opacity: 0.4;
     font-size: 18px;
     display: inline;
