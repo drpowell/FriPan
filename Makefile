@@ -1,5 +1,8 @@
 
 INSTALLDIR:=$(HOME)/public_html/fripan
+export PATH := ./node_modules/.bin/:$(PATH)
+SHELL := /bin/bash
+
 
 CP:=cp -f
 MKDIR:=mkdir
