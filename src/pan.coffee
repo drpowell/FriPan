@@ -788,7 +788,7 @@ parse_proteinortho = (tsv) ->
 # ------------------------------------------------------------
 #
 get_stem = () ->
-    Util.get_url_params() || 'pan'
+    Util.get_url_params() || 'test'
 
 process_gene_order = (matrix, json) ->
     strains = d3.keys(json).sort()
