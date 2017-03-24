@@ -42,14 +42,21 @@ body {
   float: right;
 }
 
+.right-opt-panel {
+    margin-left: 20px;
+}
+
 .columns {
-  margin-right: 240px;
+  /*margin-right: 240px;*/
   height: 390px;
+  display: flex;
 }
 
 .columns .column {
-  width: 48%;
+  /*width: 48%;*/
   height: 100%;
+  flex-grow: 1;
+  flex-basis: 0;
 }
 
 .option {
