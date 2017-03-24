@@ -812,7 +812,7 @@ parse_roary = (csv) ->
 # ------------------------------------------------------------
 #
 get_stem = () ->
-    Util.get_url_params() || 'test'
+    Util.get_url_params() || 'pan'
 
 process_gene_order = (matrix, json) ->
     strains = d3.keys(json).sort()
