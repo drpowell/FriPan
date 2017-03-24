@@ -30,6 +30,6 @@ debug:
 install: compile
 	@echo "### Installing to $(INSTALLDIR) ###"
 	$(MKDIR) -p $(INSTALLDIR)
-	$(CP) build.js pan.css pan.html index.html test.{proteinortho,strains,descriptions} $(INSTALLDIR)
+	$(CP) build.js pan.css pan.html pan.index index.html test.{proteinortho,strains,descriptions} $(INSTALLDIR)
 	@echo "### URL ###"
 	@echo "http://$(HOSTNAME)/~$(USER)/fripan/pan.html?test"

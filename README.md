@@ -106,6 +106,10 @@ just give each of them a different stem, say `mypop`. Then you just
 append `?mypop` to the URL, so it looks like 
 `http://example.com/~user/fripan/pan.html?mypop`.
 
+To simplify this, just add each stem to the file called `pan.index`.
+This will allow them to be selected via the `Index` menu item within
+the application.
+
 ## Development
 
 While developing code, it is useful to enable coffee in "watch" mode and with source maps.  Run the following:
