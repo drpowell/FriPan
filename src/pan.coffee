@@ -876,6 +876,20 @@ class StrainInfo
             else
                 for c in @columns
                     s[c] = row[c]
+load_index = () ->
+    d3.text('pan.index', (err, data) ->
+        $("a.index-link").click(() -> $('.index-list').toggle())
+        if (err)
+            Util.log_info("No pan.index.  Skipping index list...")
+            d3.select(".index-list ul").html("Create a pan.index file")
+        else
+            d3.select(".index-list ul")
+              .selectAll("li")
+              .data(data.split("\n").filter((str) -> str.length > 0))
+              .enter()
+                .append("li")
+                .html((str) -> "<A HREF='?#{str}'>#{str}</A>")
+    )
 
 setup_download = (sel) ->
     d3.selectAll(".svg-download")
@@ -893,13 +907,13 @@ setup_about = () ->
     $( "#dialog-message" ).prepend(LogoSVG)
 
 
-
 init = () ->
     document.title = "FriPan : #{get_stem()}"
     $(".hdr").prepend(LogoSVG)
     $(".hdr .title").append("<span class='title'>: #{get_stem()}</span>")
     Util.setup_nav_bar()
     setup_about()
+    load_index()
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->

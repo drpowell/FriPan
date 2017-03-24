@@ -14,6 +14,7 @@
 
   <div class='hdr'>
     <div class='title'>FriPan</div>
+    <a class="index-link" href="#">Index</a>
     <a class="about-link" href="#">About</a>
     <a class="log-link" href="#">Logs</a>
     <div class='title' id='topinfo'></div>
@@ -23,59 +24,12 @@
     <h4>Log messages</h4>
   </div>
 
+  <div class='index-list'>
+      <h4>Index of FriPans</h4>
+      <ul></ul>
+  </div>
+
   <div class='container'>
-
-    <div class="right">
-      <a class='svg-download' href='#' data-for='#mds-bargraph svg'>Download</a>
-      <div id="mds-bargraph"></div>
-
-      <div class="option">
-        <div>
-          <label for="dendrogram-type">Dendrogram:</label>
-          <select id="dendrogram-type">
-            <option value="radial">Radial</option>
-            <option value="horz">Horizontal</option>
-          </select>
-        </div>
-        <div>
-          <label>Vertical scale</label>
-          <input id="vscale" type='text' value=1.0 size=5></input>
-        </div>
-        <div>
-          <label for='strain-sort'>Strain sort:</label>
-          <select id='strain-sort'>
-              <option value="mds">MDS dim 1</option>
-              <option value="mds-dyn">MDS (dynamic)</option>
-              <option value="fixed">Input order</option>
-          </select>
-        </div>
-        <div>
-          <label for="strain-colour">Strain colour:</label>
-          <select id="strain-colour">
-            <option value="none">None</option>
-          </select>
-          <select id="strain-colour-scheme">
-            <option value="raw">Raw</option>
-            <option value="cat10" selected>Cat 10</option>
-            <option value="cat20a">Cat 20a</option>
-            <option value="cat20b">Cat 20b</option>
-            <option value="cat20c">Cat 20c</option>
-          </select>
-        </div>
-        <div>
-          <label for="gene-order">Gene order:</label>
-          <select id="gene-order">
-              <option value="none">Input order</option>
-              <option value="1st">By first strain</option>
-          </select>
-        </div>
-        <div>
-          <label for='search'>Gene search:</label>
-          <input id='search' />
-        </div>
-      </div>
-      <div id='colour-legend'></div>
-    </div> <!-- .right -->
 
     <div class='columns'>
       <div class='column'>
@@ -88,6 +42,59 @@
         <div id='mds-thinking'>THINKING...</div>
         <div id='mds'></div>
       </div>
+
+      <!-- Options panel on the right -->
+      <div class="right-opt-panel">
+        <a class='svg-download' href='#' data-for='#mds-bargraph svg'>Download</a>
+        <div id="mds-bargraph"></div>
+
+        <div class="option">
+          <div>
+            <label for="dendrogram-type">Dendrogram:</label>
+            <select id="dendrogram-type">
+              <option value="radial">Radial</option>
+              <option value="horz">Horizontal</option>
+            </select>
+          </div>
+          <div>
+            <label>Vertical scale</label>
+            <input id="vscale" type='text' value=1.0 size=5></input>
+          </div>
+          <div>
+            <label for='strain-sort'>Strain sort:</label>
+            <select id='strain-sort'>
+                <option value="mds">MDS dim 1</option>
+                <option value="mds-dyn">MDS (dynamic)</option>
+                <option value="fixed">Input order</option>
+            </select>
+          </div>
+          <div>
+            <label for="strain-colour">Strain colour:</label>
+            <select id="strain-colour">
+              <option value="none">None</option>
+            </select>
+            <select id="strain-colour-scheme">
+              <option value="raw">Raw</option>
+              <option value="cat10" selected>Cat 10</option>
+              <option value="cat20a">Cat 20a</option>
+              <option value="cat20b">Cat 20b</option>
+              <option value="cat20c">Cat 20c</option>
+            </select>
+          </div>
+          <div>
+            <label for="gene-order">Gene order:</label>
+            <select id="gene-order">
+                <option value="none">Input order</option>
+                <option value="1st">By first strain</option>
+            </select>
+          </div>
+          <div>
+            <label for='search'>Gene search:</label>
+            <input id='search' />
+          </div>
+        </div>
+        <div id='colour-legend'></div>
+      </div> <!-- .right -->
     </div>
 
     <div id='chart'>
