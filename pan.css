@@ -9,17 +9,24 @@ body {
 }
 
 .hdr {
-  background-color: #333;
+  background-color: #ddd;
   margin: 0;
   margin-bottom: 5px;
 
+}
+
+.hdr svg {
+    width: 90px;
+    height: 100%;
+    float: left;
 }
 
 .hdr .title {
   font-size: 32px;
   font-weight: bold;
   margin-left: 20px;
-  color: #ddd;
+  color: #333;
+  display: inline-block;
 }
 
 #topinfo {
@@ -35,14 +42,21 @@ body {
   float: right;
 }
 
+.right-opt-panel {
+    margin-left: 20px;
+}
+
 .columns {
-  margin-right: 240px;
+  /*margin-right: 240px;*/
   height: 390px;
+  display: flex;
 }
 
 .columns .column {
-  width: 48%;
+  /*width: 48%;*/
   height: 100%;
+  flex-grow: 1;
+  flex-basis: 0;
 }
 
 .option {
@@ -63,7 +77,17 @@ body {
 
 
 #colour-legend .title { font-weight: bold; }
-#colour-legend .box {float: left; height: 10px; width: 10px; margin: 3px;}
+#colour-legend .box {
+    float: left;
+    height: 10px;
+    width: 10px;
+    margin: 3px;
+}
+
+#colour-legend {
+    max-height: 100px;
+    overflow: scroll;
+}
 
 .ui-menu-item { font-size: 9pt; }
 
@@ -122,6 +146,7 @@ svg {
   text-align: right
 }
 
+#dialog-message { display: none; }
 /* ------------------------------------------------------------ */
 
 
@@ -209,6 +234,38 @@ svg.dendrogram {
     padding: 5px 20px;
 }
 
+/* Index message panel ****************************************************/
+
+.index-list ul {
+    padding-left: 5px;
+}
+
+.index-list li:hover {
+    background-color: #eee;
+}
+
+.index-list li {
+    list-style: none;
+    display: block;
+    margin-top: 2px;
+}
+
+.index-list {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 60px;
+
+    border: thin solid black;
+    background: #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    z-index: 99;
+    max-height: 600px;
+    overflow: scroll;
+    font-size: 20px
+}
+
 /* Log message panel ****************************************************/
 
 .log-list {
@@ -230,13 +287,14 @@ svg.dendrogram {
 .log-list .warn { color: yellow; }
 .log-list .info { color: blue; }
 
-.log-link {
+.log-link, .about-link, .index-link {
     opacity: 0.4;
     font-size: 18px;
     display: inline;
     float: right;
-    color: #eee;
+    color: #333;
     margin-top: 9px;
+    padding-right: 10px;
 }
 
 /*  ****************************************************/

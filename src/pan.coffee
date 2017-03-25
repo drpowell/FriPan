@@ -3,6 +3,7 @@ Util = require('./util.coffee')
 GeneMatrix = require('./gene-matrix.coffee')
 Tree = require('./tree.coffee')
 Plot = require('./mds-plot.coffee')
+LogoSVG = require('./FriPan-logo.svg.js')
 
 
 dendrogram2 = null
@@ -91,6 +92,8 @@ class MDSHandler
     reorder: () ->
         if @last_comp? && @sort_enabled
             comp = @last_comp
+            if @sort_enabled=='once'
+                @sort_enabled = false
             # Callback to reorder rows.  Do it occasionally, otherwise very disconcerting
             window.clearTimeout(@background_runner)
             @background_runner = window.setTimeout(() =>
@@ -411,7 +414,7 @@ class Pan
                     .attr('x', (p) -> p.x)
                     .attr('width', (p) => @bw*p.len)
 
-        row.transition()
+        row #.transition()
            .attr('transform', (s) => "translate(0,#{s.pos * @bh})")
 
     show_strain_info: (s) ->
@@ -517,6 +520,7 @@ class Pan
 
         @draw_boxes(@focus)
         @draw_labels(@labels)
+        @re_colour()
 
     draw_chart: () ->
         @x2.domain([0, @matrix.genes().length])
@@ -552,9 +556,17 @@ class Pan
 
         @vscale = 1.0
         @create_elems()
-        @draw_chart()
 
-        @matrix.on('order_changed', () => @redraw())
+        @matrix.on('order_changed', () =>
+            sel = $('select#gene-order option:selected').val()
+            # Order of the strains has changed.
+            # If we are ordering genes by the first strain, reorder genes too
+            # otherwise just redraw
+            if (sel == '1st')
+                @reorder_genes(sel)
+            else
+                @redraw()
+        )
 
         @mdsDimension = 1
         @mdsBarGraph = new Plot.BarGraph(
@@ -632,17 +644,30 @@ class Pan
         )
 
         $('select#gene-order').on('change', (e) =>
-            order = $('option:selected',e.target).data('order')
-            @matrix.set_gene_order(order)
-            @clear_boxes()
-            @redraw()
+            sel = $('option:selected',e.target).val()
+            @reorder_genes(sel)
         )
 
         @sort_order = $('select#strain-sort option:selected').val()
+        @draw_chart()
         @reorder()
 
+    reorder_genes: (sel) ->
+        if sel == 'none'
+            order = []  # default order is from input file
+        else if sel == '1st'
+            order = @matrix.get_genes_for_strain_pos(0) # Take the first row
+                           .filter((n) -> !!n)          # Remove null names
+                           .map((n) -> n.split(',')[0]) # First name for paralogs
+                           .sort()
+        else
+            order = $('option:selected',e.target).data('order')
+        @matrix.set_gene_order(order)
+        @clear_boxes()
+        @redraw()
+
     make_colour_legend: (scale, fld) ->
-        vals = scale.domain().sort()
+        vals = scale.domain().sort((a,b) -> a.localeCompare(b, [], {numeric: true}))
         elem = d3.select('#colour-legend')
         elem.html('')
         return if vals.length==0
@@ -724,8 +749,10 @@ class Pan
         @dendrogram.redraw()
 
     reorder: () ->
-        if @sort_order=='mds'
+        if @sort_order=='mds-dyn'
             @mds.enable_sort(true)
+        else if @sort_order=='mds'
+            @mds.enable_sort('once')
         else
             @mds.enable_sort(false)
             fld = @sort_order
@@ -773,10 +800,35 @@ parse_proteinortho = (tsv) ->
     for row in tsv
         i += 1
         if i==1
-            strains = d3.keys(row)[3..] # skip first 3 junk columns
+            strains = d3.keys(row)
+                        .filter((s) -> ['# Species','Genes', 'Alg.-Conn.'].indexOf(s)<0)  # skip 3 junk columns
                         .map((s) -> {name: s})
         genes.push( {name:"cluster#{i}", desc:""} )
         values.push( strains.map( (s) -> if row[s.name]=='*' then null else row[s.name]) )
+
+    new GeneMatrix( strains, genes, d3.transpose(values) )
+
+# ------------------------------------------------------------
+# Load a Roary output file
+parse_roary = (csv) ->
+    info_cols = ["Gene","Non-unique Gene name","Annotation","No. isolates","No. sequences",
+                 "Avg sequences per isolate","Genome Fragment","Order within Fragment","Accessory Fragment",
+                 "Accessory Order with Fragment","QC","Min group size nuc","Max group size nuc","Avg group size nuc"
+                ]
+    strains = []
+    values = []
+    genes = []
+    i=0
+    for row in csv
+        i += 1
+        if i==1
+            strains = d3.keys(row)
+                        .filter((s) -> info_cols.indexOf(s)<0)  # skip 3 junk columns
+                        .map((s) -> {name: s})
+        gene = {name:"cluster#{i}", desc:""}
+        info_cols.forEach((i) -> gene[i] = row[i])
+        genes.push(gene)
+        values.push( strains.map( (s) -> if row[s.name]=='' then null else row[s.name]) )
 
     new GeneMatrix( strains, genes, d3.transpose(values) )
 
@@ -871,39 +923,80 @@ class StrainInfo
             else
                 for c in @columns
                     s[c] = row[c]
+load_index = () ->
+    d3.text('pan.index', (err, data) ->
+        $("a.index-link").click(() -> $('.index-list').toggle())
+        if (err)
+            Util.log_info("No pan.index.  Skipping index list...")
+            d3.select(".index-list ul").html("Create a pan.index file")
+        else
+            d3.select(".index-list ul")
+              .selectAll("li")
+              .data(data.split("\n").filter((str) -> str.length > 0))
+              .enter()
+                .append("li")
+                .html((str) -> "<A HREF='?#{str}'>#{str}</A>")
+    )
 
 setup_download = (sel) ->
     d3.selectAll(".svg-download")
           .on("mousedown", (e) -> Util.download_svg(d3.event.target))
 
+setup_about = () ->
+    $("a.about-link").click(() ->
+        $( "#dialog-message" ).dialog(
+            modal: true
+            width: 500
+            buttons:
+                Ok: () -> $( this ).dialog( "close" )
+        )
+    )
+    $( "#dialog-message" ).prepend(LogoSVG)
+
+load_rest = (matrix) ->
+    strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
+    #console.log "Features : ",matrix.genes()
+    #console.log "Strains : ",matrix.strains()
+
+    load_json(matrix)
+    load_strains(strains)
+
+    d3.select("#topinfo")
+      .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")
+
+    pan = new Pan('#chart', matrix, strains)
+
+    $( window ).resize(() -> pan.resize())
+
+    setup_download(".svg_download")
+
+
 init = () ->
     document.title = "FriPan : #{get_stem()}"
+    $(".hdr").prepend(LogoSVG)
     $(".hdr .title").append("<span class='title'>: #{get_stem()}</span>")
     Util.setup_nav_bar()
+    setup_about()
+    load_index()
 
     url = "#{get_stem()}.proteinortho"
     d3.tsv(url, (data) ->
-        if !data?
-            $('#chart').text("Unable to load : #{url}")
-            return
-        $('#chart').html('')
-        matrix = parse_proteinortho(data)
-
-        strains = new StrainInfo(matrix.strains().map((s) -> {name:s.name, id:s.id}))
-        #console.log "Features : ",matrix.genes()
-        #console.log "Strains : ",matrix.strains()
-
-        load_json(matrix)
-        load_strains(strains)
-
-        d3.select("#topinfo")
-          .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")
-
-        pan = new Pan('#chart', matrix, strains)
-
-        $( window ).resize(() -> pan.resize())
-
-        setup_download(".svg_download")
+        if data?
+            $('#chart').html('')
+            matrix = parse_proteinortho(data)
+            load_rest(matrix)
+        else
+            url = "#{get_stem()}.roary"
+            Util.log_info "No proteinortho, trying : #{url}"
+            d3.csv(url, (data) ->
+                if data?
+                    $('#chart').html('')
+                    matrix = parse_roary(data)
+                    load_rest(matrix)
+                else
+                    Util.log_error "No data file found"
+                    $('#chart').text("Unable to load : #{url}")
+            )
     )
 
 $(document).ready(() -> Util.add_browser_warning() ; init() )

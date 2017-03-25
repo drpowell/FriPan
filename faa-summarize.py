@@ -25,6 +25,9 @@ for fname in sys.argv[1:]:
                 # Part of the sequence, increment the length
                 if gene is not None:
                     gene['length'] += len(l.rstrip('*\n'))
+        if gene is not None:
+            strain.append(gene)
+
     result[fname] = strain
 
 print json.dumps({'gene_order':result})

@@ -1,0 +1,14 @@
+ID	Order	Country	Year	Colour
+NC_004829	1	USA	2016	blue
+NC_017502	2	USA	2016	blue
+NC_017503	3	USA	2015	darkblue
+NC_018406	4	UK	2015	green
+NC_018407	5	UK	2015	green
+NC_018408	6	NZ	2014	purple
+NC_018409	7	NZ	2016	indigo
+NC_018410	8	Australia	2017	gray
+NC_018411	9	Australia	2016	gray
+NC_018412	10	NZ	2015	mauve
+NC_018413	11	Australia	2016	LightGray
+NC_023030	12	Canada	2013	red
+

@@ -10,6 +10,8 @@
   "description": "Interactive, web tool for exploring pan-genome of bacterial strains",
   "readme": "README.md",
   "dependencies": {
+    "browserify": "",
+    "watchify": "",
     "coffeeify": "2.x",
     "webworkify": "1.x"
   },
