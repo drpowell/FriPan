@@ -105,6 +105,7 @@ class SVG
         wrapper.appendChild(node)
         html = wrapper.innerHTML
         d3.select(e)
+          .attr('target', "_blank")
           .attr("href-lang", "image/svg+xml")
           .attr("href", "data:image/svg+xml;base64,\n" + btoa(html))
 
