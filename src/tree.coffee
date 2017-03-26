@@ -157,14 +157,14 @@ class Dendrogram
     #             This object will also be passed back on 'mouseover' events
     draw: (typ, builder, node_info={}) ->
         typ ?= 'horz'
-        if typ=='horz'
-            @draw_horz(builder, node_info)
+        if typ=='horz' || typ=='diag'
+            @draw_horz(builder, node_info, typ)
         else if typ=='radial'
             @draw_radial(builder, node_info)
         else
             log_error("Unknown dendrogram type",typ)
 
-    draw_horz: (builder, node_info) ->
+    draw_horz: (builder, node_info, typ) ->
         @clear()
         [root, nodes, leaves] = @_prep_tree(builder)
         @_attach_colours(root, node_info)
@@ -179,15 +179,26 @@ class Dendrogram
         g = @g.append("g")
                 .attr("transform","translate(#{@opts.w_pad},#{@opts.h_pad+@opts.axis_height})")
 
-        node2line = (n) -> [{x:n.children[0].dist, y:n.children[0].y},
-                            {x:n.dist, y:n.children[0].y},
-                            {x:n.dist, y:n.children[1].y},
-                            {x:n.children[1].dist, y:n.children[1].y}]
+        node2line_horz = (n) ->
+            res = []
+            for c in n.children
+                res.push({x:n.dist, y:c.y})
+                res.push({x:c.dist, y:c.y})
+                res.push({x:n.dist, y:c.y})
+            res
+
+        node2line_diag = (n) ->
+            res = []
+            for c,i in n.children
+                res.push({x:n.dist, y:n.y})
+                res.push({x:c.dist, y:c.y})
+            res
+
+        node2line = if typ=='diag' then node2line_diag else node2line_horz
 
         mk_line = d3.svg.line()
                   .x((d) -> x(d.x))
                   .y((d) -> y(d.y))
-                  #.interpolate("basis")
 
         # Draw the dendrogram
         g.selectAll('path.link')
