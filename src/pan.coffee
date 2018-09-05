@@ -278,6 +278,7 @@ class Pan
         $('select#strain-colour-scheme').on('change', (e) => @re_colour())
 
         $('select#strain-sort').on('change', (e) =>
+            dat = $("option:selected",e.target).data()
             @sort_order = $(e.target).val()
             @reorder()
         )
@@ -394,16 +395,20 @@ class Pan
         @dendrogram.redraw()
 
     reorder: () ->
-        if @sort_order=='mds-dyn'
+        if @sort_order=='_mds-dyn'
             @mds.enable_sort(true)
-        else if @sort_order=='mds'
+        else if @sort_order=='_mds'
             @mds.enable_sort('once')
+        else if @sort_order=='_tree'
+            @mds.enable_sort(false)
+            tree = $('select#strain-sort option:selected').data()
+            @panChart.show_tree(tree)
         else
             @mds.enable_sort(false)
             fld = @sort_order
             strains = @strains.as_array()
 
-            if fld=='fixed'
+            if fld=='_fixed'
                 strains.sort((a,b) -> a.id - b.id)
             else
                 strains.sort((a,b) -> a[fld].localeCompare(b[fld], [], {numeric: true}))
