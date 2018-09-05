@@ -110,7 +110,9 @@ class PanChart
     create_elems: () ->
         tot_width = $(@elem).width()
         tot_height = @bh * @matrix.strains().length + 200
-        margin = {top: 150, right: 10, bottom: 10, left: 240}
+        @tree_width = if @tree_newick? then 240 else 100
+
+        margin = {top: 150, right: 10, bottom: 10, left: @tree_width}
         margin2 = {top: 30, right: margin.right, bottom: tot_height - 100, left: margin.left}
         @width = tot_width - margin.left - margin.right
         @height = tot_height - margin.top - margin.bottom
@@ -213,10 +215,8 @@ class PanChart
                       .append("g")
                        .attr('class','label-scale')
                        .attr("transform", "scale(1,#{@vscale})")
-        @labels.attr('display','none')
 
         # set up tree area
-        @tree_width = margin.left
         @tree = @svg.append("g")
                      .attr("transform", "translate(0,#{margin.top})")
                     .append("g")
@@ -240,9 +240,10 @@ class PanChart
     redraw: () ->
         @draw_boxes(@mini)
         @draw_boxes(@focus)
-        @draw_labels(@labels)
         if @tree_newick?
             @draw_tree(@tree, @tree_newick)
+        else
+            @draw_labels(@labels)
 
     # Collapse the 'off' regions in a set of boxes with x and len
     collapse_off: (strain_id) ->
@@ -316,6 +317,7 @@ class PanChart
 
     set_tree: (tree) ->
         @tree_newick = tree
+        @resize()
         @draw_tree(@tree, @tree_newick)
 
     _set_node_y_pos: (node) ->

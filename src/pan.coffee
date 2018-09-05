@@ -613,13 +613,13 @@ load_index = () ->
     )
 
 load_tree = () ->
-    $('#show-newick').hide()
+    $('#show-newick').parent().hide()
     d3.text("#{get_stem()}.tree", (data) ->
         return if !data?
         tree = new Newick.Newick(data)
         Util.log_info("Loaded tree :\n#{tree.top.to_string()}")
 
-        $('#show-newick').show()
+        $('#show-newick').parent().show()
         $('#show-newick').data(tree)
         $('#show-newick').prop('checked', true)
         $("#show-newick").trigger("change")
