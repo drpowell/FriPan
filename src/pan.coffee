@@ -319,6 +319,16 @@ class Pan
                 @panChart.set_tree(tree)
         )
 
+        # Use proportional genes plotting
+        if @matrix._genes[0].len?
+            $('#gene-width').removeAttr('disabled')
+        else
+            $('#gene-width').attr('disabled','true')
+        $('#gene-width').on('change', (e) =>
+            checked = e.target.checked
+            @panChart.set_proportional(checked)
+        )
+
         @sort_order = $('select#strain-sort option:selected').val()
         @panChart.draw_chart()
         @reorder()

@@ -17,6 +17,25 @@ class GeneMatrix
         # Create a default strain ordering
         @set_strain_order( @_strains.map((s) -> s.id) )
 
+        @_genes.forEach((g) ->
+            v = g["Avg group size nuc"]
+            if v?
+                g.len = +v
+        )
+
+    set_proportional: (val) ->
+        if !val
+            @_genes.forEach((g,i) => g.pos = i)
+        else
+            @_genes.forEach((g,i) =>
+                if (i==0)
+                    g.pos=0
+                else
+                    g.pos = @_genes[i-1].pos + @_genes[i-1].len
+            )
+            last_gene = @_genes[@_genes.length-1]
+            @pan_genome_length = last_gene.pos + last_gene.len
+
     # Convert GeneMatrix to a hash (for transport to a web-worker)
     as_hash: () ->
         {strains: @_strains, genes: @_genes, values: @_values, desc: @_desc}

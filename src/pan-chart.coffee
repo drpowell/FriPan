@@ -7,6 +7,7 @@ class PanChart
         # block width and height, one block per gene per species
         @bw = 1
         @bh = 10
+        @proportional_width = false
 
         @vscale = 1.0
         @create_elems()
@@ -32,10 +33,17 @@ class PanChart
             @opts.brushed(ex)
 
         # Draw or hide the gene gaps depending on the scale
-        if diff<=300
+        threshold = if @proportional_width then 100000 else 300
+        if diff<=threshold
             @draw_gaps(ex)
         else
             @hide_gaps()
+
+    # Plot by gene width?
+    set_proportional: (val) ->
+        @proportional_width = val
+        @matrix.set_proportional(val)
+        @resize()
 
     set_vscale: (val) ->
         if val>0 && val<2
@@ -54,8 +62,34 @@ class PanChart
                                                    scale(#{sc},#{@vscale})")
         @svg.selectAll(".label-scale").attr("transform", "scale(1,#{@vscale})")
 
+    genome_width: () ->
+        if @proportional_width
+            @matrix.pan_genome_length
+        else
+            @matrix.genes().length
+
+    # Binary search for gene as "pos"
+    find_gene_for_pos: (pos) ->
+        genes = @matrix.genes_by_pos()
+        if !@proportional_width
+            # Simple lookup
+            return genes[pos]
+
+        # Need to do binary search to find gene for this position
+        lo=0
+        hi=genes.length-1
+        while lo<=hi
+            mid = Math.floor((lo+hi)/2)
+            if pos < genes[mid].pos
+                hi=mid-1
+            else if pos > genes[mid].pos+genes[mid].len
+                lo=mid+1
+            else
+                return genes[mid]
+        return null
+
     reset_scale: () ->
-        @_set_scale(0,@width/(@bw*@matrix.genes().length))
+        @_set_scale(0,@width/(@bw*@genome_width()))
 
     detail_off: () ->
         @tooltip.style("display", "none")
@@ -79,7 +113,7 @@ class PanChart
         row = Math.floor(y/@bh)
         col = Math.floor(x/@bw)
         strain_id = @matrix.strain_pos_to_id(row)
-        gene = @matrix.genes_by_pos()[col]
+        gene = @find_gene_for_pos(col)
         return if !gene? || !strain_id?
 
         strain = @matrix.strains()[strain_id]
@@ -100,8 +134,14 @@ class PanChart
                  <tr><th>Desc:<td>#{desc}
                  <tr><th>Strains with gene:<td>#{num_present} of #{@matrix.strains().length}
                  <tr><th>Pos:<td>#{gene.pos}
-                 </table>
-                """
+                 """
+        if (gene["Avg group size nuc"])
+            avg=gene["Avg group size nuc"]
+            min=gene["Min group size nuc"]
+            max=gene["Max group size nuc"]
+            txt += "<tr><th>Gene size:<td>#{avg}bp (#{min} - #{max})"
+
+        txt += "</table>"
         @tooltip.style("display", "block") # un-hide it (display: none <=> block)
                 .select("#tooltip-text")
                   .html(txt)
@@ -174,7 +214,7 @@ class PanChart
         @mini = @context.append("g")
                         .attr("class", "minimap")
                         .attr("transform","translate(0,0)
-                                           scale(#{@width/(@bw*@matrix.genes().length)},
+                                           scale(#{@width/(@bw*@genome_width())},
                                            #{@height2/(@bh*@matrix.strains().length)})")
 
         # Add the pointer arrow
@@ -183,7 +223,7 @@ class PanChart
                .attr("transform", "translate(0,0)")
                .attr("display","none")
              .append("g")
-               .attr("transform", "scale(#{0.5*(@bw*@matrix.genes().length)/@width},
+               .attr("transform", "scale(#{0.5*(@bw*@genome_width())/@width},
                                          #{0.5*(@bh*@matrix.strains().length)/@height2})")
              .append('line')
                .attr('class','pointer')
@@ -227,7 +267,7 @@ class PanChart
         @tooltip = d3.select("#tooltip")
 
     draw_chart: () ->
-        @x2.domain([0, @matrix.genes().length])
+        @x2.domain([0, @genome_width()])
 
         #xAxis2.tickFormat((d) -> genes[d])
         @context.select(".x.axis").call(@xAxis2)
@@ -253,7 +293,7 @@ class PanChart
             if !p
                 if last_p
                     res.push({x:g.pos, len: 0})
-                res[res.length-1].len += 1
+                res[res.length-1].len += if @proportional_width then g.len else 1
             last_p = p
         )
         res
@@ -277,7 +317,7 @@ class PanChart
         # Each row has a <rect> for 'on'
         ngs.append('rect')
                    .attr('class','on')
-                   .attr('width', @bw*@matrix.genes().length)
+                   .attr('width', @bw*@genome_width())
                    .attr('height',@bh-1)
         # Then a bunch of <rect> for collapsed 'off'
         ngs.selectAll('rect.off')
@@ -407,6 +447,7 @@ class PanChart
         col = @gene_gaps.selectAll('line.gene-gap')
                         .data(in_range, ((g) -> g.pos))
         col.exit().remove()
+        stroke_width = if @proportional_width then 1 else 0.1
         col.enter()
             .append('line')
             .attr('class','gene-gap')
@@ -415,7 +456,7 @@ class PanChart
             .attr('y1',0)
             .attr('y2',@bh * @matrix.strains().length)
             .style('stroke','white')
-            .style('stroke-width','0.1')
+            .style('stroke-width',stroke_width)
 
 
     _hide_gene_pointer: () ->
