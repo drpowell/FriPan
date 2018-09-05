@@ -4,10 +4,9 @@ GeneMatrix = require('./gene-matrix.coffee')
 Tree = require('./tree.coffee')
 Plot = require('./mds-plot.coffee')
 PanChart = require('./pan-chart.coffee')
+Newick = require('./newick.coffee')
 LogoSVG = require('./FriPan-logo.svg.js')
 
-
-dendrogram2 = null
 
 # A worker that will only compute new values if the web worker is not busy
 # and the parameters have changed
@@ -582,6 +581,21 @@ load_index = () ->
                 .html((str) -> "<A HREF='?#{str}'>#{str}</A>")
     )
 
+load_tree = () ->
+    d3.text("#{get_stem()}.tree", (data) ->
+        return if !data?
+        tree = new Newick.Newick(data)
+        Util.log_info("Loaded tree :\n#{tree.top.to_string()}")
+
+        # Add a separator to the "select" groups
+        $('select#strain-sort').append("<option disabled>──────────</option>")
+
+        # Add a selector for each column of strain info
+        opt = $("<option value='_tree'>Tree</option>")
+        $('select#strain-sort').append(opt)
+        opt.data(tree)
+    )
+
 setup_download = (sel) ->
     d3.selectAll(".svg-download")
           .on("mousedown", (e) -> Util.download_svg(d3.event.target))
@@ -604,6 +618,7 @@ load_rest = (matrix) ->
 
     load_json(matrix)
     load_strains(strains)
+    load_tree()
 
     d3.select("#topinfo")
       .html("<b>Strains</b>: #{matrix.strains().length}  <b>gene clusters</b>:#{matrix.genes().length}")

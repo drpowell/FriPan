@@ -213,6 +213,12 @@ class PanChart
                       .append("g")
                        .attr('class','label-scale')
                        .attr("transform", "scale(1,#{@vscale})")
+        # set up label area
+        @tree = @svg.append("g")
+                     .attr("transform", "translate(#{margin.left-100},#{margin.top})")
+                    .append("g")
+                     .attr('class','label-scale')
+                     .attr("transform", "scale(1,#{@vscale})")
 
         # set tooltip object
         @tooltip = d3.select("#tooltip")
@@ -299,6 +305,59 @@ class PanChart
                   .html(txt)
         @_detail_position(@tooltip)
 
+
+    ################################################################################
+    # Tree
+
+    _process_node: (node, ret_nodes) ->
+        node.dist ?= 0
+        if node.leaf()
+            strain = @matrix.strains().filter((s) -> s.name == node.name)
+            if strain.length!=1
+                Util.log_warn("Expected to find 1 strain, found : ",strain)
+                node.y = 0
+            else
+                node.y = strain[0].pos
+            ret_nodes.push(node)
+        else
+            cs = node.children.forEach((c) => @_process_node(c, ret_nodes))
+            node.y = d3.mean(d3.extent(node.children.map((c) -> c.y)))
+            ret_nodes.push(node)
+
+    show_tree: (tree) ->
+        nodes = []
+        @_process_node(tree.top, nodes)
+        console.log "tree",tree,nodes
+
+        x = (n) => 1000*n.dist
+        y = (n) => (n.y+1)*@bh
+        node2line = (n) =>
+            res = []
+            for c in n.children
+                res.push({x:x(n), y:y(c)})
+                res.push({x:x(c), y:y(c)})
+                res.push({x:x(n), y:y(c)})
+            res
+
+        mk_line = d3.svg.line()
+                    .x((d) -> d.x)
+                    .y((d) -> d.y)
+
+        # Draw the dendrogram
+        g = @tree
+        g.selectAll('path.link').remove()
+        links = g.selectAll('path.link')
+                 .data(nodes)
+        links.enter()
+             .append('path')
+              .attr('class', (d) -> 'link '+d.name)
+              .attr("stroke", (d) -> "black") # d.colour)
+              .attr('d', (d) -> mk_line(node2line(d)))
+            #   .on('mouseover', (d) => @_mouseover(node_info, d))
+            #   .on('mouseout', (d) => @_mouseout(node_info, d))
+
+    ################################################################################
+
     # Draw the strain labels
     draw_labels: (elem) ->
         lbls = elem.selectAll('text.label')
@@ -381,22 +440,6 @@ class PanChart
                 .select("#tooltip-text")
                   .html(txt)
         @_detail_position(@tooltip)
-
-    # Draw the strain labels
-    # draw_labels: (elem) ->
-    #     lbls = elem.selectAll('text.label')
-    #                .data(@matrix.strains(), (s) -> s.id)
-    #     lbls.enter()
-    #         .append('text')
-    #          .attr('class',(s) -> "label strain-#{s.id}")
-    #          .attr('text-anchor','end')
-    #          .text((s) -> s.name)
-    #          .on('click', (s) => @matrix.set_first(s.id))
-    #          .on("mouseover", (s) => @highlight(s); @show_strain_info(s))
-    #          .on("mouseout", (s) => @unhighlight(); @show_strain_info(null))
-    #     lbls.transition()
-    #         .attr('y', (s) => (s.pos+1)*@bh-1)   # i+1 as TEXT is from baseline not top
-    #     # TODO: set font size to be same as row height?
 
     hide_gaps: () ->
         @gene_gaps.selectAll('line.gene-gap').remove()
