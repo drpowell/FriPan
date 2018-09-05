@@ -105,6 +105,14 @@ class GeneMatrix
         res_desc = []
         res_pos = {}
         res_pos_desc = {}
+
+        # Check the gene "name" fields
+        for j in [0 ... @_genes.length]
+            if @_genes[j].name.indexOf(str)>=0
+                res.push({label:@_genes[j].name, value:@_genes[j], pos: j})
+                res_pos[j]=true
+
+        # Check each strain gene name, and each strain gene description
         for i in @_strain_pos
             for j in [0 ... @_values[i].length]
                 n =  @_values[i][j]
