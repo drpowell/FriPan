@@ -466,19 +466,24 @@ parse_roary = (csv) ->
     strains = []
     values = []
     genes = []
+    descriptions = {}
     i=0
     for row in csv
         i += 1
         if i==1
             strains = d3.keys(row)
-                        .filter((s) -> info_cols.indexOf(s)<0)  # skip 3 junk columns
+                        .filter((s) -> info_cols.indexOf(s)<0)  # skip non-strain columns
                         .map((s) -> {name: s})
-        gene = {name:"cluster#{i}", desc:""}
+        gene = {name:row["Gene"]}
         info_cols.forEach((i) -> gene[i] = row[i])
+        strains.forEach((s) -> descriptions[row[s.name]] = row["Annotation"])
         genes.push(gene)
         values.push( strains.map( (s) -> if row[s.name]=='' then null else row[s.name]) )
 
-    new GeneMatrix( strains, genes, d3.transpose(values) )
+    matrix = new GeneMatrix( strains, genes, d3.transpose(values) )
+    for gene,desc of descriptions
+        matrix.set_desc(gene,desc)
+    matrix
 
 # ------------------------------------------------------------
 #
@@ -495,10 +500,7 @@ process_gene_order = (matrix, json) ->
 
 load_json = (matrix) ->
     d3.json("#{get_stem()}.json", (err, json) ->
-        if (err)
-            Util.log_warn("Missing '#{get_stem()}.json', trying deprecated .descriptions file")
-            load_desc(matrix)
-        else
+        if (!err)
             process_gene_order(matrix,json.gene_order) if json.gene_order?
     )
 
@@ -662,5 +664,6 @@ init = () ->
                     $('#chart').text("Unable to load : #{url}")
             )
     )
+
 
 $(document).ready(() -> Util.add_browser_warning() ; init() )

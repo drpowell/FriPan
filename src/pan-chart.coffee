@@ -93,7 +93,7 @@ class PanChart
         num_present = @matrix.count_presence(gene.id)
         txt = """<table>
                  <tr><th>Strain:<td>#{strain.name}
-                 <tr><th>Gene (pri):<td> #{gene_name_pri}
+                 <tr><th>Gene (pri):<td> #{gene_name_pri} (#{gene.name})
                  <tr><th>Gene:<td> #{gene_name_strain}
                  <tr><th>Present:<td>#{p}
                  <tr><th>Desc (pri):<td>#{desc_pri}
