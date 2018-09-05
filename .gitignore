@@ -3,6 +3,7 @@ pan.proteinortho
 pan.strains
 pan.js
 pan.roary
+pan.tree
 mds-plot.js
 mds-worker.js
 gene-matrix.js

@@ -13,6 +13,15 @@ class Node
 class Newick
     constructor: (str) ->
         @top = @parse(str)
+        @nodes = []
+        @flatten(@top, @nodes, 0)
+
+    flatten: (node, ret_nodes, depth) ->
+        node.dist ?= 0
+        node.depth = node.dist + depth
+        if !node.leaf()
+            node.children.forEach((c) => @flatten(c, ret_nodes, node.depth))
+        ret_nodes.push(node)
 
     parse: (str) ->
         toks = str.split(/([():,;])/).filter((s) -> s.length>0)

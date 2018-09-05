@@ -294,6 +294,31 @@ class Pan
             @reorder_genes(sel)
         )
 
+        $('#show-newick').on('change', (e) =>
+            if (!e.target.checked)
+                $('#strain-sort').removeAttr('disabled')
+                @sort_order = $('select#strain-sort option:selected').val()
+                @reorder()
+                @panChart.set_tree(null)
+            else
+                $('#strain-sort').attr('disabled','true')
+                @sort_order = '_off'
+                @mds.enable_sort(false)
+                tree = $('#show-newick').data()
+
+                # Sort strains by order in newick tree
+                strain_ids = {}
+                @strains.as_array().map((s) -> strain_ids[s.name] = s.id)
+                sort_order = []
+                tree.nodes.forEach((n) ->
+                    if n.leaf()
+                        sort_order.push(strain_ids[n.name])
+                )
+                @matrix.set_strain_order(sort_order)
+
+                @panChart.set_tree(tree)
+        )
+
         @sort_order = $('select#strain-sort option:selected').val()
         @panChart.draw_chart()
         @reorder()
@@ -399,10 +424,8 @@ class Pan
             @mds.enable_sort(true)
         else if @sort_order=='_mds'
             @mds.enable_sort('once')
-        else if @sort_order=='_tree'
-            @mds.enable_sort(false)
-            tree = $('select#strain-sort option:selected').data()
-            @panChart.show_tree(tree)
+        else if @sort_order=='_off'
+            #pass
         else
             @mds.enable_sort(false)
             fld = @sort_order
@@ -528,6 +551,7 @@ load_desc = (matrix) ->
 load_strains = (strainInfo) ->
     d3.tsv("#{get_stem()}.strains", (data) ->
         return if !data?
+        data = data.filter((s) -> s.ID)   # Delete rows with no ID
         strainInfo.set_info(data)
 
         # Add a separator to the "select" groups
@@ -589,18 +613,16 @@ load_index = () ->
     )
 
 load_tree = () ->
+    $('#show-newick').hide()
     d3.text("#{get_stem()}.tree", (data) ->
         return if !data?
         tree = new Newick.Newick(data)
         Util.log_info("Loaded tree :\n#{tree.top.to_string()}")
 
-        # Add a separator to the "select" groups
-        $('select#strain-sort').append("<option disabled>──────────</option>")
-
-        # Add a selector for each column of strain info
-        opt = $("<option value='_tree'>Tree</option>")
-        $('select#strain-sort').append(opt)
-        opt.data(tree)
+        $('#show-newick').show()
+        $('#show-newick').data(tree)
+        $('#show-newick').prop('checked', true)
+        $("#show-newick").trigger("change")
     )
 
 setup_download = (sel) ->

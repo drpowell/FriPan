@@ -85,7 +85,7 @@ body {
 }
 
 #colour-legend {
-    max-height: 100px;
+    max-height: 95px;
     overflow: scroll;
 }
 
@@ -182,7 +182,7 @@ circle.brushed,text.brushed { fill: red !important; font-weight: bold; }
 }
 
 #mds-bargraph {
-  margin: 10px 0 30px 0;
+  margin: 10px 0 10px 0;
 }
 
 #mds-bargraph .bar-chart .bar { fill: steelblue; }

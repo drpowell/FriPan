@@ -110,7 +110,7 @@ class PanChart
     create_elems: () ->
         tot_width = $(@elem).width()
         tot_height = @bh * @matrix.strains().length + 200
-        margin = {top: 150, right: 10, bottom: 10, left: 140}
+        margin = {top: 150, right: 10, bottom: 10, left: 240}
         margin2 = {top: 30, right: margin.right, bottom: tot_height - 100, left: margin.left}
         @width = tot_width - margin.left - margin.right
         @height = tot_height - margin.top - margin.bottom
@@ -213,9 +213,12 @@ class PanChart
                       .append("g")
                        .attr('class','label-scale')
                        .attr("transform", "scale(1,#{@vscale})")
-        # set up label area
+        @labels.attr('display','none')
+
+        # set up tree area
+        @tree_width = margin.left
         @tree = @svg.append("g")
-                     .attr("transform", "translate(#{margin.left-100},#{margin.top})")
+                     .attr("transform", "translate(0,#{margin.top})")
                     .append("g")
                      .attr('class','label-scale')
                      .attr("transform", "scale(1,#{@vscale})")
@@ -238,6 +241,8 @@ class PanChart
         @draw_boxes(@mini)
         @draw_boxes(@focus)
         @draw_labels(@labels)
+        if @tree_newick?
+            @draw_tree(@tree, @tree_newick)
 
     # Collapse the 'off' regions in a set of boxes with x and len
     collapse_off: (strain_id) ->
@@ -309,8 +314,11 @@ class PanChart
     ################################################################################
     # Tree
 
-    _process_node: (node, ret_nodes) ->
-        node.dist ?= 0
+    set_tree: (tree) ->
+        @tree_newick = tree
+        @draw_tree(@tree, @tree_newick)
+
+    _set_node_y_pos: (node) ->
         if node.leaf()
             strain = @matrix.strains().filter((s) -> s.name == node.name)
             if strain.length!=1
@@ -318,18 +326,20 @@ class PanChart
                 node.y = 0
             else
                 node.y = strain[0].pos
-            ret_nodes.push(node)
         else
-            cs = node.children.forEach((c) => @_process_node(c, ret_nodes))
             node.y = d3.mean(d3.extent(node.children.map((c) -> c.y)))
-            ret_nodes.push(node)
 
-    show_tree: (tree) ->
-        nodes = []
-        @_process_node(tree.top, nodes)
-        console.log "tree",tree,nodes
+    draw_tree: (elem, tree_newick) ->
+        if (!tree_newick?)
+            elem.html('')
+            return
+        nodes = tree_newick.nodes
+        nodes.forEach((n) => @_set_node_y_pos(n))
+        #console.log "nodes",nodes
 
-        x = (n) => 1000*n.dist
+        max_depth = d3.max(nodes.map((n) -> n.depth))
+        depth2x = d3.scale.linear().range([0, @tree_width-80]).domain([0, max_depth])
+        x = (n) => depth2x(n.depth)
         y = (n) => (n.y+1)*@bh
         node2line = (n) =>
             res = []
@@ -339,22 +349,37 @@ class PanChart
                 res.push({x:x(n), y:y(c)})
             res
 
+        bh = @bh
         mk_line = d3.svg.line()
                     .x((d) -> d.x)
-                    .y((d) -> d.y)
+                    .y((d) -> d.y - bh/2)
 
         # Draw the dendrogram
-        g = @tree
-        g.selectAll('path.link').remove()
+        g = elem
         links = g.selectAll('path.link')
-                 .data(nodes)
+                 .data(nodes.filter((n) -> !n.leaf()))
+        links.exit().remove()
         links.enter()
              .append('path')
-              .attr('class', (d) -> 'link '+d.name)
+              .attr('class', 'link')
               .attr("stroke", (d) -> "black") # d.colour)
               .attr('d', (d) -> mk_line(node2line(d)))
             #   .on('mouseover', (d) => @_mouseover(node_info, d))
             #   .on('mouseout', (d) => @_mouseout(node_info, d))
+
+        lbls = g.selectAll('text.label')
+                .data(nodes.filter((n) -> n.children.length==0), (n) -> n.name)
+        lbls.exit().remove()
+        lbls.enter()
+            .append('text')
+             .attr('class', (n) => s=@strains.find_strain_by_name(n.name); "label strain-#{s.id}")
+             .attr('text-anchor','start')
+             .text((n) -> n.name)
+             .on("mouseover", (n) => s=@strains.find_strain_by_name(n.name); @highlight(s); @show_strain_info(s))
+             .on("mouseout", () => @unhighlight(); @show_strain_info(null))
+        lbls.transition()
+             .attr('y', (n) -> y(n) - 2)
+             .attr('x', (n) -> x(n))
 
     ################################################################################
 
@@ -426,7 +451,6 @@ class PanChart
             @tooltip.style("display", "none")
             return
         info = @strains.find_strain_by_name(s.name)
-        window.xx = info
         str = ""
         for k,v of info
             if k not in ['id','name']
