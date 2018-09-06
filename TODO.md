@@ -1,13 +1,12 @@
 
-* Remove protein_ortho, *.descriptions
-    * Load from *.roary, *.strains, Optional newick tree
-* Gene order by a specific strain lexigraphic gene order
-    * Or, gene order by roary input order
+* newick tree have labels to the right.  Dotted lines
 
-* Load optional newick tree
-* Render newick tree beside strains
-
-* Pull-down to select which metadata columns to display in botton
-* Proportional gene size rendering? (size in roary)
+* Pull-down to select which metadata columns to display in bottom
 
 * stick in analytics.js
+
+* Move opts to the left
+
+* Opts settings in URL for state
+
+* Colouring stay of resizes

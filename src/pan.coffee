@@ -261,10 +261,9 @@ class Pan
         @dendrogram.update(null)
 
         @_init_search()
-        $('input#vscale').on('keyup', (e) =>
-            str = $(e.target).val()
-            val = parseFloat(str)
-            @panChart.set_vscale(val)
+        $('input#vscale').on('input', (e) =>
+            val = $(e.target).val()
+            @panChart.set_vscale(+val/100)
         )
 
         if (colorbrewer?)
