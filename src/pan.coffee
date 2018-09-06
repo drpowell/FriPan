@@ -574,6 +574,8 @@ load_strains = (strainInfo) ->
             opt = "<option value=\"#{c}\">#{c}</option>"
             $('select#strain-sort').append(opt)
             $('select#strain-colour').append(opt)
+            $('select#metadata-show').append(opt)
+        $("#metadata-show").chosen({width: '70%'})
     )
 
 class StrainInfo
