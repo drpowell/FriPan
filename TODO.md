@@ -8,6 +8,9 @@
 * Render newick tree beside strains
 
 * Pull-down to select which metadata columns to display in botton
+
+* Display each metadata item as a column between the tree and the pan-panel
+
 * Proportional gene size rendering? (size in roary)
 
 * stick in analytics.js
