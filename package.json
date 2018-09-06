@@ -20,5 +20,8 @@
     "genomics",
     "microbiology",
     "bacteria"
-  ]
+  ],
+  "devDependencies": {
+    "browserify-css": "^0.14.0"
+  }
 }

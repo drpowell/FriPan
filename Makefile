@@ -21,11 +21,11 @@ help:
 	
 compile:
 	@echo "### Compiling src/*.coffee to build.js ###"
-	browserify -t coffeeify src/main.coffee -o build.js
+	browserify -t coffeeify -t browserify-css src/main.coffee -o build.js
 
 debug:
 	@echo "### Compiling src/*.coffee to build.js [DEBUG] ###"
-	watchify -v --debug -t coffeeify src/main.coffee -o build.js
+	watchify -v --debug -t coffeeify -t browserify-css src/main.coffee -o build.js
 	
 install: compile
 	@echo "### Installing to $(INSTALLDIR) ###"

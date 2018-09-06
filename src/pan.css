@@ -42,8 +42,8 @@ body {
   float: right;
 }
 
-.right-opt-panel {
-    margin-left: 20px;
+.opt-panel {
+    margin-right: 20px;
 }
 
 .columns {
@@ -151,7 +151,7 @@ svg {
 
 
 #chart {
-//  background: lightgray;
+/*  background: lightgray; */
 }
 
 .gene-row rect.on  { fill: green; }
@@ -298,3 +298,6 @@ svg.dendrogram {
 }
 
 /*  ****************************************************/
+.chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+  height: auto;
+}

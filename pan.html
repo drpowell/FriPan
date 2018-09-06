@@ -4,9 +4,6 @@
 
   <meta charset="utf-8" />
 
-  <link rel="stylesheet" type="text/css" href="pan.css">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-
   <script type="text/javascript" src="build.js"></script>
 </head>
 
@@ -32,19 +29,9 @@
   <div class='container'>
 
     <div class='columns'>
-      <div class='column'>
-        <a class='svg-download' href='#' data-for='#dendrogram svg'>Download</a>
-        <div id='dendrogram-thinking'>THINKING...</div>
-        <div id='dendrogram'></div>
-      </div>
-      <div class='column'>
-        <a class='svg-download' href='#' data-for='#mds svg.main'>Download</a>
-        <div id='mds-thinking'>THINKING...</div>
-        <div id='mds'></div>
-      </div>
 
-      <!-- Options panel on the right -->
-      <div class="right-opt-panel">
+      <!-- Options panel  -->
+      <div class="opt-panel">
         <a class='svg-download' href='#' data-for='#mds-bargraph svg'>Download</a>
         <div id="mds-bargraph"></div>
 
@@ -100,12 +87,29 @@
             </select>
           </div>
           <div>
+            <label for="metadata-show">Columns</label>
+            <select multiple id='metadata-show'>
+            </select>
+          </div>
+          <div>
             <label for='search'>Gene search:</label>
             <input id='search' />
           </div>
         </div>
         <div id='colour-legend'></div>
       </div> <!-- .right -->
+
+      <div class='column'>
+        <a class='svg-download' href='#' data-for='#mds svg.main'>Download</a>
+        <div id='mds-thinking'>THINKING...</div>
+        <div id='mds'></div>
+      </div>
+      <div class='column'>
+        <a class='svg-download' href='#' data-for='#dendrogram svg'>Download</a>
+        <div id='dendrogram-thinking'>THINKING...</div>
+        <div id='dendrogram'></div>
+      </div>
+
     </div>
 
     <div id='chart'>
