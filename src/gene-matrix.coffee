@@ -5,6 +5,7 @@ class GeneMatrix
     #          for not-present.  Otherwise may use a per-gene name.  Should be in the same order as "_genes"
     #
     # _desc - hash of gene descriptions.  Keyed on gene name
+    # _genes_by_pos - current gene order
     constructor: (@_strains, @_genes, @_values) ->
         # Give both genes and strains ids.
         @_strains.forEach((s,i) -> s.id = s.pos = i)
@@ -22,19 +23,26 @@ class GeneMatrix
             if v?
                 g.len = +v
         )
+        @_genes_by_pos = @_genes
+        @set_proportional(false)
 
     set_proportional: (val) ->
-        if !val
-            @_genes.forEach((g,i) => g.pos = i)
+        @proportional = val
+        @_set_gene_positions(@_genes_by_pos)
+
+    _set_gene_positions: (genes) ->
+        if !@proportional
+            genes.forEach((g,i) => g.pos = i)
         else
-            @_genes.forEach((g,i) =>
+            genes.forEach((g,i) =>
                 if (i==0)
                     g.pos=0
                 else
-                    g.pos = @_genes[i-1].pos + @_genes[i-1].len
+                    g.pos = genes[i-1].pos + genes[i-1].len
             )
-            last_gene = @_genes[@_genes.length-1]
+            last_gene = genes[genes.length-1]
             @pan_genome_length = last_gene.pos + last_gene.len
+
 
     # Convert GeneMatrix to a hash (for transport to a web-worker)
     as_hash: () ->
@@ -75,34 +83,31 @@ class GeneMatrix
         @_genes
 
     genes_by_pos: () ->
-        if !@_genes_by_pos?
-            @_genes_by_pos = @_genes.slice()
-            @_genes_by_pos.sort((g1,g2) -> g1.pos - g2.pos)
         @_genes_by_pos
 
     # Set the order of genes.  Takes an array of gene names
     set_gene_order: (gene_names) ->
         console.log "Ordering genes.  Genes specified:#{gene_names.length}"
         # First reset all positions, then set the known ones, and fill in the rest
-        @_genes.forEach((g) -> g.pos=-1)
-        new_pos=0
+        gene_added={}
+        genes_ordered = []
         gene_names.forEach((n) =>
             id = @_gene_name_id[n]
             if !id?
                 console.log "Unable to find gene '#{n}'"
             else
                 # Set the gene position if it hasn't already been set
-                gene = @_genes[id]
-                if gene.pos<0
-                    gene.pos = new_pos
-                    new_pos += 1
+                if !(id of gene_added)
+                    gene_added[id]=1
+                    genes_ordered.push(@_genes[id])
         )
         @_genes.forEach((g) ->
-            if g.pos<0
-                g.pos = new_pos
-                new_pos += 1
+            if !(g.id of gene_added)
+                gene_added[g.id]=1
+                genes_ordered.push(g)
         )
-        @_genes_by_pos=null
+        @_genes_by_pos = genes_ordered
+        @_set_gene_positions(@_genes_by_pos)
 
     # is the given gene present in the given strain
     presence: (strain_id, gene_id) ->
