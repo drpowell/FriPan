@@ -97,17 +97,22 @@ class SVG
         node = svg_elem.node().cloneNode(true)
         SVG.copyStyleDeep(svg_elem, d3.select(node))
 
-        d3.select(node)
-          .attr("version", 1.1)
-          .attr("xmlns", "http://www.w3.org/2000/svg")
+        doctype = '<?xml version="1.0" standalone="no"?>' +
+                  '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+        # serialize our SVG XML to a string.
+        source = (new XMLSerializer()).serializeToString(node)
 
-        wrapper = document.createElement('div')
-        wrapper.appendChild(node)
-        html = wrapper.innerHTML
-        d3.select(e)
-          .attr('target', "_blank")
-          .attr("href-lang", "image/svg+xml")
-          .attr("href", "data:image/svg+xml;base64,\n" + btoa(html))
+        # create a file blob of our SVG.
+        blob = new Blob([ doctype + source], { type: 'image/svg+xml;charset=utf-8' })
+
+        url = window.URL.createObjectURL(blob)
+
+        downloadLink = document.createElement("a")
+        downloadLink.href = url
+        downloadLink.download = d3.select(e).attr('data-name') + ".svg"
+        document.body.appendChild(downloadLink)
+        downloadLink.click()
+        document.body.removeChild(downloadLink)
 
 root.download_svg = SVG.download_svg
 # ------------------------------------------------------------
