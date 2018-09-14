@@ -183,6 +183,10 @@ make debug
 
 Report feedback, suggestions and bugs on the [Issues page](https://github.com/drpowell/FriPan/issues)
 
+## License
+
+[MIT](https://raw.githubusercontent.com/drpowell/FriPan/master/LICENSE)
+
 ## Source
 
 * Github: https://github.com/drpowell/FriPan
