@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/drpowell/FriPan.svg?branch=master)](https://travis-ci.org/drpowell/FriPan)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![Language: Javascript](https://img.shields.io/badge/Language-Javascript-steelblue.svg)
+
 # FriPan
 
 Interactive visualization of bacterial pan-genomes
