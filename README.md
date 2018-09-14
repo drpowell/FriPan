@@ -8,21 +8,19 @@ Interactive visualization of bacterial pan-genomes
 
 ## Introduction
 
-<img align="right" width="20%" src="fripan.png">
+<img align="right" width="25%" src="fripan.png">
 FriPan is a web-based tool for exploring the pan-genome of multiple
 bacterial genomes.  FriPan does not perform the ortholog clustering itself,
-but it can import data from ProteinOrtho5 output files.  Each isolate/strain
-is a row, and there is a columnar position for each gene cluster.  You can
-zoom/scroll through the pan-proteome, and hover over sections to see a
-description of the gene.
+but it can load the output of [Roary](http://sanger-pathogens.github.io/Roary/) 
+directly. Each genome is a row, and there is a columnar position for each gene cluster.  
 
 ## Installation
 
 Ensure you have `npm` installed:
 ```
-brew install npm          # MacOS
-sudo apt-get install npm  # Debian/Ubuntu
-sudo yum install npm      # Redhat/Centos
+brew install npm          # MacOS Homebrew or Linuxbrew
+sudo apt-get install npm  # Debian/Ubuntu/Mint
+sudo yum install npm      # Redhat/Centos/Fedora
 ```
 
 Install the code and build:
@@ -47,7 +45,66 @@ already running Apache:
 make install
 firefox http://localhost/~user/fripan/pan.html
 ```
+
+## The interface
+
+<img src="fripan_panels.png" width="75%" align="center">
+
+### A : Menu bar
+
+Tells you how many isolates were loaded and how many gene clusters across
+those isolates, as well as links to error logs and software information.
+
+### B: Gene presence/absence tree
+
+This is **not** a phylogenetic tree. It is constructed from binary matrix
+of gene presence/absence for each pair of gene cluster and isolate.
+It dynamically changes depending on the selection in panel E/F.
+
+### C1: MDS plot
+
+This MDS plot is a dimensionality scaling plot (like PCA) which uses gene
+presence/absence to group isolates with similar accessory genomes. Note
+that core genome has no influence on this plot because those genes are
+present in all the isolates. This panel also dynamically updates to 
+represent the current selection in panel E/F.
     
+### C2: MDS dimensions
+
+This graph plots the percentage of the signal present in each of the MDS
+dimensions. Ideally most of the signal will be in the first 2 dimensions 
+which are shown in panel C1. You can click on any of the bars to change
+which dimensions are displayed in panel C1.
+
+### D: Display options 
+
+These options allow you to configure how the pan-genome, tree and MDS plot
+are displayed. You can re-order rows, annotate with colours etc. 
+
+### E: Pan-genome overview
+
+This panel will always show a zoomed out version of the whole pan-genome. 
+The x-axis shows the gene clusters - here we see we have just over 900
+clusters, which matches the 931 denoted in Panel A. It is possible to select
+a region of this panel to zoom in on a smaller section of the pan-genome.
+
+### F: Pan-genome
+
+This panel provides a scrollable view of the pan genome itself. 
+When zoomed in, each gene is visible as a block,
+with width approximaltely proportional to the gene length.
+Hovering over a gene will display information about that gene
+that was present in the input files.
+
+### G: Phylogenomic tree
+
+Coming soon.
+
+### H: Metadata columns
+
+Coming soon.
+
+
 ## Input files
 
 An example set of input files with the stem `test` is provided:
@@ -116,7 +173,8 @@ the application.
 
 ## Development
 
-While developing code, it is useful to enable coffee in "watch" mode and with source maps.  Run the following:
+While developing code, it is useful to enable coffee in "watch" mode and
+with source maps.  Run the following:
 ```
 make debug
 ```
