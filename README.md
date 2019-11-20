@@ -11,7 +11,7 @@ Interactive visualization of bacterial pan-genomes
 <img align="right" width="25%" src="fripan.png">
 FriPan is a web-based tool for exploring the pan-genome of multiple
 bacterial genomes.  FriPan does not perform the ortholog clustering itself,
-but it can load the output of [Roary](http://sanger-pathogens.github.io/Roary/) 
+but it can load the output of [Roary](http://sanger-pathogens.github.io/Roary/)
 directly. Each genome is a row, and there is a columnar position for each gene cluster.  
 
 ## Installation
@@ -45,6 +45,13 @@ already running Apache:
 make install
 firefox http://localhost/~user/fripan/pan.html
 ```
+
+## Using data from roary
+
+After you've run a pan-genome analysis with [roary](http://sanger-pathogens.github.io/Roary/), copy the generated `gene_presence_absence.csv` 
+file to the `FriPan` root directory and name it `some_strain.roary` (eg `ecoli.roary`).
+
+Go to `http://localhost:8030/pan.html?some_strain` (where `some_strain` is the name you chose for the file above).
 
 ## The interface
 
