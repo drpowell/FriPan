@@ -12,39 +12,35 @@ Interactive visualization of bacterial pan-genomes
 FriPan is a web-based tool for exploring the pan-genome of multiple
 bacterial genomes.  FriPan does not perform the ortholog clustering itself,
 but it can load the output of [Roary](http://sanger-pathogens.github.io/Roary/)
-directly. Each genome is a row, and there is a columnar position for each gene cluster.  
+directly. Each genome is a row, and there is a columnar position for each gene cluster.
+
+## Demo
+
+To run a demo of the built application locally:
+
+1. Change to the `dist/` directory and run a python server:
+   ```bash
+   cd dist ; python -m http.server
+   ```
+
+2. Navigate your browser to: http://localhost:8000/pan.html
 
 ## Installation
 
-Ensure you have `npm` installed:
-```
-brew install npm          # MacOS Homebrew or Linuxbrew
-sudo apt-get install npm  # Debian/Ubuntu/Mint
-sudo yum install npm      # Redhat/Centos/Fedora
+To deploy FriPan, simply copy the following built assets from the `dist/` directory to a web-accessible location on your server:
+
+* `build.js`
+* `pan.css`
+* `pan.html`
+
+## Development
+
+For development and creating a new build, use the provided `build_dist.sh` script. This uses Docker to build the application and extract the assets.
+
+```bash
+./build_dist.sh
 ```
 
-Install the code and build:
-```
-git clone https://github.com/drpowell/FriPan
-cd FriPan
-npm install
-make compile
-```
-
-Run the demo code locally using our Python-based server in `server.sh`:
-```
-./server.sh
-firefox http://localhost:8030/pan.html
-```
-
-Or make it publicly accessible using your `public_html` if your server is 
-already running Apache:
-
-```
-# will put in $HOME/public_html/fripan by default, type 'make help' to see options
-make install
-firefox http://localhost/~user/fripan/pan.html
-```
 
 ## Using data from roary
 
@@ -177,14 +173,6 @@ append `?mypop` to the URL, so it looks like
 To simplify this, just add each stem to the file called `pan.index`.
 This will allow them to be selected via the `Index` menu item within
 the application.
-
-## Development
-
-While developing code, it is useful to enable coffee in "watch" mode and
-with source maps.  Run the following:
-```
-make debug
-```
 
 ## Issues
 
