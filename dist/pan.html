@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <script type="text/javascript" src="build.js"></script>
+</head>
+
+<body>
+
+  <div class='hdr'>
+    <div class='title'>FriPan</div>
+    <a class="index-link" href="#">Index</a>
+    <a class="about-link" href="#">About</a>
+    <a class="log-link" href="#">Logs</a>
+    <div class='title' id='topinfo'></div>
+  </div>
+
+  <div class='log-list'>
+    <h4>Log messages</h4>
+  </div>
+
+  <div class='index-list'>
+      <h4>Index of FriPans</h4>
+      <ul></ul>
+  </div>
+
+  <div class='container'>
+
+    <div class='columns'>
+
+      <!-- Options panel  -->
+      <div class="opt-panel">
+        <a class='svg-download' href='#' data-name='mds-bargraph' data-for='#mds-bargraph svg'>Download</a>
+        <div id="mds-bargraph"></div>
+
+        <div class="option">
+          <div>
+            <label for="dendrogram-type">Dendrogram:</label>
+            <select id="dendrogram-type">
+              <option value="radial">Radial</option>
+              <option value="horz">Horizontal</option>
+              <option value="diag">Tree (Diag)</option>
+            </select>
+          </div>
+          <div>
+            <label>Vertical scale</label>
+            <input type="range" min="1" max="100" value="100" class="slider" id="vscale">
+          </div>
+          <div>
+            <label for='strain-sort'>Strain sort:</label>
+            <select id='strain-sort'>
+                <option value="_mds">MDS dim 1</option>
+                <option value="_mds-dyn">MDS (dynamic)</option>
+                <option value="_fixed">Input order</option>
+            </select>
+          </div>
+          <div>
+            <span style='margin-right: 30px;'>
+              <label for='show-newick'>Newick Tree</label>
+              <input id='show-newick' type='checkbox' />
+            </span>
+            <span style=''>
+              <label for='gene-width'>Gene width</label>
+              <input id='gene-width' type='checkbox' />
+            </span>
+          </div>
+          <div>
+            <label for="strain-colour">Strain colour:</label>
+            <select id="strain-colour">
+              <option value="none">None</option>
+            </select>
+            <select id="strain-colour-scheme">
+              <option value="raw">Raw</option>
+              <option value="cat10" selected>Cat 10</option>
+              <option value="cat20a">Cat 20a</option>
+              <option value="cat20b">Cat 20b</option>
+              <option value="cat20c">Cat 20c</option>
+            </select>
+          </div>
+          <div>
+            <label for="gene-order">Gene order:</label>
+            <select id="gene-order">
+                <option value="none">Input order</option>
+                <option value="1st">By first strain</option>
+            </select>
+          </div>
+          <div>
+            <label for="metadata-show">Columns</label>
+            <select multiple id='metadata-show'>
+            </select>
+          </div>
+          <div>
+            <label for='search'>Gene search:</label>
+            <input id='search' />
+          </div>
+        </div>
+        <div id='colour-legend'></div>
+      </div> <!-- .right -->
+
+      <div class='column'>
+        <a class='svg-download' href='#' data-name='mds' data-for='#mds svg.main'>Download</a>
+        <div id='mds-thinking'>THINKING...</div>
+        <div id='mds'></div>
+      </div>
+      <div class='column'>
+        <a class='svg-download' href='#' data-name='dendrogram' data-for='#dendrogram svg'>Download</a>
+        <div id='dendrogram-thinking'>THINKING...</div>
+        <div id='dendrogram'></div>
+      </div>
+
+    </div>
+
+    <div id='chart'>
+      <h3>Loading...</h3>
+    </div>
+    <a class='svg-download' href='#' data-name='chart' data-for='#chart svg'>Download</a>
+  </div>
+
+    <div id='tooltip'>
+      <div id='tooltip-text'></div>
+    </div>
+
+    <div id="dialog-message" title="FriPan About">
+        <p>
+            FriPan for visualising the pan-genome
+        </p>
+        <ul>
+            <li>Available from <a href='https://github.com/drpowell/FriPan'>GitHub</a>
+            <li>Written by <a href='https://twitter.com/d_r_powell'>David R. Powell</a> and <a href='https://twitter.com/torstenseemann'>Torsten Seemann</a>
+        </ul>
+    </div
+</body>

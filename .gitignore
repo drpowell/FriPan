@@ -2,7 +2,7 @@ pan.descriptions
 pan.proteinortho
 pan.strains
 pan.js
-pan.roary
+/pan.roary
 pan.tree
 mds-plot.js
 mds-worker.js
@@ -12,5 +12,5 @@ tree.js
 mds.js
 *.map
 node_modules/
-build.js
+/build.js
 *~
